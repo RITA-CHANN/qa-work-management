@@ -70,7 +70,7 @@ docs            Architecture, database, API, testing, Playwright and AI docs; ph
 - [traceability.md](docs/traceability.md): requirement → screen → API → design → tests
 - [decisions/](docs/decisions/README.md): architecture decisions (ADR)
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md): how the system fits together
-- [DATABASE.md](docs/DATABASE.md): schema and migrations
+- [database/](docs/database/README.md): tables, relationships, migrations; one file per table
 - [api/](docs/api/README.md): API reference, one file per endpoint
 - [TESTING.md](docs/TESTING.md): test strategy and how to run tests
 - [PLAYWRIGHT.md](docs/PLAYWRIGHT.md): learning path and **current exercise**
