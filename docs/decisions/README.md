@@ -12,3 +12,5 @@ One file per architecture decision (ADR). Phase 0 decisions D1–D13 are in the
 | [ADR-0003](ADR-0003-run-api-with-tsx.md)          | Run the API with tsx (no build step yet)                         | accepted | 1     |
 | [ADR-0004](ADR-0004-test-db-migrate-deploy.md)    | Test DB is prepared with prisma migrate deploy + idempotent seed | accepted | 1     |
 | [ADR-0005](ADR-0005-separate-playwright-ports.md) | Playwright uses separate ports (API 3100, web 5174)              | accepted | 1     |
+| [ADR-0006](ADR-0006-server-side-sessions.md)      | Server-side sessions with a hashed token in an HttpOnly cookie   | proposed | 2     |
+| [ADR-0007](ADR-0007-password-hashing.md)          | Hash passwords with argon2id via @node-rs/argon2                 | proposed | 2     |

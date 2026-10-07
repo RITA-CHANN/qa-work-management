@@ -25,6 +25,40 @@ Conventions:
 - Primary keys are `cuid` strings; human-readable keys (`BUG-7`) arrive with each entity.
 - Timestamps are `timestamp(3)` in UTC.
 
+## Phase 2: Authentication
+
+Planned in [phases/phase-2-plan.md](phases/phase-2-plan.md); how the API uses these tables is in
+[DD-AUTH-01](design/detail/logic/DD-AUTH-01-session.md). Migration name: `add_auth`.
+
+| Table      | Column          | Type           | Null | Notes                                                        |
+| ---------- | --------------- | -------------- | ---- | ------------------------------------------------------------ |
+| `users`    | `password_hash` | text           | yes  | argon2id hash (BR-AUTH-12). Null means the user can't log in |
+| `sessions` | `id_hash`       | text, PK       | no   | SHA-256 (hex) of the token in the cookie (BR-AUTH-15)        |
+| `sessions` | `user_id`       | text, FK users | no   | `ON DELETE CASCADE`; index on `user_id`                      |
+| `sessions` | `expires_at`    | timestamp(3)   | no   | login time + `SESSION_TTL_HOURS` (BR-AUTH-05)                |
+| `sessions` | `created_at`    | timestamp(3)   | no   | default `now()`                                              |
+
+```mermaid
+erDiagram
+    users ||--o{ sessions : has
+    users {
+        text id PK
+        text email UK
+        text name
+        GlobalRole global_role
+        text password_hash
+    }
+    sessions {
+        text id_hash PK
+        text user_id FK
+        timestamp expires_at
+        timestamp created_at
+    }
+```
+
+Seed: every seed user gets the password `Password123!` (dev and test only). Phase 2 also adds
+`ratelimit@qawm.test` (Rate Limit, USER), used only by rate-limit tests.
+
 ## Migrations
 
 ```bash

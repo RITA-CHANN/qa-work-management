@@ -49,12 +49,16 @@ async function walk(dir, ext) {
 }
 
 // Minimal front matter parser: `key: value`, `key: [a, b]` and one level of nesting.
+// Prettier wraps long `[a, b]` lists over several lines, so those are joined back into one line first.
 function parseFrontMatter(text) {
   const match = text.match(/^---\n([\s\S]*?)\n---\n/);
   if (!match) return null;
+  const body = match[1]
+    .replace(/\[[^\]]*\]/g, (list) => list.replace(/\s*\n\s*/g, ' '))
+    .replace(/:[ \t]*\n\s*\[/g, ': [');
   const data = {};
   let parent = null;
-  for (const raw of match[1].split('\n')) {
+  for (const raw of body.split('\n')) {
     const line = raw.replace(/\s+#.*$/, '');
     if (!line.trim()) continue;
     const kv = line.match(/^(\s*)([\w-]+):\s*(.*)$/);

@@ -17,9 +17,12 @@ In Playwright API tests: `http://localhost:3100/api` (the `api` project's `baseU
 
 ## Endpoint index
 
-| Method | Path          | Auth | Doc                                          |
-| ------ | ------------- | ---- | -------------------------------------------- |
-| GET    | `/api/health` | None | [health/get-health.md](health/get-health.md) |
+| Method | Path               | Auth      | Doc                                          |
+| ------ | ------------------ | --------- | -------------------------------------------- |
+| GET    | `/api/health`      | None      | [health/get-health.md](health/get-health.md) |
+| POST   | `/api/auth/login`  | None      | [auth/post-login.md](auth/post-login.md)     |
+| POST   | `/api/auth/logout` | None      | [auth/post-logout.md](auth/post-logout.md)   |
+| GET    | `/api/auth/me`     | Logged in | [auth/get-me.md](auth/get-me.md)             |
 
 Planned endpoints: [phases/phase-0-architecture.md §11](../phases/phase-0-architecture.md#11-api-architecture).
 Each phase adds its endpoint files and rows here.
@@ -38,17 +41,18 @@ Types live in `packages/shared/src/api.ts`.
 
 ## Error codes
 
-| HTTP | `code`                | When                                                                              |
-| ---- | --------------------- | --------------------------------------------------------------------------------- |
-| 400  | `VALIDATION_ERROR`    | Invalid body/params/query, or body is not valid JSON. `details` lists each field. |
-| 401  | `UNAUTHENTICATED`     | Not logged in (Phase 2)                                                           |
-| 403  | `FORBIDDEN`           | Logged in but not allowed                                                         |
-| 404  | `NOT_FOUND`           | Unknown route or resource (also used for other users' private data)               |
-| 409  | `CONFLICT`            | Version conflict or invalid state transition                                      |
-| 422  | `UNPROCESSABLE`       | Valid input that breaks a business rule                                           |
-| 429  | `RATE_LIMITED`        | Too many requests                                                                 |
-| 500  | `INTERNAL_ERROR`      | Bug on our side. Quote the `requestId`.                                           |
-| 503  | `SERVICE_UNAVAILABLE` | A dependency (e.g. AI provider) is unavailable                                    |
+| HTTP | `code`                   | When                                                                              |
+| ---- | ------------------------ | --------------------------------------------------------------------------------- |
+| 400  | `VALIDATION_ERROR`       | Invalid body/params/query, or body is not valid JSON. `details` lists each field. |
+| 401  | `UNAUTHENTICATED`        | Not logged in (Phase 2)                                                           |
+| 403  | `FORBIDDEN`              | Logged in but not allowed                                                         |
+| 404  | `NOT_FOUND`              | Unknown route or resource (also used for other users' private data)               |
+| 409  | `CONFLICT`               | Version conflict or invalid state transition                                      |
+| 415  | `UNSUPPORTED_MEDIA_TYPE` | A POST, PUT, PATCH or DELETE without `Content-Type: application/json` (Phase 2)   |
+| 422  | `UNPROCESSABLE`          | Valid input that breaks a business rule                                           |
+| 429  | `RATE_LIMITED`           | Too many requests                                                                 |
+| 500  | `INTERNAL_ERROR`         | Bug on our side. Quote the `requestId`.                                           |
+| 503  | `SERVICE_UNAVAILABLE`    | A dependency (e.g. AI provider) is unavailable                                    |
 
 ### Unknown routes
 
