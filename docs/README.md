@@ -6,19 +6,19 @@ screen, the API, the design and the tests.
 
 ## Where things are
 
-| Folder or file                                                                                               | What it holds                                                | ID examples                       |
-| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ | --------------------------------- |
-| [requirements/](requirements/README.md)                                                                      | What the business needs, one folder per feature              | `US-`, `BR-`, `AC-`, `MSG-`, `Q-` |
-| [design/basic/screens/](design/basic/screens/)                                                               | Basic design: each screen's layout, fields, states, locators | `SCR-AUTH-01`                     |
-| [design/basic/flows/](design/basic/flows/)                                                                   | Basic design: user flows and navigation (Mermaid diagrams)   | `FLW-AUTH-01`                     |
-| [design/detail/logic/](design/detail/logic/)                                                                 | Detail design: how it works inside (sequence, rules in code) | `DD-AUTH-01`                      |
-| [DATABASE.md](DATABASE.md)                                                                                   | Detail design: tables, columns, migrations, seed data        |                                   |
-| [api/](api/README.md)                                                                                        | One file per endpoint                                        | `API-HEALTH-01`                   |
-| [decisions/](decisions/README.md)                                                                            | Architecture decisions (ADR)                                 | `ADR-0001`                        |
-| [phases/](phases/)                                                                                           | Technical plan per phase (what we build when)                |                                   |
-| [traceability.md](traceability.md)                                                                           | **Generated** matrix: each AC → design, API and tests        |                                   |
-| [\_templates/](_templates/README.md)                                                                         | Copy one of these to start a new doc                         |                                   |
-| [ARCHITECTURE.md](ARCHITECTURE.md), [TESTING.md](TESTING.md), [PLAYWRIGHT.md](PLAYWRIGHT.md), [AI.md](AI.md) | How the system and the tests work                            |                                   |
+| Folder or file                                                                                               | What it holds                                                                                                           | ID examples                       |
+| ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| [requirements/](requirements/README.md)                                                                      | What the business needs, one folder per feature                                                                         | `US-`, `BR-`, `AC-`, `MSG-`, `Q-` |
+| [design/basic/screens/](design/basic/screens/)                                                               | Basic design: each screen's layout, fields, states, locators                                                            | `SCR-AUTH-01`                     |
+| [design/basic/flows/](design/basic/flows/)                                                                   | Basic design: user flows and navigation (Mermaid diagrams)                                                              | `FLW-AUTH-01`                     |
+| [design/detail/logic/](design/detail/logic/)                                                                 | Detail design: how it works inside (sequence, rules in code)                                                            | `DD-AUTH-01`                      |
+| [database/](database/README.md)                                                                              | Detail design: all tables and relationships (overview), one file per table in `database/tables/`, migrations, seed data |                                   |
+| [api/](api/README.md)                                                                                        | One file per endpoint                                                                                                   | `API-HEALTH-01`                   |
+| [decisions/](decisions/README.md)                                                                            | Architecture decisions (ADR)                                                                                            | `ADR-0001`                        |
+| [phases/](phases/)                                                                                           | Technical plan per phase (what we build when)                                                                           |                                   |
+| [traceability.md](traceability.md)                                                                           | **Generated** matrix: each AC → design, API and tests                                                                   |                                   |
+| [\_templates/](_templates/README.md)                                                                         | Copy one of these to start a new doc                                                                                    |                                   |
+| [ARCHITECTURE.md](ARCHITECTURE.md), [TESTING.md](TESTING.md), [PLAYWRIGHT.md](PLAYWRIGHT.md), [AI.md](AI.md) | How the system and the tests work                                                                                       |                                   |
 
 ## IDs
 

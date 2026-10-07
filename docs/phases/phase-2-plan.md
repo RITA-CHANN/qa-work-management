@@ -2,6 +2,9 @@
 
 Status: **Waiting for your go-ahead** · 2026-10-07
 
+Requirements and design for this phase: [requirements/auth](../requirements/auth/README.md) (US, BR, AC, MSG),
+screens, flows, API docs and detail design are linked from there.
+
 ## 1. Current codebase
 
 - `main` is at the merge of PR #3 (your first Playwright tests). Lint, typecheck and all 6 tests are green.
@@ -82,13 +85,13 @@ docs/{ARCHITECTURE,DATABASE,TESTING,PLAYWRIGHT}.md, README.md, .env.example
 
 ## 6. Risks
 
-| Risk                                                                                                                                | Mitigation                                                                                                          |
-| ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **Your Phase 1 navigation tests will go red**: `/` now redirects to `/login`                                                        | This is expected and makes a good lesson. See section 9 for how you fix it with `storageState`                      |
-| Rate limiter remembers failures while a test server is reused (`reuseExistingServer`), so negative tests could lock out a seed user | The test server gets a higher limit, and each test that hits the limit uses its own email. Documented in TESTING.md |
-| Tests that share one logged-in user can log each other out (logout deletes the session)                                             | Logout tests log in fresh instead of using the shared `storageState`. This is part of the exercise                  |
-| argon2 install fails on your Mac                                                                                                    | `@node-rs/argon2` ships prebuilt binaries; if it still fails, fall back to `bcryptjs` (pure JS)                     |
-| Changing `User` needs a migration on your dev database                                                                              | `npm run db:migrate` after pulling; the README update covers it                                                     |
+| Risk                                                                                                                                | Mitigation                                                                                                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Your Phase 1 navigation tests will go red**: `/` now redirects to `/login`                                                        | This is expected and makes a good lesson. See section 9 for how you fix it with `storageState`                                                              |
+| Rate limiter remembers failures while a test server is reused (`reuseExistingServer`), so negative tests could lock out a seed user | Tests keep the real limit. Rate-limit tests use a dedicated seed user `ratelimit@qawm.test`; other wrong-password tests use a made-up email. See DD-AUTH-01 |
+| Tests that share one logged-in user can log each other out (logout deletes the session)                                             | Logout tests log in fresh instead of using the shared `storageState`. This is part of the exercise                                                          |
+| argon2 install fails on your Mac                                                                                                    | `@node-rs/argon2` ships prebuilt binaries; if it still fails, fall back to `bcryptjs` (pure JS)                                                             |
+| Changing `User` needs a migration on your dev database                                                                              | `npm run db:migrate` after pulling; the README update covers it                                                                                             |
 
 ## 7. How I'll verify before handing over
 

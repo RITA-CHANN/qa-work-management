@@ -1,5 +1,5 @@
 // QA Work Management database schema.
-// See docs/DATABASE.md for the full entity plan; tables are added phase by phase.
+// See docs/database/README.md (one file per table in docs/database/tables/); tables are added phase by phase.
 
 generator client {
   provider     = "prisma-client"

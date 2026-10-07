@@ -29,12 +29,14 @@ for example `{ tag: '@AC-AUTH-02' }`.
 
 ## Rate limit (US-AUTH-06)
 
-| ID         | Given                                                     | When                                               | Then                                     | Covers                 |
-| ---------- | --------------------------------------------------------- | -------------------------------------------------- | ---------------------------------------- | ---------------------- |
-| AC-AUTH-10 | I have failed 4 times for an email in the last 15 minutes | I fail a **5th** time                              | I see MSG-AUTH-01 (not blocked yet)      | US-AUTH-06, BR-AUTH-04 |
-| AC-AUTH-11 | I have failed 5 times for an email in the last 15 minutes | I try a **6th** time, even with the right password | I see MSG-AUTH-02 and I am not logged in | US-AUTH-06, BR-AUTH-04 |
-| AC-AUTH-12 | Email A is blocked                                        | I log in with email B and its right password       | I am logged in (the block is per email)  | BR-AUTH-04             |
-| AC-AUTH-13 | Email A was blocked                                       | 15 minutes have passed                             | I can log in with email A again          | BR-AUTH-04             |
+| ID         | Given                                                     | When                                                    | Then                                                         | Covers                 |
+| ---------- | --------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------ | ---------------------- |
+| AC-AUTH-10 | I have failed 4 times for an email in the last 15 minutes | I fail a **5th** time                                   | I see MSG-AUTH-01 (not blocked yet)                          | US-AUTH-06, BR-AUTH-04 |
+| AC-AUTH-11 | I have failed 5 times for an email in the last 15 minutes | I try a **6th** time, even with the right password      | I see MSG-AUTH-02 and I am not logged in                     | US-AUTH-06, BR-AUTH-04 |
+| AC-AUTH-12 | Email A is blocked                                        | I log in with email B and its right password            | I am logged in (the block is per email)                      | BR-AUTH-04             |
+| AC-AUTH-13 | Email A was blocked                                       | 15 minutes have passed since its first failed attempt   | I can log in with email A again                              | BR-AUTH-04             |
+| AC-AUTH-29 | I have failed 4 times for an email                        | I log in with the right password, then fail 1 more time | I see MSG-AUTH-01, not MSG-AUTH-02 (the count started again) | BR-AUTH-14             |
+| AC-AUTH-30 | The limit setting is changed to 3 failures                | I fail 3 times, then try a 4th time                     | I see MSG-AUTH-02                                            | BR-AUTH-13             |
 
 ## Staying logged in (US-AUTH-02)
 
@@ -64,9 +66,23 @@ for example `{ tag: '@AC-AUTH-02' }`.
 | AC-AUTH-25 | I am logged in                                   | I open `/login`                                      | I am sent to the dashboard                                          | BR-AUTH-10             |
 | AC-AUTH-26 | I am logged in and my session ends on the server | I do any action that loads data                      | I am sent to `/login`                                               | BR-AUTH-11             |
 
+## Session security
+
+| ID         | Given          | When                                               | Then                                              | Covers                 |
+| ---------- | -------------- | -------------------------------------------------- | ------------------------------------------------- | ---------------------- |
+| AC-AUTH-31 | I am logged in | A script on the page reads `document.cookie`       | The session cookie is not in the result           | BR-AUTH-15             |
+| AC-AUTH-32 | I log in       | I look at the login response body and the page URL | Neither contains the session token or my password | BR-AUTH-12, BR-AUTH-15 |
+
 ## Header (US-AUTH-05)
 
 | ID         | Given                    | When                             | Then                                          | Covers     |
 | ---------- | ------------------------ | -------------------------------- | --------------------------------------------- | ---------- |
 | AC-AUTH-27 | I am logged in           | I look at the header on any page | I see my name and a "Log out" button          | US-AUTH-05 |
 | AC-AUTH-28 | I am a guest on `/login` | I look at the page               | There is no user name and no "Log out" button | US-AUTH-05 |
+
+## Change log
+
+| Date       | Change                                                                    | Why                                      |
+| ---------- | ------------------------------------------------------------------------- | ---------------------------------------- |
+| 2026-10-07 | First version                                                             | Phase 2                                  |
+| 2026-10-07 | AC-AUTH-13 says when the 15 minutes start. Added AC-AUTH-29 to AC-AUTH-32 | Cover BR-AUTH-13, BR-AUTH-14, BR-AUTH-15 |

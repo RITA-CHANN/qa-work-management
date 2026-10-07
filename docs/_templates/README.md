@@ -10,5 +10,6 @@ Copy a template, rename it, fill it in, then run `npm run docs:build`.
 | Detail design (logic)        | [detail-design.md](detail-design.md)        | `docs/design/detail/logic/DD-<FEATURE>-NN-<name>.md`   |
 | A decision                   | [adr.md](adr.md)                            | `docs/decisions/ADR-NNNN-<name>.md`                    |
 | An API endpoint              | [../api/\_template.md](../api/_template.md) | `docs/api/<resource>/<method>-<name>.md`               |
+| A database table             | [table.md](table.md)                        | `docs/database/tables/<table_name>.md`                 |
 
 `FEATURE` is the feature folder name in capitals (`auth` → `AUTH`). Numbers are never reused: take the next free one.
