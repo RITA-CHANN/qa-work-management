@@ -42,9 +42,9 @@ Rules:
 - An ID is defined once: in the first column of a table row, or as the `id` in a file's front matter.
 - IDs are **never renumbered or reused**. When something is dropped, set its status to `deprecated` or strike it
   through, but keep the ID, so old tests and bug reports still point to something.
-- Every `MSG` text also lives once in code, in `packages/shared/src/messages/<feature>.ts` as
-  `msg('MSG-AUTH-01', '…')`. Apps and tests import it from `@qawm/shared`; `docs:check` fails if the docs and the
-  code differ, or if an app copies a message string.
+- Every `MSG` text also lives once in code, in `MESSAGES` in `packages/shared/src/messages.ts`
+  (`'MSG-AUTH-01': '…'`). Apps and tests use the code, `msg('MSG-AUTH-01')` from `@qawm/shared`; `docs:check` fails
+  if the docs and the code differ, or if an app copies a message string.
 - Design and API files list what they serve under `traces:` in their front matter. The matrix is built from that.
 
 ## Front matter

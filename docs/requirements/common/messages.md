@@ -9,7 +9,7 @@ updated: 2026-10-07
 
 # Common messages
 
-Code: `packages/shared/src/messages/common.ts` (`COMMON_MESSAGES`). `npm run docs:check` fails if the text below and
+Code: `packages/shared/src/messages.ts`, used as `msg('MSG-COMMON-01')`. `npm run docs:check` fails if the text below and
 the code differ. `{name}` is filled in at run time.
 
 | ID            | Where                                            | Message                                                        |

@@ -187,28 +187,21 @@ for (const path of await walk(TESTS, '.ts')) {
   });
 }
 
-// 6. Messages: every MSG row in docs/requirements has the same text in packages/shared/src/messages,
-//    and no app file copies a message string instead of importing it.
-const MESSAGES_DIR = join(ROOT, 'packages', 'shared', 'src', 'messages');
-const MSG_CALL =
-  /msg\(\s*'(MSG-[A-Z][A-Z0-9]*-\d{2,})',\s*(['"])((?:\\.|(?!\2)[^\\])*)\2\s*,?\s*\)/g;
+// 6. Messages: every MSG row in docs/requirements has the same text in packages/shared/src/messages.ts,
+//    and no app file copies a message string instead of using msg().
+const MESSAGES_FILE = join(ROOT, 'packages', 'shared', 'src', 'messages.ts');
+const MESSAGES_REL = posix(relative(ROOT, MESSAGES_FILE));
+const MSG_ENTRY = /'(MSG-[A-Z][A-Z0-9]*-\d{2,})':\s*(['"])((?:\\.|(?!\2)[^\\])*)\2/g;
 const codeMessages = new Map(); // id -> { text, rel }
-for (const path of await walk(MESSAGES_DIR, '.ts')) {
-  const rel = posix(relative(ROOT, path));
-  for (const [, id, , raw] of (await readFile(path, 'utf8')).matchAll(MSG_CALL)) {
-    const text = raw.replace(/\\(.)/g, '$1');
-    if (codeMessages.has(id)) errors.push(`${rel}: ${id} is declared twice`);
-    codeMessages.set(id, { text, rel });
-  }
+for (const [, id, , raw] of (await readFile(MESSAGES_FILE, 'utf8')).matchAll(MSG_ENTRY)) {
+  codeMessages.set(id, { text: raw.replace(/\\(.)/g, '$1'), rel: MESSAGES_REL });
 }
 for (const [id, def] of defs) {
   if (typeOf(id) !== 'MSG') continue;
   const docText = (def.row ?? []).filter(Boolean).at(-1)?.replace(/\\\|/g, '|');
   const code = codeMessages.get(id);
   if (!code) {
-    errors.push(
-      `docs/${def.rel}:${def.line}: ${id} has no msg('${id}', …) in packages/shared/src/messages`,
-    );
+    errors.push(`docs/${def.rel}:${def.line}: ${id} is missing from ${MESSAGES_REL}`);
   } else if (code.text !== docText) {
     errors.push(
       `docs/${def.rel}:${def.line}: ${id} text differs from ${code.rel}\n    docs: ${docText}\n    code: ${code.text}`,
@@ -227,7 +220,7 @@ for (const app of ['api', 'web']) {
     for (const [id, code] of codeMessages) {
       const literal = code.text.split('{')[0];
       if (literal.length >= 8 && text.includes(literal)) {
-        errors.push(`${rel}: copies the text of ${id}; import it from @qawm/shared instead`);
+        errors.push(`${rel}: copies the text of ${id}; use msg('${id}') instead`);
       }
     }
   }

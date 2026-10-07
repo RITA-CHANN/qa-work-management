@@ -1,5 +1,5 @@
 import type { ErrorRequestHandler } from 'express';
-import { COMMON_MESSAGES, type ApiError } from '@qawm/shared';
+import { msg, type ApiError } from '@qawm/shared';
 import { AppError } from '../lib/errors';
 
 function isJsonSyntaxError(err: unknown): boolean {
@@ -18,7 +18,7 @@ export const errorHandler: ErrorRequestHandler = (err: unknown, req, res, _next)
   let status = 500;
   let body: ApiError['error'] = {
     code: 'INTERNAL_ERROR',
-    message: COMMON_MESSAGES.serverError,
+    message: msg('MSG-COMMON-02'),
     requestId: req.requestId,
   };
 
@@ -30,7 +30,7 @@ export const errorHandler: ErrorRequestHandler = (err: unknown, req, res, _next)
     status = 400;
     body = {
       code: 'VALIDATION_ERROR',
-      message: COMMON_MESSAGES.invalidJson,
+      message: msg('MSG-COMMON-03'),
       requestId: req.requestId,
     };
   }

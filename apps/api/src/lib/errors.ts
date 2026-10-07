@@ -1,4 +1,4 @@
-import { COMMON_MESSAGES, type ErrorCode, type ErrorDetail } from '@qawm/shared';
+import { msg, type ErrorCode, type ErrorDetail } from '@qawm/shared';
 
 /**
  * Base class for errors we expect and want to show to the client.
@@ -17,25 +17,25 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  constructor(details: ErrorDetail[], message = COMMON_MESSAGES.validationFailed) {
+  constructor(details: ErrorDetail[], message = msg('MSG-COMMON-04')) {
     super(400, 'VALIDATION_ERROR', message, details);
   }
 }
 
 export class UnauthenticatedError extends AppError {
-  constructor(message = COMMON_MESSAGES.authRequired) {
+  constructor(message = msg('MSG-COMMON-05')) {
     super(401, 'UNAUTHENTICATED', message);
   }
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message = COMMON_MESSAGES.forbidden) {
+  constructor(message = msg('MSG-COMMON-06')) {
     super(403, 'FORBIDDEN', message);
   }
 }
 
 export class NotFoundError extends AppError {
-  constructor(message = COMMON_MESSAGES.notFound) {
+  constructor(message = msg('MSG-COMMON-07')) {
     super(404, 'NOT_FOUND', message);
   }
 }
@@ -47,7 +47,7 @@ export class ConflictError extends AppError {
 }
 
 export class UnsupportedMediaTypeError extends AppError {
-  constructor(message = COMMON_MESSAGES.jsonRequired) {
+  constructor(message = msg('MSG-COMMON-09')) {
     super(415, 'UNSUPPORTED_MEDIA_TYPE', message);
   }
 }

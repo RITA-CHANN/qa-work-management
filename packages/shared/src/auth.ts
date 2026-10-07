@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AUTH_MESSAGES } from './messages/auth';
+import { msg } from './messages';
 
 /**
  * Body of POST /api/auth/login (API-AUTH-01). Used by the login form and the API,
@@ -7,14 +7,14 @@ import { AUTH_MESSAGES } from './messages/auth';
  */
 export const loginRequestSchema = z.object({
   email: z
-    .string({ error: AUTH_MESSAGES.emailRequired })
+    .string({ error: msg('MSG-AUTH-03') })
     .trim()
-    .min(1, AUTH_MESSAGES.emailRequired)
+    .min(1, msg('MSG-AUTH-03'))
     .toLowerCase()
-    .pipe(z.email(AUTH_MESSAGES.emailInvalid)),
+    .pipe(z.email(msg('MSG-AUTH-04'))),
   password: z
-    .string({ error: AUTH_MESSAGES.passwordRequired })
-    .min(1, AUTH_MESSAGES.passwordRequired)
+    .string({ error: msg('MSG-AUTH-05') })
+    .min(1, msg('MSG-AUTH-05'))
     .max(200, 'Password is too long'),
 });
 

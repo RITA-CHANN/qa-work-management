@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
-import { AUTH_MESSAGES, COMMON_MESSAGES, loginRequestSchema } from '@qawm/shared';
+import { loginRequestSchema, msg } from '@qawm/shared';
 import { Button } from '@/components/ui/button';
 import { ApiRequestError } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
@@ -12,11 +12,11 @@ type FieldErrors = { email?: string; password?: string };
 
 function serverMessage(error: unknown): string {
   if (error instanceof ApiRequestError) {
-    if (error.code === 'UNAUTHENTICATED') return AUTH_MESSAGES.invalidCredentials;
-    if (error.code === 'RATE_LIMITED') return AUTH_MESSAGES.rateLimited;
+    if (error.code === 'UNAUTHENTICATED') return msg('MSG-AUTH-01');
+    if (error.code === 'RATE_LIMITED') return msg('MSG-AUTH-02');
     return error.message;
   }
-  return COMMON_MESSAGES.unexpected;
+  return msg('MSG-COMMON-01');
 }
 
 const inputClass =
