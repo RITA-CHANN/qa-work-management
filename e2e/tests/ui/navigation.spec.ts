@@ -40,12 +40,12 @@ test.describe('Navigation', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found');
 
     // Act: click the Dashboard link
-    await mainNav.getByRole('link', { name: /Dashboard/i }).click();
+    await page.getByRole('link', { name: 'Back to dashboard', exact: true }).click();
 
     // Assert: URL, heading, and active link
     await expect(page).toHaveURL('/');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Dashboard' })).toHaveAttribute(
+    await expect(mainNav.getByRole('link', { name: 'Dashboard' })).toHaveAttribute(
       'aria-current',
       'page',
     );
