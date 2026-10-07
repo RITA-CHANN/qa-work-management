@@ -38,6 +38,10 @@ Before the first run: Docker must be running (`npm run db:up`) and browsers inst
 3. **Locator priority:** `getByRole` → `getByLabel` → `getByPlaceholder` → `getByText` → `getByTestId` (justified) → CSS → XPath.
 4. **Assert behaviour users see** (text, URL, state), not implementation details (class names).
 5. **Lint must pass:** `npm run lint` includes `eslint-plugin-playwright`.
+6. **Trace to a requirement:** tag each test with the acceptance criteria it checks, for example
+   `test('wrong password shows a generic error', { tag: '@AC-AUTH-02' }, async ({ page }) => { … })`.
+   Run one criterion with `npx playwright test --grep @AC-AUTH-02`. `npm run docs:check` fails on a tag that
+   matches no ID, and `npm run docs:build` updates [traceability.md](traceability.md) with your tests.
 
 ## QA checklist per feature
 

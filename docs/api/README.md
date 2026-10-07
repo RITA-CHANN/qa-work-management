@@ -9,6 +9,9 @@ docs/api/
   <resource>/<method>-<name>.md
 ```
 
+Each endpoint file starts with front matter: an `id` (`API-<RESOURCE>-NN`, for example `API-HEALTH-01`) and the
+requirement and acceptance IDs it serves under `traces`. See [../README.md](../README.md) for how IDs and traces work.
+
 Base URL in development: `http://localhost:3000/api` (or via the web app at `http://localhost:5173/api`).
 In Playwright API tests: `http://localhost:3100/api` (the `api` project's `baseURL`).
 

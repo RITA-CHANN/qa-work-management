@@ -1,0 +1,19 @@
+---
+title: Authentication user stories
+type: stories
+feature: auth
+status: review
+phase: 2
+updated: 2026-10-07
+---
+
+# Authentication user stories
+
+| ID         | Story                                                                                                                                                                   |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| US-AUTH-01 | As a **user**, I want to log in with my email and password, so that I can use the app.                                                                                  |
+| US-AUTH-02 | As a **user**, I want to stay logged in when I reload or come back later, so that I don't have to log in every time.                                                    |
+| US-AUTH-03 | As a **user**, I want to log out, so that nobody else can use my session on this computer.                                                                              |
+| US-AUTH-04 | As a **guest**, when I open a page of the app, I want to be sent to the login page and then back to that page after logging in, so that I don't lose where I was going. |
+| US-AUTH-05 | As a **user**, I want to see my name in the header, so that I know which account I am using.                                                                            |
+| US-AUTH-06 | As the **business owner**, I want repeated wrong logins to be blocked for a while, so that nobody can guess passwords.                                                  |
