@@ -64,6 +64,7 @@ docs            Architecture, database, API, testing, Playwright and AI docs; ph
 
 ## Documentation
 
+- [requirements/](docs/requirements/README.md): business requirements per phase (user stories, rules, acceptance criteria)
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md): how the system fits together
 - [DATABASE.md](docs/DATABASE.md): schema and migrations
 - [api/](docs/api/README.md): API reference, one file per endpoint
