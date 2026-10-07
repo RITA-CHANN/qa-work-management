@@ -1,3 +1,16 @@
+---
+id: API-<RESOURCE>-NN
+title: METHOD /api/path
+type: api
+feature: <feature>
+status: draft
+phase: <N>
+traces:
+  requirements: []
+  acceptance: []
+updated: YYYY-MM-DD
+---
+
 # METHOD /api/path
 
 One sentence: what this endpoint does and who uses it.

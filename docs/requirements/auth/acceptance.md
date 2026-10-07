@@ -1,0 +1,72 @@
+---
+title: Authentication acceptance criteria
+type: acceptance
+feature: auth
+status: review
+phase: 2
+updated: 2026-10-07
+---
+
+# Authentication acceptance criteria
+
+Format: **Given** (starting state) / **When** (action) / **Then** (expected result). **Covers** lists the
+stories and rules each criterion proves. Tag the Playwright test that checks a criterion with its ID,
+for example `{ tag: '@AC-AUTH-02' }`.
+
+## Login (US-AUTH-01)
+
+| ID         | Given                    | When                                                            | Then                                                                | Covers                 |
+| ---------- | ------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------- |
+| AC-AUTH-01 | I am a guest on `/login` | I enter a valid email and the right password and click "Log in" | I land on the dashboard and see my name in the header               | US-AUTH-01             |
+| AC-AUTH-02 | I am on `/login`         | I enter a valid email and a **wrong** password                  | I stay on `/login` and see MSG-AUTH-01                              | US-AUTH-01, BR-AUTH-03 |
+| AC-AUTH-03 | I am on `/login`         | I enter an email that has **no account**                        | I see exactly the same message as AC-AUTH-02                        | BR-AUTH-03             |
+| AC-AUTH-04 | I am on `/login`         | I submit with email and/or password **empty**                   | I see a message under each empty field and no login request is sent | BR-AUTH-02             |
+| AC-AUTH-05 | I am on `/login`         | I enter `abc` as the email                                      | I see MSG-AUTH-04                                                   | BR-AUTH-02             |
+| AC-AUTH-06 | I am on `/login`         | I enter my email in **upper case** with the right password      | I am logged in                                                      | BR-AUTH-01             |
+| AC-AUTH-07 | I have filled the form   | I press **Enter** in the password field                         | The form submits, same as clicking "Log in"                         | US-AUTH-01             |
+| AC-AUTH-08 | I clicked "Log in"       | The request is still sending                                    | The button is disabled, so I can't submit twice                     | US-AUTH-01             |
+| AC-AUTH-09 | I am on `/login`         | I type a password                                               | The characters are hidden                                           | BR-AUTH-12             |
+
+## Rate limit (US-AUTH-06)
+
+| ID         | Given                                                     | When                                               | Then                                     | Covers                 |
+| ---------- | --------------------------------------------------------- | -------------------------------------------------- | ---------------------------------------- | ---------------------- |
+| AC-AUTH-10 | I have failed 4 times for an email in the last 15 minutes | I fail a **5th** time                              | I see MSG-AUTH-01 (not blocked yet)      | US-AUTH-06, BR-AUTH-04 |
+| AC-AUTH-11 | I have failed 5 times for an email in the last 15 minutes | I try a **6th** time, even with the right password | I see MSG-AUTH-02 and I am not logged in | US-AUTH-06, BR-AUTH-04 |
+| AC-AUTH-12 | Email A is blocked                                        | I log in with email B and its right password       | I am logged in (the block is per email)  | BR-AUTH-04             |
+| AC-AUTH-13 | Email A was blocked                                       | 15 minutes have passed                             | I can log in with email A again          | BR-AUTH-04             |
+
+## Staying logged in (US-AUTH-02)
+
+| ID         | Given                           | When                                                          | Then                  | Covers     |
+| ---------- | ------------------------------- | ------------------------------------------------------------- | --------------------- | ---------- |
+| AC-AUTH-14 | I am logged in                  | I reload the page                                             | I am still logged in  | US-AUTH-02 |
+| AC-AUTH-15 | I am logged in                  | I close the tab and open the app again in the same browser    | I am still logged in  | US-AUTH-02 |
+| AC-AUTH-16 | I am logged in in one browser   | I open the app in a **different** browser (or private window) | I am a guest there    | US-AUTH-02 |
+| AC-AUTH-17 | My session is older than 7 days | I open any page                                               | I am sent to `/login` | BR-AUTH-05 |
+
+## Logout (US-AUTH-03)
+
+| ID         | Given                                                          | When                                | Then                                                    | Covers                 |
+| ---------- | -------------------------------------------------------------- | ----------------------------------- | ------------------------------------------------------- | ---------------------- |
+| AC-AUTH-18 | I am logged in                                                 | I click "Log out"                   | I land on `/login`                                      | US-AUTH-03             |
+| AC-AUTH-19 | I just logged out                                              | I press the browser **Back** button | I do not see the previous page's data; I am on `/login` | US-AUTH-03, BR-AUTH-06 |
+| AC-AUTH-20 | I logged out, but someone kept a copy of my old session cookie | They use it                         | They are treated as a guest                             | BR-AUTH-06             |
+| AC-AUTH-21 | I am logged in in browser 1 and browser 2                      | I log out in browser 1              | Browser 2 is still logged in                            | BR-AUTH-07             |
+
+## Protected pages and redirect (US-AUTH-04)
+
+| ID         | Given                                            | When                                                 | Then                                                                | Covers                 |
+| ---------- | ------------------------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------- | ---------------------- |
+| AC-AUTH-22 | I am a guest                                     | I open `/projects`                                   | I am sent to `/login`, and after logging in I land on `/projects`   | US-AUTH-04, BR-AUTH-08 |
+| AC-AUTH-23 | I am a guest                                     | I open `/`                                           | I am sent to `/login`, and after logging in I land on the dashboard | BR-AUTH-08             |
+| AC-AUTH-24 | I am a guest                                     | I open `/login?returnTo=https://evil.com` and log in | I land on the dashboard, not on the outside site                    | BR-AUTH-09             |
+| AC-AUTH-25 | I am logged in                                   | I open `/login`                                      | I am sent to the dashboard                                          | BR-AUTH-10             |
+| AC-AUTH-26 | I am logged in and my session ends on the server | I do any action that loads data                      | I am sent to `/login`                                               | BR-AUTH-11             |
+
+## Header (US-AUTH-05)
+
+| ID         | Given                    | When                             | Then                                          | Covers     |
+| ---------- | ------------------------ | -------------------------------- | --------------------------------------------- | ---------- |
+| AC-AUTH-27 | I am logged in           | I look at the header on any page | I see my name and a "Log out" button          | US-AUTH-05 |
+| AC-AUTH-28 | I am a guest on `/login` | I look at the page               | There is no user name and no "Log out" button | US-AUTH-05 |

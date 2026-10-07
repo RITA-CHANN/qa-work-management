@@ -1,3 +1,13 @@
+---
+id: API-HEALTH-01
+title: GET /api/health
+type: api
+feature: health
+status: approved
+phase: 1
+updated: 2026-10-07
+---
+
 # GET /api/health
 
 Reports whether the API and its database are reachable. Used by the web app's "API status"

@@ -58,15 +58,8 @@ Express 5 forwards errors thrown in `async` handlers to the error handler automa
 
 ## Decisions log
 
-See the decision table (D1–D13) in the Phase 0 architecture. Phase 1 additions:
-
-| #    | Decision                                                           | Why                                                                                                   |
-| ---- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| P1-1 | Node 22 LTS (22.12+)                                               | Matches the verified toolchain; still in LTS support                                                  |
-| P1-2 | TypeScript 6.0 (not 7)                                             | `typescript-eslint` supports up to TS 6.0                                                             |
-| P1-3 | Run the API with `tsx` (no build step yet)                         | Simpler while learning; a production build arrives with Deployment (Phase 19)                         |
-| P1-4 | Test DB is prepared with `prisma migrate deploy` + idempotent seed | Non-destructive and fast; a per-test data reset strategy is designed in Phase 3 when real data exists |
-| P1-5 | Playwright uses separate ports (API 3100, web 5174)                | Tests never reuse your dev servers or dev database                                                    |
+Phase 0 decisions D1–D13 are in the [Phase 0 architecture](phases/phase-0-architecture.md). Every decision since then is
+one ADR file in [decisions/](decisions/README.md) (`ADR-NNNN`).
 
 ## Known issues
 

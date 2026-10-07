@@ -29,7 +29,9 @@
     "test": "npm run test --workspaces --if-present",
     "e2e": "npm run test -w @qawm/e2e",
     "e2e:ui": "npm run test:ui -w @qawm/e2e",
-    "e2e:report": "npm run report -w @qawm/e2e"
+    "e2e:report": "npm run report -w @qawm/e2e",
+    "docs:check": "node scripts/docs/check.mjs",
+    "docs:build": "node scripts/docs/check.mjs --write"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
