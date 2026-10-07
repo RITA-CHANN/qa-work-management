@@ -8,4 +8,5 @@ Coverage per criterion: [../traceability.md](../traceability.md).
 
 | Feature                          | Phase | Status | Stories | Rules | Criteria | Criteria with a test |
 | -------------------------------- | ----- | ------ | ------- | ----- | -------- | -------------------- |
+| [Common](common/README.md)       | 1     | review | 0       | 0     | 0        | 0                    |
 | [Authentication](auth/README.md) | 2     | review | 6       | 15    | 32       | 0                    |

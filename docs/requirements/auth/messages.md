@@ -9,7 +9,8 @@ updated: 2026-10-07
 
 # Authentication messages
 
-Tests should assert these exact texts.
+Code: `packages/shared/src/messages/auth.ts` (`AUTH_MESSAGES`). `npm run docs:check` fails if the text below and the
+code differ. Tests should assert these exact texts. Shared texts: [../common/messages.md](../common/messages.md).
 
 | ID          | Where                   | Message                                          |
 | ----------- | ----------------------- | ------------------------------------------------ |

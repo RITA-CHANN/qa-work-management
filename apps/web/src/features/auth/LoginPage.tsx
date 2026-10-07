@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
-import { AUTH_MESSAGES, loginRequestSchema } from '@qawm/shared';
+import { AUTH_MESSAGES, COMMON_MESSAGES, loginRequestSchema } from '@qawm/shared';
 import { Button } from '@/components/ui/button';
 import { ApiRequestError } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ function serverMessage(error: unknown): string {
     if (error.code === 'RATE_LIMITED') return AUTH_MESSAGES.rateLimited;
     return error.message;
   }
-  return 'Something went wrong. Please try again.';
+  return COMMON_MESSAGES.unexpected;
 }
 
 const inputClass =

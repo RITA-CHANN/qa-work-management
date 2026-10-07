@@ -1,3 +1,4 @@
+import { COMMON_MESSAGES } from '@qawm/shared';
 import { cn } from '@/lib/utils';
 import { useHealth } from './use-health';
 
@@ -9,10 +10,10 @@ export function ApiStatus() {
   const { data, isPending, isError } = useHealth();
 
   const state = isPending
-    ? { label: 'Checking…', dot: 'bg-muted-foreground' }
+    ? { label: COMMON_MESSAGES.apiChecking, dot: 'bg-muted-foreground' }
     : isError || data?.status !== 'ok'
-      ? { label: 'Offline', dot: 'bg-destructive' }
-      : { label: 'Online', dot: 'bg-success' };
+      ? { label: COMMON_MESSAGES.apiOffline, dot: 'bg-destructive' }
+      : { label: COMMON_MESSAGES.apiOnline, dot: 'bg-success' };
 
   return (
     <p

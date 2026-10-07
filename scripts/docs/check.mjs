@@ -187,7 +187,53 @@ for (const path of await walk(TESTS, '.ts')) {
   });
 }
 
-// 6. Generated files
+// 6. Messages: every MSG row in docs/requirements has the same text in packages/shared/src/messages,
+//    and no app file copies a message string instead of importing it.
+const MESSAGES_DIR = join(ROOT, 'packages', 'shared', 'src', 'messages');
+const MSG_CALL =
+  /msg\(\s*'(MSG-[A-Z][A-Z0-9]*-\d{2,})',\s*(['"])((?:\\.|(?!\2)[^\\])*)\2\s*,?\s*\)/g;
+const codeMessages = new Map(); // id -> { text, rel }
+for (const path of await walk(MESSAGES_DIR, '.ts')) {
+  const rel = posix(relative(ROOT, path));
+  for (const [, id, , raw] of (await readFile(path, 'utf8')).matchAll(MSG_CALL)) {
+    const text = raw.replace(/\\(.)/g, '$1');
+    if (codeMessages.has(id)) errors.push(`${rel}: ${id} is declared twice`);
+    codeMessages.set(id, { text, rel });
+  }
+}
+for (const [id, def] of defs) {
+  if (typeOf(id) !== 'MSG') continue;
+  const docText = (def.row ?? []).filter(Boolean).at(-1)?.replace(/\\\|/g, '|');
+  const code = codeMessages.get(id);
+  if (!code) {
+    errors.push(
+      `docs/${def.rel}:${def.line}: ${id} has no msg('${id}', …) in packages/shared/src/messages`,
+    );
+  } else if (code.text !== docText) {
+    errors.push(
+      `docs/${def.rel}:${def.line}: ${id} text differs from ${code.rel}\n    docs: ${docText}\n    code: ${code.text}`,
+    );
+  }
+}
+for (const [id, code] of codeMessages) {
+  if (!defs.has(id))
+    errors.push(`${code.rel}: ${id} is not in any docs/requirements/*/messages.md`);
+}
+for (const app of ['api', 'web']) {
+  for (const path of await walk(join(ROOT, 'apps', app, 'src'), '')) {
+    if (!/\.tsx?$/.test(path) || /\.test\.tsx?$/.test(path)) continue;
+    const rel = posix(relative(ROOT, path));
+    const text = await readFile(path, 'utf8');
+    for (const [id, code] of codeMessages) {
+      const literal = code.text.split('{')[0];
+      if (literal.length >= 8 && text.includes(literal)) {
+        errors.push(`${rel}: copies the text of ${id}; import it from @qawm/shared instead`);
+      }
+    }
+  }
+}
+
+// 7. Generated files
 const idsOfType = (type, feature) =>
   [...defs.keys()]
     .filter((id) => typeOf(id) === type && (!feature || id.split('-')[1] === feature))
@@ -217,6 +263,7 @@ function traceability() {
   ];
   for (const f of features) {
     const acs = idsOfType('AC', f.code);
+    if (!acs.length && !idsOfType('US', f.code).length) continue;
     const tested = acs.filter((id) => testsFor.has(id)).length;
     out.push(
       `## ${f.title}`,
