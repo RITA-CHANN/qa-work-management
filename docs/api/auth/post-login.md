@@ -94,10 +94,10 @@ Logged in. The body is the user; the session token is only in the cookie (BR-AUT
 
 ### Response headers
 
-| Header         | Value                                                                                         |
-| -------------- | --------------------------------------------------------------------------------------------- |
-| `Set-Cookie`   | `qawm_sid=<token>; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800` (+ `Secure` in production) |
-| `X-Request-Id` | Request id                                                                                    |
+| Header         | Value                                                                                                                 |
+| -------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `Set-Cookie`   | `qawm_sid=<token>; Max-Age=604800; Path=/; Expires=<now + 7 days>; HttpOnly; SameSite=Lax` (+ `Secure` in production) |
+| `X-Request-Id` | Request id                                                                                                            |
 
 If the request already carried a valid `qawm_sid`, that old session is deleted and replaced by the new one.
 

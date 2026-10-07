@@ -45,3 +45,15 @@ export class ConflictError extends AppError {
     super(409, 'CONFLICT', message, details);
   }
 }
+
+export class UnsupportedMediaTypeError extends AppError {
+  constructor(message = 'Content-Type must be application/json') {
+    super(415, 'UNSUPPORTED_MEDIA_TYPE', message);
+  }
+}
+
+export class RateLimitedError extends AppError {
+  constructor(message: string) {
+    super(429, 'RATE_LIMITED', message);
+  }
+}

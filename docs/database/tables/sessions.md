@@ -57,6 +57,6 @@ None. Tests create sessions by logging in.
 
 ## Change log
 
-| Date       | Change  | Migration            | Why     |
-| ---------- | ------- | -------------------- | ------- |
-| 2026-10-07 | Planned | `add_auth` (planned) | Phase 2 |
+| Date       | Change  | Migration  | Why     |
+| ---------- | ------- | ---------- | ------- |
+| 2026-10-07 | Created | `add_auth` | Phase 2 |

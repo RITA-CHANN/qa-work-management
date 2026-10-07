@@ -1,5 +1,8 @@
 import type { GlobalRole } from '../../../src/generated/prisma/client';
 
+/** Dev and test only. Documented in docs/database/tables/users.md#seed-data. */
+export const SEED_PASSWORD = 'Password123!';
+
 // One user per persona from the Phase 0 architecture. Project roles arrive in Phase 3.
 export const users: { email: string; name: string; globalRole: GlobalRole }[] = [
   { email: 'admin@qawm.test', name: 'Ada Admin', globalRole: 'ADMIN' },
@@ -7,4 +10,6 @@ export const users: { email: string; name: string; globalRole: GlobalRole }[] = 
   { email: 'linh@qawm.test', name: 'Linh QA', globalRole: 'USER' },
   { email: 'dev@qawm.test', name: 'Dev Nguyen', globalRole: 'USER' },
   { email: 'viewer@qawm.test', name: 'Pat Viewer', globalRole: 'USER' },
+  // Only for rate-limit tests, so a blocked email never breaks other tests (DD-AUTH-01).
+  { email: 'ratelimit@qawm.test', name: 'Rate Limit', globalRole: 'USER' },
 ];

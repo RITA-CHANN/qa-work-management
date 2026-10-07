@@ -20,7 +20,7 @@ One row per person who can log in. Created by the seed only in Phase 2 (no sign-
 | `email`         | text         | no   |                     | unique | Login name, stored lower-case                     | BR-AUTH-01 | 1           |
 | `name`          | text         | no   |                     |        | Shown in the header                               |            | 1           |
 | `global_role`   | `GlobalRole` | no   | `USER`              |        | `ADMIN` or `USER`                                 |            | 1           |
-| `password_hash` | text         | yes  |                     |        | argon2id hash. `null` means the user can't log in | BR-AUTH-12 | 2 (planned) |
+| `password_hash` | text         | yes  |                     |        | argon2id hash. `null` means the user can't log in | BR-AUTH-12 | 2           |
 | `created_at`    | timestamp(3) | no   | `now()`             |        |                                                   |            | 1           |
 | `updated_at`    | timestamp(3) | no   | Prisma `@updatedAt` |        |                                                   |            | 1           |
 
@@ -63,7 +63,7 @@ Every seed user gets the password `Password123!` from Phase 2 (dev and test only
 
 ## Change log
 
-| Date       | Change                                             | Migration            | Why     |
-| ---------- | -------------------------------------------------- | -------------------- | ------- |
-| 2026-10-07 | Created                                            | `init`               | Phase 1 |
-| 2026-10-07 | `password_hash` and `ratelimit@` seed user planned | `add_auth` (planned) | Phase 2 |
+| Date       | Change                                           | Migration  | Why     |
+| ---------- | ------------------------------------------------ | ---------- | ------- |
+| 2026-10-07 | Created                                          | `init`     | Phase 1 |
+| 2026-10-07 | `password_hash` and `ratelimit@` seed user added | `add_auth` | Phase 2 |

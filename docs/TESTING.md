@@ -48,6 +48,29 @@ Before the first run: Docker must be running (`npm run db:up`) and browsers inst
 Each phase adds a table here covering: happy path, negative, boundary, validation, permissions, error handling,
 empty state, loading state, concurrency, data consistency, API failure and browser behaviour.
 
+### Phase 2: Authentication
+
+The full list is [requirements/auth/acceptance.md](requirements/auth/acceptance.md); coverage per criterion is in
+[traceability.md](traceability.md).
+
+| Dimension     | Case                                                                                                      | Criteria                                       | Automate |
+| ------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | -------- |
+| Happy path    | Log in, see your name; log out, back at `/login`                                                          | AC-AUTH-01, AC-AUTH-18                         | UI, API  |
+| Negative      | Wrong password and unknown email give the same message                                                    | AC-AUTH-02, AC-AUTH-03                         | UI, API  |
+| Validation    | Empty fields, invalid email; API 400 with `details`                                                       | AC-AUTH-04, AC-AUTH-05                         | UI, API  |
+| Boundary      | 5th failure still 401, 6th 429                                                                            | AC-AUTH-10, AC-AUTH-11                         | API      |
+| Security      | HttpOnly cookie, no token in body, old cookie dead after logout, open redirect blocked, non-JSON POST 415 | AC-AUTH-20, AC-AUTH-24, AC-AUTH-31, AC-AUTH-32 | UI, API  |
+| Session       | Reload keeps you in; a new context is a guest                                                             | AC-AUTH-14, AC-AUTH-16                         | UI, API  |
+| Browser       | Back after logout shows no data                                                                           | AC-AUTH-19                                     | UI       |
+| Accessibility | Labels, `role="alert"`, Enter submits                                                                     | AC-AUTH-07, AC-AUTH-09                         | UI       |
+| Config        | Rate limit and session length come from `.env`                                                            | AC-AUTH-30                                     | unit     |
+
+Test data notes:
+
+- Seed users all use `Password123!`. Rate-limit tests use `ratelimit@qawm.test` only. A block lasts 15 minutes in
+  the running API, so a local re-run with a reused server needs the API restarted.
+- Wrong-password tests for other cases can use a made-up email, so they never block a real user.
+
 ### Phase 1: App shell and health
 
 | Dimension      | Case                                                                    | Manual           | Automate                                  |

@@ -9,6 +9,10 @@ export const envSchema = z.object({
     .string({ error: 'is required (for NODE_ENV=test, set DATABASE_URL_TEST)' })
     .startsWith('postgresql://', { error: 'must start with postgresql://' }),
   AI_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
+  // Auth (BR-AUTH-05, BR-AUTH-04, BR-AUTH-13)
+  SESSION_TTL_HOURS: z.coerce.number().int().min(1).max(8760).default(168),
+  LOGIN_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(5),
+  LOGIN_RATE_LIMIT_WINDOW_MIN: z.coerce.number().int().min(1).max(1440).default(15),
 });
 
 export type Env = z.infer<typeof envSchema>;

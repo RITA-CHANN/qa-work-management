@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router';
+import { UserMenu } from '@/features/auth/UserMenu';
 import { ApiStatus } from '@/features/health/ApiStatus';
 import { SideNav } from './SideNav';
 
@@ -14,7 +15,10 @@ export function AppLayout() {
       </a>
       <header className="flex h-14 items-center justify-between border-b px-6">
         <p className="font-semibold">QA Work Management</p>
-        <ApiStatus />
+        <div className="flex items-center gap-4">
+          <ApiStatus />
+          <UserMenu />
+        </div>
       </header>
       <div className="flex flex-1">
         <SideNav />

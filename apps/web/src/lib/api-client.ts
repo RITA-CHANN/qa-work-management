@@ -13,6 +13,15 @@ export class ApiRequestError extends Error {
   }
 }
 
+// Paths whose 401 is an answer, not a lost session.
+const AUTH_PATHS = new Set(['/auth/login', '/auth/logout', '/auth/me']);
+let onUnauthenticated: (() => void) | undefined;
+
+/** Called for a 401 from any other endpoint: the session ended on the server (BR-AUTH-11). */
+export function setUnauthenticatedHandler(handler: () => void) {
+  onUnauthenticated = handler;
+}
+
 /**
  * The one place the web app calls the API. Every feature goes through here,
  * so credentials, JSON handling and error parsing are consistent.
@@ -33,9 +42,10 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     throw new ApiRequestError(0, 'NETWORK_ERROR', 'Cannot reach the server');
   }
 
-  const body: unknown = await response.json().catch(() => null);
+  const body: unknown = response.status === 204 ? null : await response.json().catch(() => null);
 
   if (!response.ok) {
+    if (response.status === 401 && !AUTH_PATHS.has(path)) onUnauthenticated?.();
     const error = (body as ApiError | null)?.error;
     throw new ApiRequestError(
       response.status,

@@ -36,9 +36,9 @@ Body: `{}` (an empty JSON object). The cookie `qawm_sid` identifies the session.
 
 Always, whether or not there was a valid session, so the call is safe to repeat.
 
-| Header       | Value                                                                       |
-| ------------ | --------------------------------------------------------------------------- |
-| `Set-Cookie` | `qawm_sid=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0` (deletes the cookie) |
+| Header       | Value                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------- |
+| `Set-Cookie` | `qawm_sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax` (deletes the cookie) |
 
 Only the session in this cookie is deleted. The same user's sessions in other browsers stay (BR-AUTH-07).
 After this, the old token returns 401 everywhere, even if someone copied it (BR-AUTH-06).
