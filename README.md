@@ -66,7 +66,7 @@ docs            Architecture, database, API, testing, Playwright and AI docs; ph
 
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md): how the system fits together
 - [DATABASE.md](docs/DATABASE.md): schema and migrations
-- [API.md](docs/API.md): endpoints and conventions
+- [api/](docs/api/README.md): API reference, one file per endpoint
 - [TESTING.md](docs/TESTING.md): test strategy and how to run tests
 - [PLAYWRIGHT.md](docs/PLAYWRIGHT.md): learning path and **current exercise**
 - [AI.md](docs/AI.md): AI architecture (built from Phase 8)
