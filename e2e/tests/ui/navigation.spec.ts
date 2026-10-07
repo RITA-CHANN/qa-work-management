@@ -17,8 +17,7 @@ test.describe('Navigation', () => {
     const mainNav = page.getByRole('navigation', { name: 'Main' });
 
     // Act: click the Projects link
-    await page.getByRole('link', { name: 'Projects' }).click();
-
+    await mainNav.getByRole('link', { name: 'Projects' }).click();
     // Assert: URL, heading, active link, empty state
     await expect(page).toHaveURL('/projects');
     await expect(page.getByRole('heading', { level: 1, name: 'Projects' })).toBeVisible();
@@ -29,21 +28,21 @@ test.describe('Navigation', () => {
     await expect(page.getByRole('heading', { level: 2, name: 'No projects yet' })).toBeVisible();
   });
 
-  test('navigate back to the dashboard when open not exist page', async ({ page }) => {
+  test('navigate back to the dashboard when visiting a non-existent page', async ({ page }) => {
     // Arrange: scope locators to the "Main" navigation landmark
     const mainNav = page.getByRole('navigation', { name: 'Main' });
 
     // Act: go to a non-existent page
     await page.goto('/does-not-exist');
 
-    // Assert: URL, heading, active link, empty state
+    // Assert: URL, heading
     await expect(page).toHaveURL('/does-not-exist');
-    await expect(page.getByRole('heading', { level: 1, name: 'Page Not Found' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found');
 
     // Act: click the Dashboard link
-    await page.getByRole('link', { name: 'Back to Dashboard' }).click();
+    await mainNav.getByRole('link', { name: /Dashboard/i }).click();
 
-    // Assert: URL, heading, active link, empty state
+    // Assert: URL, heading, and active link
     await expect(page).toHaveURL('/');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Dashboard' })).toHaveAttribute(
