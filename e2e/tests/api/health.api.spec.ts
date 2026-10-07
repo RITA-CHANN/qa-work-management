@@ -12,7 +12,7 @@ test.describe('Health API', () => {
     // Assert: body fields
     const body = await response.json();
     expect(body.data.status).toBe('ok');
-    expect(body.data.database).toBe('up'
+    expect(body.data.database).toBe('up');
     expect(healthResponseSchema.safeParse(body.data).success).toBe(true);
   });
 
