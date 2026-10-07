@@ -1,0 +1,29 @@
+// QA Work Management database schema.
+// See docs/DATABASE.md for the full entity plan; tables are added phase by phase.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum GlobalRole {
+  ADMIN
+  USER
+}
+
+/// A person who can sign in. Password and sessions arrive in Phase 2.
+model User {
+  id         String     @id @default(cuid())
+  email      String     @unique
+  name       String
+  globalRole GlobalRole @default(USER) @map("global_role")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  @@map("users")
+}
