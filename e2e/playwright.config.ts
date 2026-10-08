@@ -35,9 +35,14 @@ export default defineConfig({
       use: { baseURL: TEST_API_URL },
     },
     {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+    {
       name: 'chromium',
       testDir: './tests/ui',
-      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'], // run setup first
+      use: { ...devices['Desktop Chrome'], storageState: '.auth/user.json' },
     },
   ],
 
