@@ -88,7 +88,7 @@ checking `safeParse(...).success`, so a failure tells you which field is wrong.
 ```bash
 npm run e2e
 npm run lint
-npm run docs:build   # your tags appear in docs/traceability.md
+npm run docs:build   # your tags appear in docs/traceability/
 ```
 
 ### 4. Submit for review

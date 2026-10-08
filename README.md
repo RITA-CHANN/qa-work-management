@@ -71,7 +71,7 @@ docs            Architecture, database, API, testing, Playwright and AI docs; ph
 - [docs/README.md](docs/README.md): **start here**, map of all docs and how IDs work
 - [requirements/](docs/requirements/README.md): business requirements per feature (user stories, rules, acceptance criteria)
 - [design/](docs/README.md#design): screens, user flows (basic design) and detail design
-- [traceability.md](docs/traceability.md): requirement → screen → API → design → tests
+- [traceability/](docs/traceability/README.md): coverage overview, requirement → screen → API → design → tests, and test → requirement
 - [decisions/](docs/decisions/README.md): architecture decisions (ADR)
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md): how the system fits together
 - [database/](docs/database/README.md): tables, relationships, migrations; one file per table

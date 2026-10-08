@@ -41,7 +41,8 @@ Before the first run: Docker must be running (`npm run db:up`) and browsers inst
 6. **Trace to a requirement:** tag each test with the acceptance criteria it checks, for example
    `test('wrong password shows a generic error', { tag: '@AC-AUTH-02' }, async ({ page }) => { … })`.
    Run one criterion with `npx playwright test --grep @AC-AUTH-02`. `npm run docs:check` fails on a tag that
-   matches no ID, and `npm run docs:build` updates [traceability.md](traceability.md) with your tests.
+   matches no ID, and `npm run docs:build` updates [traceability/](traceability/README.md) with your tests. Its automation gaps list,
+   sorted by risk, is a good place to pick the next test to write.
 
 ## QA checklist per feature
 
@@ -51,7 +52,7 @@ empty state, loading state, concurrency, data consistency, API failure and brows
 ### Phase 2: Authentication
 
 The full list is [requirements/auth/acceptance.md](requirements/auth/acceptance.md); coverage per criterion is in
-[traceability.md](traceability.md).
+[traceability/auth.md](traceability/auth.md).
 
 | Dimension     | Case                                                                                                      | Criteria                                       | Automate |
 | ------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | -------- |

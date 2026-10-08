@@ -16,7 +16,7 @@ screen, the API, the design and the tests.
 | [api/](api/README.md)                                                                                        | One file per endpoint                                                                                                   | `API-HEALTH-01`                   |
 | [decisions/](decisions/README.md)                                                                            | Architecture decisions (ADR)                                                                                            | `ADR-0001`                        |
 | [phases/](phases/)                                                                                           | Technical plan per phase (what we build when)                                                                           |                                   |
-| [traceability.md](traceability.md)                                                                           | **Generated** matrix: each AC → design, API and tests                                                                   |                                   |
+| [traceability/](traceability/README.md)                                                                      | **Generated**: coverage overview, one matrix per feature (AC → design, API, tests) and the reverse view (test → AC)     |                                   |
 | [\_templates/](_templates/README.md)                                                                         | Copy one of these to start a new doc                                                                                    |                                   |
 | [ARCHITECTURE.md](ARCHITECTURE.md), [TESTING.md](TESTING.md), [PLAYWRIGHT.md](PLAYWRIGHT.md), [AI.md](AI.md) | How the system and the tests work                                                                                       |                                   |
 
@@ -47,6 +47,19 @@ Rules:
   if the docs and the code differ, or if an app copies a message string.
 - Design and API files list what they serve under `traces:` in their front matter. The matrix is built from that.
 
+## Requirement attributes
+
+Following ISO/IEC/IEEE 29148, requirement rows carry a few attributes as extra table columns. `docs:check` fails if
+one is missing or has a value not in the list.
+
+| Column     | On     | Values                                            | Meaning                                                                                                                        |
+| ---------- | ------ | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `Priority` | US, AC | `Must`, `Should`, `Could`, `Won't`                | Business value (MoSCoW). Decides what is built and tested first.                                                               |
+| `Source`   | US, BR | free text                                         | Where the requirement came from (a brief, a person, a review), so you know who to ask.                                         |
+| `Risk`     | AC     | `High`, `Medium`, `Low`                           | How likely this breaks and how much it hurts if it does (risk-based testing, ISO/IEC/IEEE 29119-2). High risk is tested first. |
+| `Verify`   | AC     | `Auto-UI`, `Auto-API`, `Unit`, `Manual`, `Review` | How the criterion is checked; one or more, comma-separated. `Auto-*` means a Playwright test should be tagged with it.         |
+| `Covers`   | AC     | US and BR IDs                                     | The stories and rules the criterion proves (trace up).                                                                         |
+
 ## Front matter
 
 Design, API and decision files start with a header like this:
@@ -71,6 +84,18 @@ updated: 2026-10-07
 
 Tag each Playwright test with the criteria it checks: `{ tag: '@AC-AUTH-02' }`. See [TESTING.md](TESTING.md#rules-for-every-test).
 
+## Traceability
+
+`npm run docs:build` writes [traceability/](traceability/README.md) from the docs and the test tags:
+
+- `README.md`: coverage per feature and the gaps to review (high-risk criteria with no test, stories and rules with
+  no criterion, tests with no tag).
+- `<feature>.md`: requirement → design → API → test, then the automation gaps sorted by risk.
+- `tests.md`: the reverse view, each test and the IDs it covers.
+
+The gaps are warnings, not errors: they are normal while a phase is in progress. Review the `traceability/` diff in
+each pull request to see what coverage changed.
+
 ## Looking back
 
 - Every change goes through a pull request, so `git log -p docs/requirements/auth/rules.md` (or "History" on GitHub)
@@ -79,7 +104,7 @@ Tag each Playwright test with the criteria it checks: `{ tag: '@AC-AUTH-02' }`. 
 
 ## Commands
 
-| Command              | Does                                                                                                 |
-| -------------------- | ---------------------------------------------------------------------------------------------------- |
-| `npm run docs:check` | Checks front matter, duplicate IDs, links to IDs that don't exist, and test tags. Run before a PR.   |
-| `npm run docs:build` | Same checks, then regenerates `traceability.md`, `requirements/README.md` and `decisions/README.md`. |
+| Command              | Does                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `npm run docs:check` | Checks front matter, requirement attributes, duplicate IDs, links to IDs that don't exist, and test tags. Run before a PR. |
+| `npm run docs:build` | Same checks, then regenerates `traceability/`, `requirements/README.md` and `decisions/README.md`.                         |

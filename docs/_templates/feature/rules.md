@@ -9,6 +9,6 @@ updated: YYYY-MM-DD
 
 # <Feature name> business rules
 
-| ID              | Rule |
-| --------------- | ---- |
-| BR-<FEATURE>-01 |      |
+| ID              | Rule | Source |
+| --------------- | ---- | ------ |
+| BR-<FEATURE>-01 |      |        |
