@@ -4,7 +4,7 @@
 
 What the business needs, one folder per feature: stories (`US`), business rules (`BR`), acceptance criteria
 (`AC`) and messages (`MSG`). How to add a feature: [../\_templates/README.md](../_templates/README.md).
-Coverage per criterion: [../traceability.md](../traceability.md).
+Coverage per criterion: [../traceability/](../traceability/README.md).
 
 | Feature                          | Phase | Status | Stories | Rules | Criteria | Criteria with a test |
 | -------------------------------- | ----- | ------ | ------- | ----- | -------- | -------------------- |

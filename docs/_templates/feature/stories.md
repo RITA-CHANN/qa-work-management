@@ -9,6 +9,6 @@ updated: YYYY-MM-DD
 
 # <Feature name> user stories
 
-| ID              | Story                                              |
-| --------------- | -------------------------------------------------- |
-| US-<FEATURE>-01 | As a **<actor>**, I want <goal>, so that <reason>. |
+| ID              | Story                                              | Priority | Source |
+| --------------- | -------------------------------------------------- | -------- | ------ |
+| US-<FEATURE>-01 | As a **<actor>**, I want <goal>, so that <reason>. | Must     |        |
