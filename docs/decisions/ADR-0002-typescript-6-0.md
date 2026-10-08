@@ -3,6 +3,9 @@ id: ADR-0002
 title: TypeScript 6.0 (not 7)
 type: decision
 status: accepted
+owner: Claude
+reviewers: [Linh]
+approved: 2026-10-07
 phase: 1
 updated: 2026-10-07
 ---

@@ -12,9 +12,9 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 
 ## Coverage by feature
 
-| Feature                   | Phase | Criteria | High risk | Planned automated | With a tagged test | Automation gaps | Manual, unit or review |
-| ------------------------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- |
-| [Authentication](auth.md) | 2     | 32       | 12        | 28                | 15                 | 13              | 4                      |
+| Feature                   | Phase | Criteria | High risk | Planned automated | With a tagged test | Automation gaps | Manual, unit or review | NFR |
+| ------------------------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- | --- |
+| [Authentication](auth.md) | 2     | 32       | 12        | 28                | 15                 | 13              | 4                      | 5   |
 
 ## Gaps to review
 

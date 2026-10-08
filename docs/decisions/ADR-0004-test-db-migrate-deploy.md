@@ -3,6 +3,9 @@ id: ADR-0004
 title: Test DB is prepared with prisma migrate deploy + idempotent seed
 type: decision
 status: accepted
+owner: Claude
+reviewers: [Linh]
+approved: 2026-10-07
 phase: 1
 updated: 2026-10-07
 ---

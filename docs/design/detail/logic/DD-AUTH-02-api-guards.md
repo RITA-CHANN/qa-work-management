@@ -3,7 +3,10 @@ id: DD-AUTH-02
 title: API guards (requireAuth, requireJson, cookie)
 type: detail-design
 feature: auth
+viewpoint: interface
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 2
 traces:
   requirements: [BR-AUTH-05, BR-AUTH-06, BR-AUTH-08, BR-AUTH-11, BR-AUTH-15]
@@ -92,9 +95,36 @@ CORS setup is needed.
 
 The request logger redacts the `cookie` and `set-cookie` headers and the `password` field (BR-AUTH-12, BR-AUTH-15).
 
+## Errors
+
+| Situation                                 | What the code does             | Status / message                             |
+| ----------------------------------------- | ------------------------------ | -------------------------------------------- |
+| Protected route, no cookie                | Stops before the handler       | 401 `UNAUTHENTICATED` (MSG-COMMON-05)        |
+| Cookie with an unknown or expired session | Deletes the row, clears cookie | 401 `UNAUTHENTICATED` (MSG-COMMON-05)        |
+| POST/PUT/PATCH/DELETE without JSON        | Stops before the handler       | 415 `UNSUPPORTED_MEDIA_TYPE` (MSG-COMMON-09) |
+| Body is not valid JSON                    | `express.json` error, mapped   | 400 (MSG-COMMON-03)                          |
+| No router matches                         | Falls through                  | 404 `NOT_FOUND` (MSG-COMMON-08)              |
+
+## Security
+
+- Authentication is checked once, in `requireAuth`, for every protected router (OWASP API2). Handlers trust
+  `req.user` only.
+- CSRF: `SameSite=Lax` plus the JSON-only rule above.
+- No secrets in logs: cookies and passwords are redacted.
+- Object- and role-level checks (OWASP API1, API5) are not needed in Phase 2: every logged-in user may call every
+  protected route. Phase 3 adds project roles here.
+
+## Testability
+
+- `require-json.test.ts` covers the 415 rule without a server.
+- `requireAuth` is covered end to end by the API tests (`/me` without a session, old cookie after logout).
+- A test can build a "session ended on the server" case by logging out with the same cookie in a second request
+  context.
+
 ## Change log
 
-| Date       | Change                                                             | Why                            |
-| ---------- | ------------------------------------------------------------------ | ------------------------------ |
-| 2026-10-07 | First version                                                      | Phase 2                        |
-| 2026-10-07 | Protected routers start with `requireAuth`; unknown paths stay 404 | Keep the Phase 1 404 behaviour |
+| Date       | Change                                                             | Why                                         |
+| ---------- | ------------------------------------------------------------------ | ------------------------------------------- |
+| 2026-10-07 | First version                                                      | Phase 2                                     |
+| 2026-10-07 | Protected routers start with `requireAuth`; unknown paths stay 404 | Keep the Phase 1 404 behaviour              |
+| 2026-10-08 | Added viewpoint, Errors, Security and Testability                  | Documentation standards (docs/STANDARDS.md) |

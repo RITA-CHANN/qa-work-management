@@ -66,6 +66,16 @@ Criteria whose Verify says Auto-UI or Auto-API but no test is tagged with them y
 | [AC-AUTH-25](../requirements/auth/acceptance.md) | Low    | Should   | Auto-UI  | I am sent to the dashboard                                          |
 | [AC-AUTH-28](../requirements/auth/acceptance.md) | Low    | Should   | Auto-UI  | There is no user name and no "Log out" button                       |
 
+## Non-functional requirements
+
+| NFR                                        | Quality characteristic | Measure                                                                                           | Priority | Verify           | Tests  |
+| ------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------- | -------- | ---------------- | ------ |
+| [NFR-AUTH-01](../requirements/auth/nfr.md) | Security               | argon2id with the library defaults; no plain text in the database or logs                         | Must     | Review, Unit     | —      |
+| [NFR-AUTH-02](../requirements/auth/nfr.md) | Security               | Same status, code and message for unknown email and wrong password; dummy hash for unknown emails | Must     | Auto-API, Review | ⚠ none |
+| [NFR-AUTH-03](../requirements/auth/nfr.md) | Security               | `HttpOnly`, `SameSite=Lax`, and `Secure` in production                                            | Must     | Auto-API         | ⚠ none |
+| [NFR-AUTH-04](../requirements/auth/nfr.md) | Performance efficiency | 95% of successful logins answer in under 1 second on a developer laptop                           | Should   | Manual           | —      |
+| [NFR-AUTH-05](../requirements/auth/nfr.md) | Interaction capability | WCAG 2.2 level AA on SCR-AUTH-01 and SCR-AUTH-02; no axe violations                               | Should   | Manual           | —      |
+
 ## Checked without Playwright
 
 Criteria verified by unit tests, manual testing or review instead of a Playwright test.

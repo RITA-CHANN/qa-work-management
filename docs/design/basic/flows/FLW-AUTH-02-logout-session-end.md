@@ -4,6 +4,8 @@ title: Logout and session end
 type: flow
 feature: auth
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 2
 traces:
   requirements: [US-AUTH-03, BR-AUTH-05, BR-AUTH-06, BR-AUTH-07, BR-AUTH-11]
@@ -18,6 +20,21 @@ updated: 2026-10-07
 The two ways a session ends: the user clicks "Log out", or the server no longer accepts the session (it expired
 after 7 days, or it was logged out from a copy of the cookie).
 
+## Actors
+
+User (logged in).
+
+## Preconditions
+
+The user is logged in and on any page of the app.
+
+## Postconditions
+
+This browser's session row is deleted, the cookie is cleared, cached page data is gone, and the user is on `/login`.
+Sessions in other browsers still work (BR-AUTH-07).
+
+## Diagram
+
 ```mermaid
 flowchart TD
     P[Logged in, on any page] -- clicks Log out in SCR-AUTH-02 --> LO[POST /api/auth/logout]
@@ -31,6 +48,27 @@ flowchart TD
     G -- no --> L
 ```
 
+## Main flow
+
+1. The user clicks "Log out" in [SCR-AUTH-02](../screens/SCR-AUTH-02-user-menu.md).
+2. The app calls `POST /api/auth/logout`; the API deletes the session and clears the cookie.
+3. The app clears cached user and page data.
+4. The app shows `/login`, replacing the history entry (AC-AUTH-18).
+
+## Alternative flows
+
+| ID  | At step | Condition                                  | What happens                                    | Criteria               |
+| --- | ------- | ------------------------------------------ | ----------------------------------------------- | ---------------------- |
+| A1  | 4       | The user presses Back                      | Stays on `/login`; no old page data is shown    | AC-AUTH-19             |
+| A2  | 1       | The session expired or was ended elsewhere | The next API call gets 401; `/login?returnTo=…` | AC-AUTH-17, AC-AUTH-26 |
+
+## Exception flows
+
+| ID  | At step | Error                         | What happens                                                          | Criteria   |
+| --- | ------- | ----------------------------- | --------------------------------------------------------------------- | ---------- |
+| E1  | 2       | Network error on logout       | Steps 3 and 4 still run; the server session may stay until it expires | AC-AUTH-18 |
+| E2  | 2       | Someone reuses the old cookie | The API answers 401: the session no longer exists                     | AC-AUTH-20 |
+
 ## Notes
 
 - Logout replaces the history entry, and the cached data is cleared, so Back cannot show the old page's data
@@ -42,6 +80,7 @@ flowchart TD
 
 ## Change log
 
-| Date       | Change        | Why     |
-| ---------- | ------------- | ------- |
-| 2026-10-07 | First version | Phase 2 |
+| Date       | Change                                                                       | Why                                         |
+| ---------- | ---------------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                                                | Phase 2                                     |
+| 2026-10-08 | Use case sections: actors, conditions, main, alternative and exception flows | Documentation standards (docs/STANDARDS.md) |

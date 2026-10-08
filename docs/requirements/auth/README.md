@@ -3,8 +3,10 @@ title: Authentication
 type: feature
 feature: auth
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 2
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 
 # Authentication
@@ -12,12 +14,13 @@ updated: 2026-10-07
 Technical plan: [phase-2-plan.md](../../phases/phase-2-plan.md) (how we build it). The files in this folder say
 **what the business needs** and how we know it works. Test cases trace back to the IDs (US, BR, AC, MSG).
 
-| File                           | Contains                               |
-| ------------------------------ | -------------------------------------- |
-| [stories.md](stories.md)       | User stories `US-AUTH-NN`              |
-| [rules.md](rules.md)           | Business rules `BR-AUTH-NN`            |
-| [acceptance.md](acceptance.md) | Acceptance criteria `AC-AUTH-NN`       |
-| [messages.md](messages.md)     | Exact UI and error texts `MSG-AUTH-NN` |
+| File                           | Contains                                  |
+| ------------------------------ | ----------------------------------------- |
+| [stories.md](stories.md)       | User stories `US-AUTH-NN`                 |
+| [rules.md](rules.md)           | Business rules `BR-AUTH-NN`               |
+| [acceptance.md](acceptance.md) | Acceptance criteria `AC-AUTH-NN`          |
+| [nfr.md](nfr.md)               | Non-functional requirements `NFR-AUTH-NN` |
+| [messages.md](messages.md)     | Exact UI and error texts `MSG-AUTH-NN`    |
 
 ## Design and API
 
@@ -35,6 +38,15 @@ Technical plan: [phase-2-plan.md](../../phases/phase-2-plan.md) (how we build it
 Only known team members can use QA Work Management. Every later feature (projects, bugs, activity log, permissions)
 needs to know **who** is acting, so this feature gives the system an identity for every request.
 
+## Stakeholders
+
+| Stakeholder                | What they care about                                                      |
+| -------------------------- | ------------------------------------------------------------------------- |
+| Team members (all roles)   | Log in quickly, stay logged in, no surprise logouts                       |
+| Business owner             | Only known people get in; passwords can't be guessed or leaked            |
+| QA (Linh)                  | Every rule has a criterion and a test; test data that doesn't get blocked |
+| Developers of later phases | A trusted `req.user` on every request                                     |
+
 ## Actors
 
 | Actor | Description                                                                                                                    |
@@ -45,6 +57,19 @@ needs to know **who** is acting, so this feature gives the system an identity fo
 
 Accounts are created by the seed data only. There is no sign-up in this phase.
 
+## Assumptions and constraints
+
+- Accounts come from the seed; the team is small and known in advance.
+- One API instance, so an in-memory rate limit is enough (see DD-AUTH-01).
+- The web app and the API are served from one origin, so cookies need no CORS setup.
+- HTTPS in production (the cookie gets `Secure` there); plain HTTP on localhost.
+
+## Dependencies
+
+- PostgreSQL tables [users](../../database/tables/users.md) and [sessions](../../database/tables/sessions.md).
+- Shared message catalog and schemas in `packages/shared`.
+- Every later feature depends on this one for `req.user`.
+
 ## Out of scope (later phases)
 
 - Sign-up, forgot password, change password.
@@ -53,6 +78,14 @@ Accounts are created by the seed data only. There is no sign-up in this phase.
 - Logging out of all devices.
 - Project roles (OWNER, QA_LEAD, …): Phase 3, when projects exist.
 - Two-factor login, social login (Google, GitHub).
+
+## Business risks
+
+| Risk                                                          | Why it matters                           | Covered by                          |
+| ------------------------------------------------------------- | ---------------------------------------- | ----------------------------------- |
+| Someone outside the team gets in (guessed or leaked password) | Project data and bug reports are exposed | BR-AUTH-03, BR-AUTH-04, NFR-AUTH-01 |
+| A session is stolen and reused                                | Someone acts as a team member            | BR-AUTH-06, BR-AUTH-15              |
+| Real users get blocked by the rate limit                      | People can't work for 15 minutes         | BR-AUTH-04, AC-AUTH-12              |
 
 ## Test data
 
@@ -68,7 +101,8 @@ All seed users share the password `Password123!` (dev and test only). The seed u
 
 ## Change log
 
-| Date       | Change                                                                                              | Why                       |
-| ---------- | --------------------------------------------------------------------------------------------------- | ------------------------- |
-| 2026-10-07 | First version (was `phase-2-authentication.md`, IDs renamed `AC-11` → `AC-AUTH-11`)                 | Phase 2; new docs layout  |
-| 2026-10-07 | Added BR-AUTH-14, BR-AUTH-15, AC-AUTH-29 to AC-AUTH-32; linked the API, flow and detail design docs | Full login feature design |
+| Date       | Change                                                                                              | Why                                         |
+| ---------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version (was `phase-2-authentication.md`, IDs renamed `AC-11` → `AC-AUTH-11`)                 | Phase 2; new docs layout                    |
+| 2026-10-07 | Added BR-AUTH-14, BR-AUTH-15, AC-AUTH-29 to AC-AUTH-32; linked the API, flow and detail design docs | Full login feature design                   |
+| 2026-10-08 | Added stakeholders, assumptions, dependencies, business risks and nfr.md                            | Documentation standards (docs/STANDARDS.md) |

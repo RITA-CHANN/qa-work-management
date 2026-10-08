@@ -4,6 +4,8 @@ title: POST /api/auth/login
 type: api
 feature: auth
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 2
 traces:
   requirements:
@@ -126,6 +128,21 @@ Checked in this order: content type, body, rate limit, credentials.
 The web app shows MSG-AUTH-01 for 401 and MSG-AUTH-02 for 429. The 400 `details` messages are the same texts
 as the field messages MSG-AUTH-03, MSG-AUTH-04 and MSG-AUTH-05.
 
+## Security
+
+| Risk (OWASP API Security Top 10, 2023)   | How this endpoint handles it                                                                                                                              |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| API1 Object level authorization          | Not applicable: no object id in the request                                                                                                               |
+| API2 Broken authentication               | argon2id; same 401 for unknown email and wrong password, with equal timing (BR-AUTH-03); per-email rate limit (BR-AUTH-04); new session id at every login |
+| API3 Object property level authorization | The response has only `id`, `email`, `name`, `globalRole`; never `password_hash` or the token (BR-AUTH-12, BR-AUTH-15). Unknown body fields are ignored   |
+| API4 Unrestricted resource consumption   | Body limited to 1 MB; rate limit per email. Known gap: no limit per IP address                                                                            |
+| API5 Function level authorization        | Public by design                                                                                                                                          |
+
+## Side effects
+
+Not idempotent: each success creates a session row and a new cookie, and deletes the session the request came with.
+Each 401 adds one failure for the email; a success clears them.
+
 ## Example
 
 ```bash
@@ -144,3 +161,10 @@ curl -i -c cookies.txt http://localhost:3000/api/auth/login \
 | Boundary   | 5th wrong password; 6th attempt with the right password | 401, then 429                                     |
 | Security   | Inspect `Set-Cookie`                                    | `HttpOnly`, `SameSite=Lax`, no token in the body  |
 | Security   | Send as `text/plain`                                    | 415                                               |
+
+## Change log
+
+| Date       | Change                                             | Why                                         |
+| ---------- | -------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                      | Phase 2                                     |
+| 2026-10-08 | Added Security (OWASP API Top 10) and Side effects | Documentation standards (docs/STANDARDS.md) |

@@ -1,10 +1,12 @@
 ---
 title: Common
-type: feature
+type: catalog
 feature: common
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 1
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 
 # Common

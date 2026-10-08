@@ -69,6 +69,7 @@ docs            Architecture, database, API, testing, Playwright and AI docs; ph
 ## Documentation
 
 - [docs/README.md](docs/README.md): **start here**, map of all docs and how IDs work
+- [STANDARDS.md](docs/STANDARDS.md): the international standard each kind of doc follows
 - [requirements/](docs/requirements/README.md): business requirements per feature (user stories, rules, acceptance criteria)
 - [design/](docs/README.md#design): screens, user flows (basic design) and detail design
 - [traceability/](docs/traceability/README.md): coverage overview, requirement → screen → API → design → tests, and test → requirement
