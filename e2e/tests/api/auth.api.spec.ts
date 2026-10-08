@@ -38,9 +38,11 @@ test.describe('Auth API', () => {
 
     // Act: GET /api/auth/me
     const meResponse = await guest.get('/api/auth/me');
+    const meResponseBody = await meResponse.json();
 
     // Assert: 401, body.error.code is 'UNAUTHENTICATED'
     expect(meResponse.status()).toBe(401);
+    expect(meResponseBody.error.code).toBe('UNAUTHENTICATED');
 
     await guest.dispose();
   });
@@ -73,7 +75,6 @@ test.describe('Auth API', () => {
     'old cookie is rejected after logout',
     { tag: '@AC-AUTH-20' },
     async ({ request, baseURL }) => {
-      // Arrange: log in, keep a copy of the cookie (request.storageState() or the set-cookie header)
       const loginResponse = await request.post('/api/auth/login', {
         data: { email: EMAIL, password: PASSWORD },
       });
@@ -83,8 +84,6 @@ test.describe('Auth API', () => {
       const logoutResponse = await request.post('/api/auth/logout', { data: {} });
       expect(logoutResponse.status()).toBe(204);
 
-      // Act: log out, then call /me with the OLD cookie (e.g. a new context with that cookie,
-      //      or send it yourself in the `Cookie` header)
       const token = loginResponse.headers()['set-cookie']?.match(/qawm_sid=([^;]+)/)?.[1];
       expect(token).toBeTruthy();
       const guest = await playwrightRequest.newContext({
@@ -92,9 +91,11 @@ test.describe('Auth API', () => {
         extraHTTPHeaders: { Cookie: `qawm_sid=${token}` },
       });
       const meResponse = await guest.get('/api/auth/me');
+      const meResponseBody = await meResponse.json();
 
       // Assert: 401, body.error.code is 'UNAUTHENTICATED'
       expect(meResponse.status()).toBe(401);
+      expect(meResponseBody.error.code).toBe('UNAUTHENTICATED');
 
       await guest.dispose();
     },
