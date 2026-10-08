@@ -31,7 +31,7 @@ cp .env.example .env            # adjust ports here if something is already usin
 npm install                     # also generates the Prisma client
 npm run db:up                   # starts Postgres in Docker (creates qawm_dev and qawm_test)
 npm run db:migrate              # applies migrations to qawm_dev
-npm run db:seed                 # adds seed users
+npm run db:seed                 # adds seed users (password for all: Password123!)
 npx playwright install chromium # downloads the browser Playwright drives
 ```
 
@@ -50,7 +50,11 @@ npx playwright install chromium # downloads the browser Playwright drives
 | `npm run db:studio`  | Prisma Studio: browse the dev database                             |
 | `npm run db:reset`   | Drops and recreates the **dev** database, then seeds it            |
 
-Open http://localhost:5173. The header shows **API: Online** when the API and database are reachable.
+Open http://localhost:5173 and log in as `linh@qawm.test` with `Password123!` (every seed user has this dev-only
+password; the list is in [docs/database/tables/users.md](docs/database/tables/users.md#seed-data)). The header shows
+**API: Online** when the API and database are reachable.
+
+After pulling Phase 2: run `npm install`, `npm run db:migrate` and `npm run db:seed`.
 
 ## Repository layout
 

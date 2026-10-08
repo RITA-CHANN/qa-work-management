@@ -31,3 +31,19 @@ describe('parseEnv', () => {
     expect(() => parseEnv({ DATABASE_URL: validDbUrl, API_PORT: '70000' })).toThrow(/API_PORT/);
   });
 });
+
+describe('parseEnv auth settings (BR-AUTH-13)', () => {
+  it('defaults to a 7-day session and 5 failures in 15 minutes', () => {
+    const env = parseEnv({ DATABASE_URL: validDbUrl });
+
+    expect(env.SESSION_TTL_HOURS).toBe(168);
+    expect(env.LOGIN_RATE_LIMIT_MAX).toBe(5);
+    expect(env.LOGIN_RATE_LIMIT_WINDOW_MIN).toBe(15);
+  });
+
+  it('reads the limits from the environment', () => {
+    const env = parseEnv({ DATABASE_URL: validDbUrl, LOGIN_RATE_LIMIT_MAX: '3' });
+
+    expect(env.LOGIN_RATE_LIMIT_MAX).toBe(3);
+  });
+});

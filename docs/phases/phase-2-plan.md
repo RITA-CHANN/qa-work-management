@@ -1,6 +1,6 @@
 # Phase 2 Plan: Authentication
 
-Status: **Waiting for your go-ahead** · 2026-10-07
+Status: **In progress** (code done, waiting for your Playwright tests) · 2026-10-07
 
 Requirements and design for this phase: [requirements/auth](../requirements/auth/README.md) (US, BR, AC, MSG),
 screens, flows, API docs and detail design are linked from there.

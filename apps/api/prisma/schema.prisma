@@ -16,14 +16,31 @@ enum GlobalRole {
   USER
 }
 
-/// A person who can sign in. Password and sessions arrive in Phase 2.
+/// A person who can sign in. See docs/database/tables/users.md.
 model User {
-  id         String     @id @default(cuid())
-  email      String     @unique
-  name       String
-  globalRole GlobalRole @default(USER) @map("global_role")
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @updatedAt @map("updated_at")
+  id           String     @id @default(cuid())
+  /// Always stored lower-case (BR-AUTH-01).
+  email        String     @unique
+  name         String
+  globalRole   GlobalRole @default(USER) @map("global_role")
+  /// argon2id hash; null means the user can't log in (BR-AUTH-12).
+  passwordHash String?    @map("password_hash")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  sessions     Session[]
 
   @@map("users")
+}
+
+/// One logged-in browser. See docs/database/tables/sessions.md.
+model Session {
+  /// SHA-256 (hex) of the token in the qawm_sid cookie. The token itself is never stored.
+  idHash    String   @id @map("id_hash")
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("sessions")
 }

@@ -187,7 +187,46 @@ for (const path of await walk(TESTS, '.ts')) {
   });
 }
 
-// 6. Generated files
+// 6. Messages: every MSG row in docs/requirements has the same text in packages/shared/src/messages.ts,
+//    and no app file copies a message string instead of using msg().
+const MESSAGES_FILE = join(ROOT, 'packages', 'shared', 'src', 'messages.ts');
+const MESSAGES_REL = posix(relative(ROOT, MESSAGES_FILE));
+const MSG_ENTRY = /'(MSG-[A-Z][A-Z0-9]*-\d{2,})':\s*(['"])((?:\\.|(?!\2)[^\\])*)\2/g;
+const codeMessages = new Map(); // id -> { text, rel }
+for (const [, id, , raw] of (await readFile(MESSAGES_FILE, 'utf8')).matchAll(MSG_ENTRY)) {
+  codeMessages.set(id, { text: raw.replace(/\\(.)/g, '$1'), rel: MESSAGES_REL });
+}
+for (const [id, def] of defs) {
+  if (typeOf(id) !== 'MSG') continue;
+  const docText = (def.row ?? []).filter(Boolean).at(-1)?.replace(/\\\|/g, '|');
+  const code = codeMessages.get(id);
+  if (!code) {
+    errors.push(`docs/${def.rel}:${def.line}: ${id} is missing from ${MESSAGES_REL}`);
+  } else if (code.text !== docText) {
+    errors.push(
+      `docs/${def.rel}:${def.line}: ${id} text differs from ${code.rel}\n    docs: ${docText}\n    code: ${code.text}`,
+    );
+  }
+}
+for (const [id, code] of codeMessages) {
+  if (!defs.has(id))
+    errors.push(`${code.rel}: ${id} is not in any docs/requirements/*/messages.md`);
+}
+for (const app of ['api', 'web']) {
+  for (const path of await walk(join(ROOT, 'apps', app, 'src'), '')) {
+    if (!/\.tsx?$/.test(path) || /\.test\.tsx?$/.test(path)) continue;
+    const rel = posix(relative(ROOT, path));
+    const text = await readFile(path, 'utf8');
+    for (const [id, code] of codeMessages) {
+      const literal = code.text.split('{')[0];
+      if (literal.length >= 8 && text.includes(literal)) {
+        errors.push(`${rel}: copies the text of ${id}; use msg('${id}') instead`);
+      }
+    }
+  }
+}
+
+// 7. Generated files
 const idsOfType = (type, feature) =>
   [...defs.keys()]
     .filter((id) => typeOf(id) === type && (!feature || id.split('-')[1] === feature))
@@ -217,6 +256,7 @@ function traceability() {
   ];
   for (const f of features) {
     const acs = idsOfType('AC', f.code);
+    if (!acs.length && !idsOfType('US', f.code).length) continue;
     const tested = acs.filter((id) => testsFor.has(id)).length;
     out.push(
       `## ${f.title}`,

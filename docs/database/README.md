@@ -14,10 +14,10 @@ The full entity plan for later phases is in
 
 ## Tables
 
-| Table                          | Holds                            | Prisma model | Since phase | Status                       |
-| ------------------------------ | -------------------------------- | ------------ | ----------- | ---------------------------- |
-| [users](tables/users.md)       | People who can log in            | `User`       | 1           | built; Phase 2 adds a column |
-| [sessions](tables/sessions.md) | Login sessions (one per browser) | `Session`    | 2           | planned                      |
+| Table                          | Holds                            | Prisma model | Since phase | Status                         |
+| ------------------------------ | -------------------------------- | ------------ | ----------- | ------------------------------ |
+| [users](tables/users.md)       | People who can log in            | `User`       | 1           | built (Phase 2 added a column) |
+| [sessions](tables/sessions.md) | Login sessions (one per browser) | `Session`    | 2           | built                          |
 
 ## Relationships
 
@@ -73,10 +73,10 @@ creates `qawm_test` the first time the volume is created.
 
 ## Migrations
 
-| Migration            | Phase | Changes                                      |
-| -------------------- | ----- | -------------------------------------------- |
-| `init`               | 1     | Create `users` and `GlobalRole`              |
-| `add_auth` (planned) | 2     | Add `users.password_hash`, create `sessions` |
+| Migration  | Phase | Changes                                      |
+| ---------- | ----- | -------------------------------------------- |
+| `init`     | 1     | Create `users` and `GlobalRole`              |
+| `add_auth` | 2     | Add `users.password_hash`, create `sessions` |
 
 ```bash
 # 1. Edit apps/api/prisma/schema.prisma

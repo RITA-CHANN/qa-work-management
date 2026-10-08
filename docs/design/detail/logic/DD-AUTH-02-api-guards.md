@@ -23,9 +23,10 @@ The Express middleware that protects every API route. Sessions themselves are in
 ```mermaid
 flowchart LR
     RID[requestId] --> LOG[logger] --> CP[cookie-parser] --> J[express.json] --> RJ[requireJson]
-    RJ --> PUB{Public route?}
-    PUB -- "/api/health, /api/auth/login, /api/auth/logout" --> H[handler]
-    PUB -- no --> RA[requireAuth] --> H
+    RJ --> PUB{Which router?}
+    PUB -- "public: /api/health, /api/auth/login, /api/auth/logout" --> H[handler]
+    PUB -- "protected: /api/auth/me, later modules" --> RA[requireAuth] --> H
+    PUB -- "no router matches" --> NF[404 NOT_FOUND]
     H --> EH[errorHandler]
 ```
 
@@ -55,8 +56,9 @@ sequenceDiagram
 
 - One generic 401 for every case, message `Authentication required` (API-AUTH-03).
 - `req.user` is typed in `apps/api/src/types/express.d.ts`. Handlers never read the cookie themselves.
-- Routes are protected **by default**: the router mounts `requireAuth` once, after the short list of public
-  routes. A new route is protected unless someone adds it to that list (BR-AUTH-08).
+- Every protected router starts with `router.use(requireAuth)` (see `authRouter` in
+  `apps/api/src/modules/auth/auth.routes.ts`); only `/api/health` and the login and logout routes are public
+  (BR-AUTH-08). Unknown paths still return 404 `NOT_FOUND`, as in Phase 1, because no router matches them.
 
 ## requireJson (CSRF guard)
 
@@ -73,15 +75,15 @@ Why: an HTML form on another site can only send `text/plain`, `multipart/form-da
 
 ## Cookie
 
-| Attribute  | Value                           | Rule       |
-| ---------- | ------------------------------- | ---------- |
-| Name       | `qawm_sid`                      |            |
-| Value      | the session token (base64url)   | BR-AUTH-15 |
-| `HttpOnly` | yes: page scripts can't read it | BR-AUTH-15 |
-| `SameSite` | `Lax`                           | CSRF       |
-| `Secure`   | only when `NODE_ENV=production` |            |
-| `Path`     | `/`                             |            |
-| `Max-Age`  | `SESSION_TTL_HOURS` × 3600      | BR-AUTH-05 |
+| Attribute  | Value                                               | Rule       |
+| ---------- | --------------------------------------------------- | ---------- |
+| Name       | `qawm_sid`                                          |            |
+| Value      | the session token (base64url)                       | BR-AUTH-15 |
+| `HttpOnly` | yes: page scripts can't read it                     | BR-AUTH-15 |
+| `SameSite` | `Lax`                                               | CSRF       |
+| `Secure`   | only when `NODE_ENV=production`                     |            |
+| `Path`     | `/`                                                 |            |
+| `Max-Age`  | `SESSION_TTL_HOURS` × 3600 (also sent as `Expires`) | BR-AUTH-05 |
 
 The web app and the API share one origin through the Vite proxy (dev) and the Playwright web server (tests), so no
 CORS setup is needed.
@@ -92,6 +94,7 @@ The request logger redacts the `cookie` and `set-cookie` headers and the `passwo
 
 ## Change log
 
-| Date       | Change        | Why     |
-| ---------- | ------------- | ------- |
-| 2026-10-07 | First version | Phase 2 |
+| Date       | Change                                                             | Why                            |
+| ---------- | ------------------------------------------------------------------ | ------------------------------ |
+| 2026-10-07 | First version                                                      | Phase 2                        |
+| 2026-10-07 | Protected routers start with `requireAuth`; unknown paths stay 404 | Keep the Phase 1 404 behaviour |
