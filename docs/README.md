@@ -17,6 +17,8 @@ screen, the API, the design and the tests.
 | [decisions/](decisions/README.md)                                                                            | Architecture decisions (ADR)                                                                                            | `ADR-0001`                        |
 | [phases/](phases/)                                                                                           | Technical plan per phase (what we build when)                                                                           |                                   |
 | [traceability/](traceability/README.md)                                                                      | **Generated**: coverage overview, one matrix per feature (AC → design, API, tests) and the reverse view (test → AC)     |                                   |
+| [STANDARDS.md](STANDARDS.md)                                                                                 | Which international standard each kind of doc follows                                                                   |                                   |
+| [glossary.md](glossary.md)                                                                                   | Terms used in requirements, design and tests                                                                            |                                   |
 | [\_templates/](_templates/README.md)                                                                         | Copy one of these to start a new doc                                                                                    |                                   |
 | [ARCHITECTURE.md](ARCHITECTURE.md), [TESTING.md](TESTING.md), [PLAYWRIGHT.md](PLAYWRIGHT.md), [AI.md](AI.md) | How the system and the tests work                                                                                       |                                   |
 
@@ -24,18 +26,23 @@ screen, the API, the design and the tests.
 
 `<TYPE>-<FEATURE>-<NN>`, for example `AC-AUTH-11`. `FEATURE` is the requirements folder name in capitals.
 
-| Type  | Meaning              | Defined in                             |
-| ----- | -------------------- | -------------------------------------- |
-| `US`  | User story           | `requirements/<feature>/stories.md`    |
-| `BR`  | Business rule        | `requirements/<feature>/rules.md`      |
-| `AC`  | Acceptance criterion | `requirements/<feature>/acceptance.md` |
-| `MSG` | UI or error message  | `requirements/<feature>/messages.md`   |
-| `Q`   | Open question        | `requirements/<feature>/README.md`     |
-| `SCR` | Screen               | `design/basic/screens/SCR-…md`         |
-| `FLW` | User flow            | `design/basic/flows/FLW-…md`           |
-| `DD`  | Detail design item   | `design/detail/logic/DD-…md`           |
-| `API` | Endpoint             | `api/<resource>/<method>-<name>.md`    |
-| `ADR` | Decision             | `decisions/ADR-NNNN-…md` (`ADR-0001`)  |
+| Type        | Meaning                           | Defined in                                           |
+| ----------- | --------------------------------- | ---------------------------------------------------- |
+| `US`        | User story                        | `requirements/<feature>/stories.md`                  |
+| `BR`        | Business rule                     | `requirements/<feature>/rules.md`                    |
+| `AC`        | Acceptance criterion              | `requirements/<feature>/acceptance.md`               |
+| `NFR`       | Non-functional requirement        | `requirements/<feature>/nfr.md`                      |
+| `MSG`       | UI or error message               | `requirements/<feature>/messages.md`                 |
+| `Q`         | Open question                     | `requirements/<feature>/README.md`                   |
+| `SCR`       | Screen                            | `design/basic/screens/SCR-…md`                       |
+| `FLW`       | User flow                         | `design/basic/flows/FLW-…md`                         |
+| `DD`        | Detail design item                | `design/detail/logic/DD-…md`                         |
+| `API`       | Endpoint                          | `api/<resource>/<method>-<name>.md`                  |
+| `ADR`       | Decision                          | `decisions/ADR-NNNN-…md` (`ADR-0001`)                |
+| `RSK`       | Product risk                      | `testing/risks.md`                                   |
+| `TCO`       | Test condition                    | `testing/<feature>/conditions.md`                    |
+| `MTC`       | Manual test case                  | `testing/<feature>/manual-cases.md`                  |
+| `TP`, `TCR` | Test plan, test completion report | `testing/plans/`, `testing/reports/` (`TP-PHASE-NN`) |
 
 Rules:
 
@@ -49,20 +56,28 @@ Rules:
 
 ## Requirement attributes
 
-Following ISO/IEC/IEEE 29148, requirement rows carry a few attributes as extra table columns. `docs:check` fails if
+Following ISO/IEC/IEEE 29148 and ISO/IEC 25010, requirement rows carry a few attributes as extra table columns. `docs:check` fails if
 one is missing or has a value not in the list.
 
-| Column     | On     | Values                                            | Meaning                                                                                                                        |
-| ---------- | ------ | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `Priority` | US, AC | `Must`, `Should`, `Could`, `Won't`                | Business value (MoSCoW). Decides what is built and tested first.                                                               |
-| `Source`   | US, BR | free text                                         | Where the requirement came from (a brief, a person, a review), so you know who to ask.                                         |
-| `Risk`     | AC     | `High`, `Medium`, `Low`                           | How likely this breaks and how much it hurts if it does (risk-based testing, ISO/IEC/IEEE 29119-2). High risk is tested first. |
-| `Verify`   | AC     | `Auto-UI`, `Auto-API`, `Unit`, `Manual`, `Review` | How the criterion is checked; one or more, comma-separated. `Auto-*` means a Playwright test should be tagged with it.         |
-| `Covers`   | AC     | US and BR IDs                                     | The stories and rules the criterion proves (trace up).                                                                         |
+| Column                   | On          | Values                                                                                                                                                                                   | Meaning                                                                                                                        |
+| ------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `Status`                 | US, BR      | `proposed`, `approved`, `deprecated`                                                                                                                                                     | Where the single requirement is in its life. A deprecated row keeps its ID.                                                    |
+| `Priority`               | US, AC, NFR | `Must`, `Should`, `Could`, `Won't`                                                                                                                                                       | Business value (MoSCoW). Decides what is built and tested first.                                                               |
+| `Source`                 | US, BR      | free text                                                                                                                                                                                | Where the requirement came from (a brief, a person, a review), so you know who to ask.                                         |
+| `Risk`                   | AC          | `High`, `Medium`, `Low`                                                                                                                                                                  | How likely this breaks and how much it hurts if it does (risk-based testing, ISO/IEC/IEEE 29119-2). High risk is tested first. |
+| `Verify`                 | AC, NFR     | `Auto-UI`, `Auto-API`, `Unit`, `Manual`, `Review`                                                                                                                                        | How the criterion is checked; one or more, comma-separated. `Auto-*` means a Playwright test should be tagged with it.         |
+| `Covers`                 | AC          | US and BR IDs                                                                                                                                                                            | The stories and rules the criterion proves (trace up).                                                                         |
+| `Quality characteristic` | NFR         | ISO/IEC 25010:2023: `Functional suitability`, `Performance efficiency`, `Compatibility`, `Interaction capability`, `Reliability`, `Security`, `Maintainability`, `Flexibility`, `Safety` | What kind of quality the requirement is about.                                                                                 |
+| `Measure`                | NFR         | free text                                                                                                                                                                                | A number or check that proves it, for example "p95 under 1 second".                                                            |
+
+Other docs have columns of their own (messages: `Kind`, `Shown as`; tables: `Definition`, `Classification`; test
+conditions: `Technique`; risks: `Likelihood`, `Impact`, `Level`). Their allowed values are in each
+[template](_templates/README.md), and `docs:check` enforces them.
 
 ## Front matter
 
-Design, API and decision files start with a header like this:
+Every doc starts with a header like this (ISO/IEC/IEEE 15289: who owns it, who reviews it, its status). Design and
+API docs also list what they serve under `traces:`:
 
 ```yaml
 ---
@@ -72,6 +87,9 @@ type: screen
 feature: auth
 status: review # draft | review | approved | deprecated
 phase: 2
+owner: Claude # who keeps it up to date
+reviewers: [Linh]
+approved: # YYYY-MM-DD, required once status is approved
 traces:
   requirements: [US-AUTH-01, BR-AUTH-03]
   acceptance: [AC-AUTH-01, AC-AUTH-02]
@@ -104,7 +122,7 @@ each pull request to see what coverage changed.
 
 ## Commands
 
-| Command              | Does                                                                                                                       |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `npm run docs:check` | Checks front matter, requirement attributes, duplicate IDs, links to IDs that don't exist, and test tags. Run before a PR. |
-| `npm run docs:build` | Same checks, then regenerates `traceability/`, `requirements/README.md` and `decisions/README.md`.                         |
+| Command              | Does                                                                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run docs:check` | Checks front matter, required sections and columns, requirement attributes, duplicate IDs, links to IDs that don't exist, and test tags. Run before a PR. |
+| `npm run docs:build` | Same checks, then regenerates `traceability/`, `requirements/README.md` and `decisions/README.md`.                                                        |

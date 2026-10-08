@@ -4,6 +4,8 @@ title: Login screen
 type: screen
 feature: auth
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 2
 route: /login
 traces:
@@ -88,6 +90,31 @@ How the form works inside: [DD-AUTH-03](../../detail/logic/DD-AUTH-03-web-auth-s
 | Blocked    | MSG-AUTH-02 in the alert                                   | AC-AUTH-11             |
 | Success    | Navigates to `returnTo` (inside the app only) or dashboard | AC-AUTH-01, AC-AUTH-24 |
 
+## Permissions
+
+| Role                    | Can see                              | Can do         |
+| ----------------------- | ------------------------------------ | -------------- |
+| Guest                   | The login form                       | Log in         |
+| User, Admin (logged in) | Nothing: redirected to the dashboard | — (AC-AUTH-25) |
+
+## Accessibility
+
+- Page title "Log in · QA Work Management"; one `<h1>` "Log in".
+- Landmarks: `header` and `main` (`id="main-content"`).
+- Tab order: Email → Password → "Log in". Enter in either field submits (AC-AUTH-07).
+- Every input has a visible `<label>`; `autocomplete` is `username` and `current-password` (WCAG 1.3.5).
+- Server errors (MSG-AUTH-01, MSG-AUTH-02) are in `role="alert"`, so screen readers announce them; focus then moves
+  to the cleared password field.
+- Field errors (MSG-AUTH-03 to MSG-AUTH-05) are linked to their input with `aria-describedby` and the input gets
+  `aria-invalid="true"`.
+- Known gap: after a client validation error, focus stays on the button and the field messages are not announced
+  (WCAG 3.3.1 is met visually; moving focus to the first invalid field would help screen reader users). Not in a
+  criterion yet.
+
+## Responsive
+
+The form is one column, at most 384 px wide, centred; it works the same on narrow screens.
+
 ## Locators for tests
 
 Use roles and labels, no `data-testid`: `getByLabel('Email')`, `getByLabel('Password')`,
@@ -95,7 +122,8 @@ Use roles and labels, no `data-testid`: `getByLabel('Email')`, `getByLabel('Pass
 
 ## Change log
 
-| Date       | Change                                                                                 | Why                       |
-| ---------- | -------------------------------------------------------------------------------------- | ------------------------- |
-| 2026-10-07 | First version                                                                          | Phase 2                   |
-| 2026-10-07 | Added Actions, API and detail design links; password is cleared after a rejected login | Full login feature design |
+| Date       | Change                                                                                 | Why                                         |
+| ---------- | -------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                                                          | Phase 2                                     |
+| 2026-10-07 | Added Actions, API and detail design links; password is cleared after a rejected login | Full login feature design                   |
+| 2026-10-08 | Added Permissions, Accessibility and Responsive                                        | Documentation standards (docs/STANDARDS.md) |

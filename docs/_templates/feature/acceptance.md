@@ -4,6 +4,9 @@ type: acceptance
 feature: <feature>
 status: draft
 phase: <N>
+owner: <who>
+reviewers: [Linh]
+approved:
 updated: YYYY-MM-DD
 ---
 
@@ -17,3 +20,8 @@ and **Verify** are explained in [docs/README.md](../../README.md#requirement-att
 | ID              | Given | When | Then | Covers          | Priority | Risk   | Verify  |
 | --------------- | ----- | ---- | ---- | --------------- | -------- | ------ | ------- |
 | AC-<FEATURE>-01 |       |      |      | US-<FEATURE>-01 | Must     | Medium | Auto-UI |
+
+## Change log
+
+| Date | Change | Why |
+| ---- | ------ | --- |

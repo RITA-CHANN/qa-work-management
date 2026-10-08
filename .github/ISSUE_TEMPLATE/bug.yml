@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a defect (fields follow the incident report of ISO/IEC/IEEE 29119-3)
+labels: [bug]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence, what is wrong.
+    validations:
+      required: true
+  - type: input
+    id: traces
+    attributes:
+      label: Related requirement and test
+      description: The AC, BR or NFR this breaks, and the test that found it, if any.
+      placeholder: AC-AUTH-02, e2e/tests/ui/login.spec.ts:70
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Commit or version, browser, OS, test or dev database.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+        2.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity (impact on the system)
+      options: [Critical, Major, Minor, Trivial]
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (how soon to fix)
+      options: [High, Medium, Low]
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Screenshot, Playwright trace, log lines with the requestId.

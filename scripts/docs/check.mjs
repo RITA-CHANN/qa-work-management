@@ -16,7 +16,8 @@ const DOCS = join(ROOT, 'docs');
 const TESTS = join(ROOT, 'e2e', 'tests');
 const WRITE = process.argv.includes('--write');
 
-const ID_PATTERN = /\b(?:(?:US|BR|AC|MSG|Q|SCR|FLW|API|DD)-[A-Z][A-Z0-9]*-\d{2,}|ADR-\d{4})\b/g;
+const ID_PATTERN =
+  /\b(?:(?:US|BR|AC|NFR|MSG|Q|SCR|FLW|API|DD|TCO|MTC|RSK|TP|TCR)-[A-Z][A-Z0-9]*-\d{2,}|ADR-\d{4})\b/g;
 const STATUSES = [
   'draft',
   'review',
@@ -26,14 +27,127 @@ const STATUSES = [
   'accepted',
   'superseded',
 ];
-// Attributes on requirement rows (ISO/IEC/IEEE 29148): column name -> allowed values.
+// Columns each kind of doc must have in its main table (the table whose first header is "ID" or "Column"),
+// and the values allowed in them: a list, `TEXT` (any non-empty text) or `OPTIONAL`. See docs/STANDARDS.md.
+const TEXT = 'text';
+const OPTIONAL = 'optional';
 const PRIORITIES = ['Must', 'Should', 'Could', "Won't"];
 const RISKS = ['High', 'Medium', 'Low'];
 const VERIFY = ['Auto-UI', 'Auto-API', 'Unit', 'Manual', 'Review'];
-const ATTRIBUTES = {
-  US: { Priority: PRIORITIES },
-  AC: { Priority: PRIORITIES, Risk: RISKS, Verify: VERIFY },
+const ROW_STATUSES = ['proposed', 'approved', 'deprecated'];
+const QUALITY = [
+  'Functional suitability',
+  'Performance efficiency',
+  'Compatibility',
+  'Interaction capability',
+  'Reliability',
+  'Security',
+  'Maintainability',
+  'Flexibility',
+  'Safety',
+];
+const TECHNIQUES = [
+  'Equivalence partitioning',
+  'Boundary value analysis',
+  'Decision table',
+  'State transition',
+  'Use case',
+  'Pairwise',
+  'Error guessing',
+  'Exploratory',
+];
+const MULTI = new Set(['Verify', 'Mitigated by', 'Traces', 'Covers']);
+const COLUMNS = {
+  stories: { Priority: PRIORITIES, Source: TEXT, Status: ROW_STATUSES },
+  rules: { Source: TEXT, Status: ROW_STATUSES },
+  acceptance: { Covers: TEXT, Priority: PRIORITIES, Risk: RISKS, Verify: VERIFY },
+  nfr: {
+    'Quality characteristic': QUALITY,
+    Measure: TEXT,
+    Priority: PRIORITIES,
+    Verify: VERIFY,
+    Source: TEXT,
+  },
+  messages: {
+    Kind: ['error', 'warning', 'info', 'success'],
+    'Shown as': ['field', 'alert', 'status', 'toast', 'page', 'api'],
+  },
+  table: { Definition: TEXT, Classification: ['public', 'internal', 'personal', 'secret'] },
+  'test-conditions': { Technique: TECHNIQUES, Traces: TEXT, Priority: PRIORITIES },
+  risks: {
+    Likelihood: RISKS,
+    Impact: RISKS,
+    Level: RISKS,
+    'Mitigated by': OPTIONAL,
+    Status: ['open', 'mitigated', 'accepted', 'closed'],
+  },
 };
+// Sections (`## Heading`) each kind of doc must have.
+const SECTIONS = {
+  feature: [
+    'Goal',
+    'Stakeholders',
+    'Actors',
+    'Assumptions and constraints',
+    'Dependencies',
+    'Out of scope',
+    'Business risks',
+    'Open questions',
+    'Change log',
+  ],
+  screen: [
+    'Layout',
+    'Actions',
+    'States',
+    'Permissions',
+    'Accessibility',
+    'Responsive',
+    'Locators for tests',
+    'Change log',
+  ],
+  flow: [
+    'Actors',
+    'Preconditions',
+    'Postconditions',
+    'Diagram',
+    'Main flow',
+    'Alternative flows',
+    'Exception flows',
+    'Change log',
+  ],
+  'detail-design': ['Errors', 'Security', 'Testability', 'Change log'],
+  api: ['Request', 'Responses', 'Security', 'Side effects', 'Test ideas', 'Change log'],
+  table: [
+    'Columns',
+    'Indexes and constraints',
+    'Relationships',
+    'Lifecycle',
+    'Retention',
+    'Data quality rules',
+    'Seed data',
+    'Used by',
+    'Change log',
+  ],
+  decision: [
+    'Context and problem',
+    'Decision drivers',
+    'Considered options',
+    'Decision outcome',
+    'Pros and cons of the options',
+  ],
+  'test-plan': [
+    'Scope',
+    'Product risks',
+    'Approach',
+    'Entry criteria',
+    'Exit criteria',
+    'Change log',
+  ],
+  'test-report': ['Summary', 'Coverage', 'Results', 'Defects', 'Exit criteria', 'Residual risks'],
+};
+// ADRs before this number were written before MADR and keep their original shape.
+const FIRST_MADR_ADR = 8;
+const VIEWPOINTS = ['interaction', 'state', 'algorithm', 'information', 'interface', 'composition'];
 const GENERATED = {
   requirements: 'requirements/README.md',
   decisions: 'decisions/README.md',
@@ -95,10 +209,19 @@ function parseFrontMatter(text) {
 }
 
 // Which docs must have front matter, and which keys they need.
+// Every doc also names its owner and reviewers (ISO/IEC/IEEE 15289).
 function requiredKeys(rel) {
-  if (/^requirements\/[^/]+\/[^/]+\.md$/.test(rel)) return ['title', 'type', 'feature', 'status'];
-  if (rel.startsWith('design/')) return ['id', 'title', 'type', 'feature', 'status'];
-  if (/^decisions\/ADR-/.test(rel)) return ['id', 'title', 'type', 'status'];
+  const review = ['owner', 'reviewers'];
+  if (/^requirements\/[^/]+\/[^/]+\.md$/.test(rel))
+    return ['title', 'type', 'feature', 'status', ...review];
+  if (rel.startsWith('design/detail/'))
+    return ['id', 'title', 'type', 'feature', 'viewpoint', 'status', ...review];
+  if (rel.startsWith('design/')) return ['id', 'title', 'type', 'feature', 'status', ...review];
+  if (/^decisions\/ADR-/.test(rel)) return ['id', 'title', 'type', 'status', ...review];
+  if (/^api\/[^/]+\/[^/]+\.md$/.test(rel))
+    return ['id', 'title', 'type', 'feature', 'status', ...review];
+  if (/^database\/tables\/[^/]+\.md$/.test(rel)) return ['title', 'type', 'status', ...review];
+  if (rel.startsWith('testing/')) return ['title', 'type', 'status', ...review];
   return null;
 }
 
@@ -123,8 +246,31 @@ for (const doc of docs) {
     errors.push(`docs/${doc.rel}: missing front matter`);
     continue;
   }
-  for (const key of keys) {
+  for (const key of keys.filter((k) => k !== 'reviewers')) {
     if (!doc.meta[key]) errors.push(`docs/${doc.rel}: front matter needs "${key}"`);
+  }
+  if (
+    keys.includes('reviewers') &&
+    !(Array.isArray(doc.meta.reviewers) && doc.meta.reviewers.length)
+  ) {
+    errors.push(`docs/${doc.rel}: front matter needs "reviewers: [name]"`);
+  }
+  if (['approved', 'accepted'].includes(doc.meta.status) && typeof doc.meta.approved !== 'string') {
+    errors.push(
+      `docs/${doc.rel}: status is ${doc.meta.status}, so front matter needs "approved: YYYY-MM-DD"`,
+    );
+  }
+  if (doc.meta.viewpoint && !VIEWPOINTS.includes(doc.meta.viewpoint)) {
+    errors.push(
+      `docs/${doc.rel}: unknown viewpoint "${doc.meta.viewpoint}" (use ${VIEWPOINTS.join(', ')})`,
+    );
+  }
+  const headings = new Set([...doc.text.matchAll(/^## (.+)$/gm)].map((m) => m[1].trim()));
+  const madr = doc.meta.type !== 'decision' || Number(doc.meta.id?.split('-')[1]) >= FIRST_MADR_ADR;
+  for (const section of madr ? (SECTIONS[doc.meta.type] ?? []) : []) {
+    if (![...headings].some((h) => h === section || h.startsWith(`${section} `))) {
+      errors.push(`docs/${doc.rel}: needs a "## ${section}" section (see docs/_templates/)`);
+    }
   }
   if (doc.meta.status && !STATUSES.includes(doc.meta.status)) {
     errors.push(
@@ -179,33 +325,58 @@ for (const doc of docs) {
   });
 }
 
-// 2b. Requirement attributes: every US and AC row has its attribute columns, with allowed values.
+// 2b. Columns: the main table of each kind of doc has its required columns, with allowed values.
 const listOf = (value) =>
   (value ?? '')
     .split(',')
     .map((v) => v.trim())
     .filter(Boolean);
-for (const [id, def] of defs) {
-  const attributes = ATTRIBUTES[typeOf(id)];
-  if (!attributes || !def.cols) continue;
-  for (const [column, allowed] of Object.entries(attributes)) {
-    const values = listOf(def.cols[column]);
-    if (!values.length) {
-      errors.push(`docs/${def.rel}:${def.line}: ${id} needs a "${column}" column value`);
+for (const doc of docs) {
+  const required = COLUMNS[doc.meta?.type];
+  if (!required) continue;
+  const lines = doc.text.split('\n');
+  let header = null;
+  let headerLine = 0;
+  lines.forEach((line, i) => {
+    if (line.trim()[0] !== '|') {
+      header = null;
+      return;
     }
-    for (const value of values) {
-      if (!allowed.includes(value)) {
-        errors.push(
-          `docs/${def.rel}:${def.line}: ${id} has ${column} "${value}" (use ${allowed.join(', ')})`,
-        );
+    if (isSeparator(line)) return;
+    const cells = splitRow(line.trim());
+    if (isSeparator(lines[i + 1])) {
+      const main = cells[0] === 'ID' || (cells[0] === 'Column' && cells.includes('Type'));
+      header = main ? cells : null;
+      headerLine = i + 1;
+      if (header) {
+        for (const column of Object.keys(required)) {
+          if (!header.includes(column)) {
+            errors.push(`docs/${doc.rel}:${headerLine}: table needs a "${column}" column`);
+          }
+        }
+      }
+      return;
+    }
+    if (!header) return;
+    const name = cells[0];
+    for (const [column, allowed] of Object.entries(required)) {
+      const k = header.indexOf(column);
+      if (k < 0 || allowed === OPTIONAL) continue;
+      const values = MULTI.has(column) ? listOf(cells[k]) : [cells[k]].filter(Boolean);
+      if (!values.length) {
+        errors.push(`docs/${doc.rel}:${i + 1}: ${name} needs a "${column}" value`);
+        continue;
+      }
+      if (allowed === TEXT) continue;
+      for (const value of values) {
+        if (!allowed.includes(value)) {
+          errors.push(
+            `docs/${doc.rel}:${i + 1}: ${name} has ${column} "${value}" (use ${allowed.join(', ')})`,
+          );
+        }
       }
     }
-    if (column !== 'Verify' && values.length > 1) {
-      errors.push(
-        `docs/${def.rel}:${def.line}: ${id} needs one ${column}, not "${values.join(', ')}"`,
-      );
-    }
-  }
+  });
 }
 
 // 3. References in docs and traces must point to something defined.
@@ -360,7 +531,7 @@ const untaggedTests = () =>
 const testRef = (t) => `\`${t.replace('e2e/tests/', '')}\``;
 const featureFile = (f) => `${TRACEABILITY_DIR}/${f.dir}.md`;
 const tracedFeatures = () =>
-  features.filter((f) => idsOfType('AC', f.code).length || idsOfType('US', f.code).length);
+  features.filter((f) => ['AC', 'US', 'NFR'].some((type) => idsOfType(type, f.code).length));
 
 function traceabilityFeature(f) {
   const rel = featureFile(f);
@@ -410,6 +581,23 @@ function traceabilityFeature(f) {
     for (const id of gaps) {
       out.push(
         `| ${linkTo(rel, id)} | ${col(id, 'Risk')} | ${col(id, 'Priority')} | ${col(id, 'Verify')} | ${col(id, 'Then')} |`,
+      );
+    }
+  } else {
+    out.push('None.');
+  }
+  const nfrs = idsOfType('NFR', f.code);
+  out.push('', '## Non-functional requirements', '');
+  if (nfrs.length) {
+    out.push(
+      '| NFR | Quality characteristic | Measure | Priority | Verify | Tests |',
+      '| --- | ---------------------- | ------- | -------- | ------ | ----- |',
+    );
+    for (const id of nfrs) {
+      const tests = (testsFor.get(id) ?? []).map(testRef);
+      const testCell = tests.length ? tests.join(', ') : isAutomated(id) ? '⚠ none' : '—';
+      out.push(
+        `| ${linkTo(rel, id)} | ${col(id, 'Quality characteristic')} | ${col(id, 'Measure')} | ${col(id, 'Priority')} | ${col(id, 'Verify')} | ${testCell} |`,
       );
     }
   } else {
@@ -493,13 +681,13 @@ function traceabilityOverview() {
     '',
     '## Coverage by feature',
     '',
-    '| Feature | Phase | Criteria | High risk | Planned automated | With a tagged test | Automation gaps | Manual, unit or review |',
-    '| ------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- |',
+    '| Feature | Phase | Criteria | High risk | Planned automated | With a tagged test | Automation gaps | Manual, unit or review | NFR |',
+    '| ------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- | --- |',
   ];
   for (const f of tracedFeatures()) {
     const acs = idsOfType('AC', f.code);
     out.push(
-      `| [${f.title}](${f.dir}.md) | ${f.phase ?? '—'} | ${acs.length} | ${acs.filter((id) => col(id, 'Risk') === 'High').length} | ${acs.filter(isAutomated).length} | ${acs.filter((id) => testsFor.has(id)).length} | ${automationGaps(f).length} | ${acs.filter((id) => !isAutomated(id)).length} |`,
+      `| [${f.title}](${f.dir}.md) | ${f.phase ?? '—'} | ${acs.length} | ${acs.filter((id) => col(id, 'Risk') === 'High').length} | ${acs.filter(isAutomated).length} | ${acs.filter((id) => testsFor.has(id)).length} | ${automationGaps(f).length} | ${acs.filter((id) => !isAutomated(id)).length} | ${idsOfType('NFR', f.code).length} |`,
     );
   }
   out.push(

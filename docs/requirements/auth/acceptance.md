@@ -3,6 +3,8 @@ title: Authentication acceptance criteria
 type: acceptance
 feature: auth
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 2
 updated: 2026-10-08
 ---

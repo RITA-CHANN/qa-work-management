@@ -3,6 +3,9 @@ id: ADR-0005
 title: Playwright uses separate ports (API 3100, web 5174)
 type: decision
 status: accepted
+owner: Claude
+reviewers: [Linh]
+approved: 2026-10-07
 phase: 1
 updated: 2026-10-07
 ---

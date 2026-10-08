@@ -3,6 +3,8 @@ id: ADR-0007
 title: Hash passwords with argon2id via @node-rs/argon2
 type: decision
 status: proposed
+owner: Claude
+reviewers: [Linh]
 phase: 2
 updated: 2026-10-07
 ---

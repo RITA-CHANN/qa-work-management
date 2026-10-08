@@ -3,7 +3,10 @@ id: DD-AUTH-01
 title: Sessions and login rate limit
 type: detail-design
 feature: auth
+viewpoint: interaction
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 2
 traces:
   requirements:
@@ -104,9 +107,40 @@ reused server (`reuseExistingServer`) needs the API restarted.
 | Cleanup          | Expired session rows are deleted on read; a full sweep is not needed in Phase 2                                         | BR-AUTH-05             |
 | Password         | Stored as an argon2 hash; never logged or returned                                                                      | BR-AUTH-12             |
 
+## Errors
+
+| Situation                                    | What the code does                                          | Status / message                       |
+| -------------------------------------------- | ----------------------------------------------------------- | -------------------------------------- |
+| Body is not valid (missing field, bad email) | Zod fails before the rate limiter; not counted as a failure | 400 `VALIDATION_ERROR` (MSG-COMMON-04) |
+| Email is blocked                             | Rejected before the password is checked; not counted        | 429 `RATE_LIMITED` (MSG-AUTH-02)       |
+| Unknown email or wrong password              | Failure recorded for the email                              | 401 `UNAUTHENTICATED` (MSG-AUTH-01)    |
+| Session expired or unknown on a request      | Expired row deleted, cookie cleared                         | 401 `UNAUTHENTICATED` (MSG-COMMON-05)  |
+| Database down                                | Error handler logs it with the requestId                    | 500 `INTERNAL_ERROR` (MSG-COMMON-02)   |
+
+## Security
+
+- Passwords: argon2id ([ADR-0007](../../../decisions/ADR-0007-password-hashing.md)), never logged or returned
+  (BR-AUTH-12).
+- Account enumeration: same message and a dummy argon2 verify for unknown emails, so neither the text nor the
+  timing tells which emails exist (BR-AUTH-03).
+- Brute force: per-email rate limit (BR-AUTH-04). Known limit: it lives in memory, so it resets when the API
+  restarts and is not shared between API instances; fine for one instance.
+- Stolen database copy: only `sha256(token)` is stored, so rows can't be used as cookies.
+- Session fixation: the incoming session is deleted at login.
+
+## Testability
+
+- Real limits in tests, so AC-AUTH-10 and AC-AUTH-11 hit the true boundary; the seed user `ratelimit@qawm.test` is
+  reserved for them.
+- The 15-minute window (AC-AUTH-13) and the 7-day expiry (AC-AUTH-17) can't be waited for in an E2E test: the
+  window is covered by unit tests in `apps/api/src/modules/auth/rate-limit.test.ts`; expiry needs a test hook or a
+  database update and is checked by hand for now.
+- Settings (AC-AUTH-30) are covered by `apps/api/src/config/env.test.ts`.
+
 ## Change log
 
-| Date       | Change                                                                    | Why                       |
-| ---------- | ------------------------------------------------------------------------- | ------------------------- |
-| 2026-10-07 | First version, from the Phase 2 plan                                      | Phase 2                   |
-| 2026-10-07 | Window start, reset on success, settings, token, session fixation, timing | Full login feature design |
+| Date       | Change                                                                    | Why                                         |
+| ---------- | ------------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version, from the Phase 2 plan                                      | Phase 2                                     |
+| 2026-10-07 | Window start, reset on success, settings, token, session fixation, timing | Full login feature design                   |
+| 2026-10-08 | Added viewpoint, Errors, Security and Testability                         | Documentation standards (docs/STANDARDS.md) |

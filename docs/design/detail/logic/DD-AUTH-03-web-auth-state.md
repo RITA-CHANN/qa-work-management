@@ -3,7 +3,10 @@ id: DD-AUTH-03
 title: Web auth state (login form, RequireAuth, returnTo)
 type: detail-design
 feature: auth
+viewpoint: state
 status: review
+owner: Claude
+reviewers: [Linh]
 phase: 2
 traces:
   requirements:
@@ -99,9 +102,34 @@ the query cache and navigates to `/login?returnTo=<current path>` with `replace`
 | Success       | `['me']` now holds the user, so the page renders `<Navigate to={safeReturnTo(returnTo)} replace />`, the same redirect as opening `/login` while logged in | AC-AUTH-01, AC-AUTH-22 to AC-AUTH-24 |
 | Autocomplete  | `autocomplete="username"` and `"current-password"`                                                                                                         |                                      |
 
+## Errors
+
+| Situation                                   | What the app does                                                  | Message                                                                                   |
+| ------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `GET /api/auth/me` returns 401              | Treated as guest (`null`), not an error                            | —                                                                                         |
+| `GET /api/auth/me` fails for another reason | `RequireAuth` shows an error in `role="alert"` instead of the page | "Cannot reach the server. Reload the page to try again." (not in the message catalog yet) |
+| Any other API call returns 401              | Global 401 handling above                                          | —                                                                                         |
+| Login rejected (401 / 429)                  | Alert with the message for the error code                          | MSG-AUTH-01, MSG-AUTH-02                                                                  |
+| Logout request fails                        | Still clears data and goes to `/login`                             | —                                                                                         |
+
+## Security
+
+- No page content is rendered before `me` answers, so a guest never sees protected data (BR-AUTH-08).
+- The session token is never in JavaScript: the cookie is `HttpOnly` (BR-AUTH-15).
+- Open redirect: `returnTo` goes through `safeReturnTo` (BR-AUTH-09, OWASP "unvalidated redirects").
+- Logout removes every cached query, so Back can't show old data (AC-AUTH-19).
+
+## Testability
+
+- `return-to.test.ts` covers every row of the sanitiser table.
+- E2E tests use the saved session in `e2e/.auth/` for logged-in pages, and `storageState` with no cookies for guest
+  cases.
+- A test can force the global 401 path by logging out in another request context and then navigating.
+
 ## Change log
 
-| Date       | Change                                                                              | Why                          |
-| ---------- | ----------------------------------------------------------------------------------- | ---------------------------- |
-| 2026-10-07 | First version                                                                       | Phase 2                      |
-| 2026-10-07 | Login success redirects through the `me` state; logout order; refetch on navigation | Found while building Phase 2 |
+| Date       | Change                                                                              | Why                                         |
+| ---------- | ----------------------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                                                       | Phase 2                                     |
+| 2026-10-07 | Login success redirects through the `me` state; logout order; refetch on navigation | Found while building Phase 2                |
+| 2026-10-08 | Added viewpoint, Errors, Security and Testability                                   | Documentation standards (docs/STANDARDS.md) |

@@ -3,6 +3,8 @@ id: ADR-0006
 title: Server-side sessions with a hashed token in an HttpOnly cookie
 type: decision
 status: proposed
+owner: Claude
+reviewers: [Linh]
 phase: 2
 updated: 2026-10-07
 ---
