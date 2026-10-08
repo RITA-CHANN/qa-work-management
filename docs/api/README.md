@@ -17,27 +17,92 @@ In Playwright API tests: `http://localhost:3100/api` (the `api` project's `baseU
 
 ## Endpoint index
 
-| Method | Path               | Auth      | Doc                                          |
-| ------ | ------------------ | --------- | -------------------------------------------- |
-| GET    | `/api/health`      | None      | [health/get-health.md](health/get-health.md) |
-| POST   | `/api/auth/login`  | None      | [auth/post-login.md](auth/post-login.md)     |
-| POST   | `/api/auth/logout` | None      | [auth/post-logout.md](auth/post-logout.md)   |
-| GET    | `/api/auth/me`     | Logged in | [auth/get-me.md](auth/get-me.md)             |
+| Method | Path                                 | Auth                                                                                             | Doc                                                                    |
+| ------ | ------------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| GET    | `/api/health`                        | None                                                                                             | [health/get-health.md](health/get-health.md)                           |
+| POST   | `/api/auth/login`                    | None                                                                                             | [auth/post-login.md](auth/post-login.md)                               |
+| POST   | `/api/auth/logout`                   | None                                                                                             | [auth/post-logout.md](auth/post-logout.md)                             |
+| GET    | `/api/auth/me`                       | Logged in                                                                                        | [auth/get-me.md](auth/get-me.md)                                       |
+| GET    | `/api/projects`                      | Logged in                                                                                        | [projects/get-projects.md](projects/get-projects.md)                   |
+| POST   | `/api/projects`                      | Logged in                                                                                        | [projects/post-project.md](projects/post-project.md)                   |
+| GET    | `/api/projects/:key`                 | Role: any member, or Admin                                                                       | [projects/get-project.md](projects/get-project.md)                     |
+| PATCH  | `/api/projects/:key`                 | Role: Owner, Project manager, QA lead (or Admin)                                                 | [projects/patch-project.md](projects/patch-project.md)                 |
+| POST   | `/api/projects/:key/archive`         | Role: Owner (or Admin)                                                                           | [projects/post-project-archive.md](projects/post-project-archive.md)   |
+| POST   | `/api/projects/:key/restore`         | Role: Owner (or Admin)                                                                           | [projects/post-project-restore.md](projects/post-project-restore.md)   |
+| DELETE | `/api/projects/:key`                 | Role: Owner (or Admin)                                                                           | [projects/delete-project.md](projects/delete-project.md)               |
+| GET    | `/api/projects/:key/members`         | Role: any member, or Admin                                                                       | [projects/get-project-members.md](projects/get-project-members.md)     |
+| POST   | `/api/projects/:key/members`         | Role: Owner, Project manager, QA lead (or Admin); Owner role only by an Owner                    | [projects/post-project-member.md](projects/post-project-member.md)     |
+| PATCH  | `/api/projects/:key/members/:userId` | Role: Owner, Project manager, QA lead (or Admin); Owner rules in BR-PROJECT-23 and BR-PROJECT-24 | [projects/patch-project-member.md](projects/patch-project-member.md)   |
+| DELETE | `/api/projects/:key/members/:userId` | Role: Owner, Project manager, QA lead (or Admin) to remove others; any member to leave           | [projects/delete-project-member.md](projects/delete-project-member.md) |
+| GET    | `/api/projects/:key/activity`        | Role: any member, or Admin                                                                       | [projects/get-project-activity.md](projects/get-project-activity.md)   |
+| GET    | `/api/projects/:key/releases`        | Role: any member, or Admin                                                                       | [releases/get-releases.md](releases/get-releases.md)                   |
+| POST   | `/api/projects/:key/releases`        | Role: Owner, Project manager, QA lead (or Admin)                                                 | [releases/post-release.md](releases/post-release.md)                   |
+| PATCH  | `/api/projects/:key/releases/:id`    | Role: Owner, Project manager, QA lead (or Admin)                                                 | [releases/patch-release.md](releases/patch-release.md)                 |
+| DELETE | `/api/projects/:key/releases/:id`    | Role: Owner, Project manager, QA lead (or Admin)                                                 | [releases/delete-release.md](releases/delete-release.md)               |
+| GET    | `/api/projects/:key/milestones`      | Role: any member, or Admin                                                                       | [milestones/get-milestones.md](milestones/get-milestones.md)           |
+| POST   | `/api/projects/:key/milestones`      | Role: Owner, Project manager, QA lead, Team lead (or Admin)                                      | [milestones/post-milestone.md](milestones/post-milestone.md)           |
+| PATCH  | `/api/projects/:key/milestones/:id`  | Role: Owner, Project manager, QA lead, Team lead (or Admin)                                      | [milestones/patch-milestone.md](milestones/patch-milestone.md)         |
+| DELETE | `/api/projects/:key/milestones/:id`  | Role: Owner, Project manager, QA lead, Team lead (or Admin)                                      | [milestones/delete-milestone.md](milestones/delete-milestone.md)       |
+| GET    | `/api/users`                         | Logged in                                                                                        | [users/get-users.md](users/get-users.md)                               |
 
 Planned endpoints: [phases/phase-0-architecture.md §11](../phases/phase-0-architecture.md#11-api-architecture).
-Each phase adds its endpoint files and rows here.
+Each phase adds its endpoint files and rows here. Phase 3 rows are designed; they are built in the Phase 3 code PR.
 
 ## Conventions (apply to every endpoint)
 
-| Topic      | Rule                                                                                                             |
-| ---------- | ---------------------------------------------------------------------------------------------------------------- |
-| Format     | JSON only                                                                                                        |
-| Success    | `{ "data": ... }`; lists: `{ "data": [...], "meta": { "page", "pageSize", "total" } }`                           |
-| Errors     | `{ "error": { "code", "message", "details"?, "requestId" } }`                                                    |
-| Request id | Every response has an `X-Request-Id` header. Send your own (letters, digits, `-`, `_`, max 64) to tag a request. |
-| Dates      | ISO 8601 UTC strings                                                                                             |
+| Topic      | Rule                                                                                                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Format     | JSON only                                                                                                                                      |
+| Success    | `{ "data": ... }`; lists: `{ "data": [...], "meta": { "page", "pageSize", "total" } }`                                                         |
+| Errors     | Until the Phase 3 code PR: `{ "error": { "code", "message", "details"?, "requestId" } }`. From it: RFC 9457, see [Error format](#error-format) |
+| Request id | Every response has an `X-Request-Id` header. Send your own (letters, digits, `-`, `_`, max 64) to tag a request.                               |
+| Dates      | ISO 8601 UTC strings                                                                                                                           |
 
 Types live in `packages/shared/src/api.ts`.
+
+## Error format
+
+From the Phase 3 code PR every error is an RFC 9457 problem details body with `Content-Type:
+application/problem+json` ([ADR-0010](../decisions/ADR-0010-problem-details-errors.md)). The auth endpoints change
+too.
+
+```json
+{
+  "type": "https://qawm.test/problems/validation-error",
+  "title": "Validation error",
+  "status": 400,
+  "detail": "Request validation failed",
+  "instance": "/api/projects",
+  "code": "VALIDATION_ERROR",
+  "messageId": "MSG-COMMON-04",
+  "errors": [{ "pointer": "/key", "detail": "Key is required", "messageId": "MSG-PROJECT-01" }],
+  "requestId": "…"
+}
+```
+
+`type` is `https://qawm.test/problems/<code in kebab case>`. `detail` is the catalog text of `messageId`. `errors`
+is only present for 400. The machine-readable contract is `docs/api/openapi.yaml`, generated from the Zod schemas
+in the same PR.
+
+### Phase 3 codes
+
+| HTTP | `code`                      | When                                                             |
+| ---- | --------------------------- | ---------------------------------------------------------------- |
+| 409  | `KEY_TAKEN`                 | Project key already used (BR-PROJECT-03)                         |
+| 409  | `ALREADY_MEMBER`            | The user is already a member (BR-PROJECT-10)                     |
+| 409  | `VERSION_CONFLICT`          | Stale `version` on a `PATCH` (BR-PROJECT-07)                     |
+| 409  | `INVALID_TRANSITION`        | Status moved backwards or skipped (BR-PROJECT-16, BR-PROJECT-31) |
+| 409  | `RELEASE_NAME_TAKEN`        | Release name used in the project (BR-PROJECT-14)                 |
+| 409  | `MILESTONE_NAME_TAKEN`      | Milestone name used in the project (BR-PROJECT-27)               |
+| 422  | `PROJECT_ARCHIVED`          | Change to an archived project (BR-PROJECT-08)                    |
+| 422  | `DELETE_NOT_ALLOWED`        | Project, release or milestone can't be deleted in its state      |
+| 422  | `LAST_OWNER`                | Change would leave no Owner (BR-PROJECT-12)                      |
+| 422  | `OWN_ROLE`                  | Caller changes their own role (BR-PROJECT-24)                    |
+| 422  | `ACTIVE_RELEASE_EXISTS`     | Another release is active (BR-PROJECT-17)                        |
+| 422  | `OPEN_MILESTONES`           | Release has milestones not completed (BR-PROJECT-25)             |
+| 422  | `CANNOT_ACTIVATE_MILESTONE` | Release not active or another milestone active (BR-PROJECT-32)   |
+| 422  | `MILESTONE_OUTSIDE_RELEASE` | Milestone dates outside the release (BR-PROJECT-29)              |
+| 422  | `MILESTONE_OVERLAP`         | Milestones of one release overlap (BR-PROJECT-30)                |
 
 ## Error codes
 

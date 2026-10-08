@@ -15,12 +15,35 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 | Feature                   | Phase | Criteria | High risk | Planned automated | With a tagged test | Automation gaps | Manual, unit or review | NFR |
 | ------------------------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- | --- |
 | [Authentication](auth.md) | 2     | 32       | 12        | 28                | 15                 | 13              | 4                      | 5   |
+| [Projects](project.md)    | 3     | 70       | 22        | 70                | 0                  | 70              | 0                      | 8   |
 
 ## Gaps to review
 
 ### High-risk criteria planned for automation without a test
 
 - [AC-AUTH-14](../requirements/auth/acceptance.md): I am still logged in
+- [AC-PROJECT-01](../requirements/project/acceptance.md): I land on the new project's page, and I am listed as Owner
+- [AC-PROJECT-05](../requirements/project/acceptance.md): I see MSG-PROJECT-04 and nothing is created
+- [AC-PROJECT-09](../requirements/project/acceptance.md): The table shows exactly SHOP and MOBI with Key, Name, My role, Members, Active release
+- [AC-PROJECT-16](../requirements/project/acceptance.md): I see the "Project not found" page / API 404, same as for a key that doesn't exist
+- [AC-PROJECT-17](../requirements/project/acceptance.md): I see no Edit, Archive, Delete, Add member, New release or New milestone buttons
+- [AC-PROJECT-18](../requirements/project/acceptance.md): I get 403 and nothing changes
+- [AC-PROJECT-22](../requirements/project/acceptance.md): There is no Edit button; the API returns 403
+- [AC-PROJECT-23](../requirements/project/acceptance.md): Dev Nguyen appears in the members table with role Developer, and can now open the project
+- [AC-PROJECT-25](../requirements/project/acceptance.md): The table shows QA Engineer; Linh's next request uses the new role without logging in again
+- [AC-PROJECT-26](../requirements/project/acceptance.md): Dev Nguyen disappears from the table and now gets 404 on the project
+- [AC-PROJECT-27](../requirements/project/acceptance.md): I see MSG-PROJECT-12 and nothing changes
+- [AC-PROJECT-29](../requirements/project/acceptance.md): I see members but no Add / Change role / Remove controls; the API returns 403
+- [AC-PROJECT-31](../requirements/project/acceptance.md): 422 with MSG-PROJECT-08
+- [AC-PROJECT-35](../requirements/project/acceptance.md): The confirm button stays disabled for the wrong key; with the right key the project is gone and its page is 404
+- [AC-PROJECT-47](../requirements/project/acceptance.md): No entry was added for it
+- [AC-PROJECT-48](../requirements/project/acceptance.md): Each step works and writes an activity entry
+- [AC-PROJECT-49](../requirements/project/acceptance.md): "Owner" is not offered in my role picker; the API returns 403 and nothing changes
+- [AC-PROJECT-50](../requirements/project/acceptance.md): The control is disabled for my own row; the API returns 422 with MSG-PROJECT-22
+- [AC-PROJECT-59](../requirements/project/acceptance.md): I see MSG-PROJECT-26; 11-15 → 11-28 is accepted
+- [AC-PROJECT-66](../requirements/project/acceptance.md): I can see them but there is no New / Edit / Delete; the API returns 403
+- [AC-PROJECT-70](../requirements/project/acceptance.md): 404 for the other project's release; 400 without a release; nothing is created
+- [AC-PROJECT-21](../requirements/project/acceptance.md): Tab 2 shows MSG-PROJECT-07, tab 1's values are kept, and tab 2 can reload to see them
 
 ### Stories and rules without an acceptance criterion
 
