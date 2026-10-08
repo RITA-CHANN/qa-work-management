@@ -109,14 +109,13 @@ test.describe('Auth API', () => {
       const password = 'wrongpassword';
 
       // Act 1: 5 wrong passwords (a for loop)
-      await Promise.all(
-        Array.from({ length: 5 }, async () => {
-          const wrongEmailResponse = await request.post('/api/auth/login', {
-            data: { email, password },
-          });
-          expect(wrongEmailResponse.status()).toBe(401);
-        }),
-      );
+      // One after another (not Promise.all): the order matters, attempt N must finish before N+1.
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        const wrongPasswordResponse = await request.post('/api/auth/login', {
+          data: { email, password },
+        });
+        expect(wrongPasswordResponse.status(), `attempt ${attempt}`).toBe(401);
+      }
 
       // Act 2: 6th attempt with the RIGHT password
       const rightPasswordResponse = await request.post('/api/auth/login', {

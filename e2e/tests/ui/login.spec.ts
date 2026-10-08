@@ -100,6 +100,7 @@ test.describe('Login', () => {
           // Assert
           await expect(page).toHaveURL('/');
           await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+          await expect(page.getByText('Linh QA')).toBeVisible();
         },
       );
     }
@@ -151,15 +152,26 @@ test.describe('Login', () => {
       await page.getByRole('button', { name: 'Log in' }).click();
       await expect(page).toHaveURL('/');
       await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+      // Build history with a protected page to go Back to:
+      // [/, /projects, /] -> logout replaces the last entry -> [/, /projects, /login]
+      const mainNav = page.getByRole('navigation', { name: 'Main' });
+      await mainNav.getByRole('link', { name: 'Projects' }).click();
+      await expect(page).toHaveURL('/projects');
+      await mainNav.getByRole('link', { name: 'Dashboard', exact: true }).click();
+      await expect(page).toHaveURL('/');
 
       // Act 1: click "Log out"
       await page.getByRole('button', { name: 'Log out' }).click();
       // Assert 1: on /login
       await expect(page).toHaveURL('/login');
 
-      // Act 2: page.goBack()
+      // Act 2: Back goes to /projects (a protected page)
       await page.goBack();
-      // Assert 2: not back to the dashboard
+      // Assert 2: the guard sends us to /login with returnTo=/projects. This URL can only appear
+      // if Back really reached /projects, so the test can't pass by staying on /login.
+      // Wait for the login form FIRST, so the toBeHidden checks run on the final page.
+      await expect(page).toHaveURL('/login?returnTo=%2Fprojects');
+      await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeHidden();
     },
   );

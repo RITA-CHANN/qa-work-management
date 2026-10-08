@@ -14,7 +14,6 @@ test.describe('Health API', () => {
     expect(body.data.status).toBe('ok');
     expect(body.data.database).toBe('up');
     healthResponseSchema.parse(body.data);
-
   });
 
   test('unknown route returns 404 with the request id', async ({ request }) => {
