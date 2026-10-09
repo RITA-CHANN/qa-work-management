@@ -59,7 +59,11 @@ function groupsFor(projectKey: string | null): NavGroup[] {
           } satisfies NavGroup,
         ]
       : []),
-    { label: 'Workspace', items: [{ to: '/projects', label: 'Projects', icon: FolderKanban }] },
+    {
+      label: 'Workspace',
+      // end: a project's own pages are not "Projects".
+      items: [{ to: '/projects', label: 'Projects', icon: FolderKanban, end: true }],
+    },
   ];
 }
 

@@ -199,6 +199,8 @@ async function main() {
   const byEmail = await seedUsers();
   for (const project of projects) await seedProject(project, byEmail);
   await seedAudit(byEmail);
+  // Back to the default workspace settings: the API recreates the row with its defaults when read.
+  await prisma.workspaceSetting.deleteMany();
   console.log(`Seeded ${users.length} users and ${projects.length} projects`);
 }
 
