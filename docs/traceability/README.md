@@ -12,16 +12,33 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 
 ## Coverage by feature
 
-| Feature                   | Phase | Criteria | High risk | Planned automated | With a tagged test | Automation gaps | Manual, unit or review | NFR |
-| ------------------------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- | --- |
-| [Authentication](auth.md) | 2     | 32       | 12        | 28                | 15                 | 13              | 4                      | 5   |
-| [Projects](project.md)    | 3     | 70       | 22        | 70                | 0                  | 70              | 0                      | 8   |
+| Feature                      | Phase | Criteria | High risk | Planned automated | With a tagged test | Automation gaps | Manual, unit or review | NFR |
+| ---------------------------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- | --- |
+| [Authentication](auth.md)    | 2     | 32       | 12        | 28                | 15                 | 13              | 4                      | 5   |
+| [Admin console](admin.md)    | 3     | 22       | 10        | 21                | 0                  | 21              | 1                      | 0   |
+| [Project dashboard](dash.md) | 3     | 7        | 1         | 7                 | 0                  | 7               | 0                      | 0   |
+| [Guest access](guest.md)     | 3     | 6        | 2         | 6                 | 0                  | 6               | 0                      | 0   |
+| [Projects](project.md)       | 3     | 70       | 22        | 70                | 0                  | 70              | 0                      | 8   |
+| [App shell](shell.md)        | 3     | 8        | 1         | 7                 | 0                  | 7               | 1                      | 0   |
 
 ## Gaps to review
 
 ### High-risk criteria planned for automation without a test
 
 - [AC-AUTH-14](../requirements/auth/acceptance.md): I am still logged in
+- [AC-ADMIN-01](../requirements/admin/acceptance.md): I see the "Page not found" page (MSG-COMMON-13) and the API returns 404, as for any unknown route
+- [AC-ADMIN-04](../requirements/admin/acceptance.md): The audit log has the entry marked "as Admin" with the old → new name, my name, the time and my IP
+- [AC-ADMIN-05](../requirements/admin/acceptance.md): The password was shown once with MSG-ADMIN-02; Hoa sees MSG-ADMIN-07 and must set a new password before anything else
+- [AC-ADMIN-06](../requirements/admin/acceptance.md): Both are refused with MSG-ADMIN-04 (422); Ada stays an active Admin
+- [AC-ADMIN-07](../requirements/admin/acceptance.md): Both browsers are signed out on the next request; signing in shows MSG-ADMIN-06; after Reactivate they can sign in again
+- [AC-ADMIN-10](../requirements/admin/acceptance.md): The entry shows actor "unknown", the email tried and the IP, and no password anywhere
+- [AC-ADMIN-12](../requirements/admin/acceptance.md): WEB exists, Linh is its only Project admin, I am not a member, and the audit log has the entry
+- [AC-ADMIN-13](../requirements/admin/acceptance.md): There is no button; the API returns 403 with MSG-ADMIN-09
+- [AC-ADMIN-16](../requirements/admin/acceptance.md): A new one-time password is shown once; the user's session ends; their next sign-in asks for a new password (MSG-ADMIN-07)
+- [AC-ADMIN-18](../requirements/admin/acceptance.md): No entry was added for it, and the user or project is unchanged
+- [AC-DASH-03](../requirements/dash/acceptance.md): There is no create, edit or delete control, every card links to its page, and no cost, budget or rate data is shown
+- [AC-GUEST-01](../requirements/guest/acceptance.md): Sam sees the dashboard and Releases only; Members and Activity are in neither the nav, search nor dashboard; both APIs return 404
+- [AC-GUEST-03](../requirements/guest/acceptance.md): Every call returns 403 (MSG-COMMON-06) and nothing changes
 - [AC-PROJECT-01](../requirements/project/acceptance.md): I land on the new project's page, and I am listed as Owner
 - [AC-PROJECT-05](../requirements/project/acceptance.md): I see MSG-PROJECT-04 and nothing is created
 - [AC-PROJECT-09](../requirements/project/acceptance.md): The table shows exactly SHOP and MOBI with Key, Name, My role, Members, Active release
@@ -44,6 +61,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 - [AC-PROJECT-66](../requirements/project/acceptance.md): I can see them but there is no New / Edit / Delete; the API returns 403
 - [AC-PROJECT-70](../requirements/project/acceptance.md): 404 for the other project's release; 400 without a release; nothing is created
 - [AC-PROJECT-21](../requirements/project/acceptance.md): Tab 2 shows MSG-PROJECT-07, tab 1's values are kept, and tab 2 can reload to see them
+- [AC-SHELL-05](../requirements/shell/acceptance.md): SECRET is in neither the results nor the API response; with no match I see MSG-SHELL-01; Esc closes the search
 
 ### Stories and rules without an acceptance criterion
 

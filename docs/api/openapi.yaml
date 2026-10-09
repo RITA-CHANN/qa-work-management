@@ -1911,6 +1911,12 @@ components:
             - MILESTONE_OUTSIDE_RELEASE
             - MILESTONE_OVERLAP
             - RELEASE_CLOSED
+            - EMAIL_TAKEN
+            - LAST_ADMIN
+            - OWN_ACCOUNT
+            - LAST_PROJECT_ADMIN
+            - ACCOUNT_DEACTIVATED
+            - PASSWORD_CHANGE_REQUIRED
         messageId:
           type: string
         errors:
@@ -1956,11 +1962,14 @@ components:
           enum:
             - ADMIN
             - USER
+        mustChangePassword:
+          type: boolean
       required:
         - id
         - email
         - name
         - globalRole
+        - mustChangePassword
       additionalProperties: false
     Health:
       type: object
