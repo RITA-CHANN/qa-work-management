@@ -23,6 +23,7 @@ export const MESSAGES = {
   'MSG-COMMON-12': 'Offline',
   'MSG-COMMON-13': 'Page not found',
   'MSG-COMMON-14': 'The page you are looking for does not exist.',
+  'MSG-COMMON-15': 'You have unsaved changes. Leave this page and lose them?',
 
   // Authentication: docs/requirements/auth/messages.md
   'MSG-AUTH-01': 'Invalid email or password',

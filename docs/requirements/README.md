@@ -13,5 +13,5 @@ Coverage per criterion: [../traceability/](../traceability/README.md).
 | [Admin console](admin/README.md)    | 3     | review | 5       | 18    | 22       | 0                    |
 | [Project dashboard](dash/README.md) | 3     | review | 2       | 8     | 7        | 0                    |
 | [Guest access](guest/README.md)     | 3     | review | 2       | 6     | 6        | 0                    |
-| [Projects](project/README.md)       | 3     | review | 14      | 37    | 76       | 0                    |
+| [Projects](project/README.md)       | 3     | review | 14      | 37    | 81       | 0                    |
 | [App shell](shell/README.md)        | 3     | review | 3       | 8     | 8        | 0                    |
