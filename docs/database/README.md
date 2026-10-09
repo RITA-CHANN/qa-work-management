@@ -14,16 +14,27 @@ The full entity plan for later phases is in
 
 ## Tables
 
-| Table                          | Holds                            | Prisma model | Since phase | Status                         |
-| ------------------------------ | -------------------------------- | ------------ | ----------- | ------------------------------ |
-| [users](tables/users.md)       | People who can log in            | `User`       | 1           | built (Phase 2 added a column) |
-| [sessions](tables/sessions.md) | Login sessions (one per browser) | `Session`    | 2           | built                          |
+| Table                                        | Holds                                       | Prisma model    | Since phase | Status                         |
+| -------------------------------------------- | ------------------------------------------- | --------------- | ----------- | ------------------------------ |
+| [users](tables/users.md)                     | People who can log in                       | `User`          | 1           | built (Phase 2 added a column) |
+| [sessions](tables/sessions.md)               | Login sessions (one per browser)            | `Session`       | 2           | built                          |
+| [projects](tables/projects.md)               | Projects                                    | `Project`       | 3           | designed                       |
+| [project_members](tables/project_members.md) | Who is in a project, with which role        | `ProjectMember` | 3           | designed                       |
+| [releases](tables/releases.md)               | Releases of a project                       | `Release`       | 3           | designed                       |
+| [milestones](tables/milestones.md)           | Agile milestones (sprints) inside a release | `Milestone`     | 3           | designed                       |
+| [activity_logs](tables/activity_logs.md)     | Who changed what in a project               | `ActivityLog`   | 3           | designed                       |
 
 ## Relationships
 
 ```mermaid
 erDiagram
     users ||--o{ sessions : "has"
+    users ||--o{ project_members : "joins"
+    projects ||--o{ project_members : "has"
+    projects ||--o{ releases : "plans"
+    releases ||--o{ milestones : "split into"
+    projects ||--o{ activity_logs : "records"
+    users ||--o{ activity_logs : "acts in"
     users {
         text id PK
         text email UK

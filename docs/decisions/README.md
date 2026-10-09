@@ -5,12 +5,15 @@
 One file per architecture decision (ADR). Phase 0 decisions D1–D13 are in the
 [Phase 0 architecture](../phases/phase-0-architecture.md). New one: copy [../\_templates/adr.md](../_templates/adr.md).
 
-| ID                                                | Decision                                                         | Status   | Phase |
-| ------------------------------------------------- | ---------------------------------------------------------------- | -------- | ----- |
-| [ADR-0001](ADR-0001-node-22-lts.md)               | Node 22 LTS (22.12+)                                             | accepted | 1     |
-| [ADR-0002](ADR-0002-typescript-6-0.md)            | TypeScript 6.0 (not 7)                                           | accepted | 1     |
-| [ADR-0003](ADR-0003-run-api-with-tsx.md)          | Run the API with tsx (no build step yet)                         | accepted | 1     |
-| [ADR-0004](ADR-0004-test-db-migrate-deploy.md)    | Test DB is prepared with prisma migrate deploy + idempotent seed | accepted | 1     |
-| [ADR-0005](ADR-0005-separate-playwright-ports.md) | Playwright uses separate ports (API 3100, web 5174)              | accepted | 1     |
-| [ADR-0006](ADR-0006-server-side-sessions.md)      | Server-side sessions with a hashed token in an HttpOnly cookie   | proposed | 2     |
-| [ADR-0007](ADR-0007-password-hashing.md)          | Hash passwords with argon2id via @node-rs/argon2                 | proposed | 2     |
+| ID                                                     | Decision                                                         | Status   | Phase |
+| ------------------------------------------------------ | ---------------------------------------------------------------- | -------- | ----- |
+| [ADR-0001](ADR-0001-node-22-lts.md)                    | Node 22 LTS (22.12+)                                             | accepted | 1     |
+| [ADR-0002](ADR-0002-typescript-6-0.md)                 | TypeScript 6.0 (not 7)                                           | accepted | 1     |
+| [ADR-0003](ADR-0003-run-api-with-tsx.md)               | Run the API with tsx (no build step yet)                         | accepted | 1     |
+| [ADR-0004](ADR-0004-test-db-migrate-deploy.md)         | Test DB is prepared with prisma migrate deploy + idempotent seed | accepted | 1     |
+| [ADR-0005](ADR-0005-separate-playwright-ports.md)      | Playwright uses separate ports (API 3100, web 5174)              | accepted | 1     |
+| [ADR-0006](ADR-0006-server-side-sessions.md)           | Server-side sessions with a hashed token in an HttpOnly cookie   | proposed | 2     |
+| [ADR-0007](ADR-0007-password-hashing.md)               | Hash passwords with argon2id via @node-rs/argon2                 | proposed | 2     |
+| [ADR-0008](ADR-0008-hide-projects-from-non-members.md) | Answer 404 for projects the caller is not a member of            | proposed | 3     |
+| [ADR-0009](ADR-0009-optimistic-locking.md)             | Optimistic locking with a version number                         | proposed | 3     |
+| [ADR-0010](ADR-0010-problem-details-errors.md)         | API errors use RFC 9457 problem details                          | proposed | 3     |
