@@ -9,8 +9,8 @@ owner: Claude
 reviewers: [Linh]
 approved:
 traces:
-  requirements: [US-SHELL-03, BR-SHELL-06, BR-PROJECT-06]
-  acceptance: [AC-SHELL-05]
+  requirements: [US-SHELL-03, BR-SHELL-06, BR-PROJECT-06, BR-GUEST-03]
+  acceptance: [AC-SHELL-05, AC-GUEST-01]
   design: [SCR-SHELL-01]
 updated: 2026-10-09
 ---
@@ -18,7 +18,8 @@ updated: 2026-10-09
 # GET /api/search
 
 Finds projects, releases, sprints (milestones) and, for Admins, users by text. Used by the ⌘K / Ctrl+K search of
-the app shell (SCR-SHELL-01, BR-SHELL-06). Results follow the same access rules as the list endpoints. Status
+the app shell (SCR-SHELL-01, BR-SHELL-06). Results follow the same access rules as the list endpoints: releases and sprints of a project where the caller is a
+Guest are left out while its `releases` area is off (BR-GUEST-03). Status
 codes follow RFC 9110; errors are RFC 9457 problem details ([README.md](../README.md#error-format),
 [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 
@@ -127,18 +128,20 @@ curl -b cookies.txt 'http://localhost:3000/api/search?q=sprint'
 
 ## Test ideas
 
-| Type       | Case                                     | Expected                                |
-| ---------- | ---------------------------------------- | --------------------------------------- |
-| Happy path | Linh, `q=shop`                           | The SHOP project first                  |
-| Permission | Linh, `q=Internal` (SECRET's name)       | `[]` (AC-SHELL-05)                      |
-| Permission | Ada, `q=Internal`; Ada, `q=linh`         | SECRET listed; a `user` result for Linh |
-| Permission | Linh, `q=linh`                           | No `user` group                         |
-| Boundary   | `q=` (empty), `q=" "`, 100 and 101 chars | 400, 400, 200, 400                      |
-| Boundary   | A text matching 6 releases               | 5 `release` results                     |
-| Validation | `q=a&x=1`                                | 400, pointer `/x`                       |
+| Type       | Case                                         | Expected                                |
+| ---------- | -------------------------------------------- | --------------------------------------- |
+| Happy path | Linh, `q=shop`                               | The SHOP project first                  |
+| Permission | Linh, `q=Internal` (SECRET's name)           | `[]` (AC-SHELL-05)                      |
+| Permission | Ada, `q=Internal`; Ada, `q=linh`             | SECRET listed; a `user` result for Linh |
+| Permission | Linh, `q=linh`                               | No `user` group                         |
+| Permission | Sam (Guest of SHOP), `releases` off, `q=2.4` | No `release` result for SHOP            |
+| Boundary   | `q=` (empty), `q=" "`, 100 and 101 chars     | 400, 400, 200, 400                      |
+| Boundary   | A text matching 6 releases                   | 5 `release` results                     |
+| Validation | `q=a&x=1`                                    | 400, pointer `/x`                       |
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-09 | First version | Phase 3C |
+| Date       | Change                                                              | Why         |
+| ---------- | ------------------------------------------------------------------- | ----------- |
+| 2026-10-09 | First version                                                       | Phase 3C    |
+| 2026-10-09 | Guest: releases and sprints hidden while the `releases` area is off | BR-GUEST-03 |

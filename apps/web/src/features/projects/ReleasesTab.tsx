@@ -101,7 +101,7 @@ export function ReleasesTab() {
     <section aria-labelledby="releases-heading" aria-busy={releases.isPending}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 id="releases-heading" className="text-lg font-semibold">
-          Releases &amp; milestones
+          Releases &amp; sprints
         </h2>
         <div className="flex gap-2">
           {canMilestone && releaseList.some((r) => r.status !== 'RELEASED') && (

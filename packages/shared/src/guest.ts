@@ -43,7 +43,7 @@ export const GUEST_AREAS_AVAILABLE: GuestArea[] = ['dashboard', 'releases', 'mem
 /** Default for new projects until a System admin changes it (ROLE-MODEL.md §2b). */
 export const DEFAULT_GUEST_AREAS: GuestArea[] = ['dashboard', 'releases'];
 
-/** Body of PUT /api/projects/:key/guest-visibility (API-PROJECT-15): the areas switched on. */
+/** Body of PUT /api/projects/:key/guest-visibility (API-PROJECT-13): the areas switched on. */
 export const guestVisibilitySchema = z.strictObject({
   areas: z.array(guestAreaSchema).max(GUEST_AREAS.length),
 });

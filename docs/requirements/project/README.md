@@ -70,9 +70,10 @@ in one project and Member in another.
 | System admin  | `users.global_role = ADMIN`              | Everything, on every project, without being a member. Only a System admin creates projects (BR-PROJECT-01).                      |
 | Project admin | `project_members.access = PROJECT_ADMIN` | Runs one project: details, members (other Project admins included), releases, milestones, archive, restore, delete.              |
 | Member        | `project_members.access = MEMBER`        | Sees the whole project. In 3A: read only (the daily work of later phases, such as test cases and bugs, comes with those phases). |
+| Guest         | `project_members.access = GUEST`         | Outside person (client, sponsor), read only, sees only the areas switched on for Guests; names only, never other Guests (3C).    |
 
-A Guest level (read only, limited areas) is planned for Phase 3C, not 3A
-([ADR-0011](../../decisions/ADR-0011-project-access-levels-and-job-titles.md)).
+The Guest level and its per-project visibility switches are specified in
+[requirements/guest](../guest/README.md) (BR-GUEST-01 to BR-GUEST-06).
 
 ### Job titles
 
@@ -169,15 +170,15 @@ All seed users share the password `Password123!` (dev and test only). Phase 3 ad
 `stakeholder@qawm.test` ([users](../../database/tables/users.md#seed-data)). Every seed project is created by
 **Ada Admin** `admin@qawm.test` (System admin), who is not a member of any of them (BR-PROJECT-01).
 
-| Key      | Name            | State    | Members (access, job title)                                                                                                                                          | Releases → milestones                                                                                                           |
-| -------- | --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `SHOP`   | ShopEase Web    | Active   | Project admins: Oanh Owner (PO), Mai PM (PM). Members: Minh Lead (QAL), Linh QA (QAE), Tuan TeamLead (TL), Dev Nguyen (DEV), Sam Stakeholder (STK), Pat Viewer (OTH) | 2.3 Released → Sprint 1, Sprint 2 Completed · 2.4 Active → Sprint 3 Completed, Sprint 4 Active · 2.5 Planned → Sprint 5 Planned |
-| `MOBI`   | ShopEase Mobile | Active   | Project admin: Linh QA (QAE). Member: Minh Lead (QAL)                                                                                                                | 1.0 Planned, no milestones                                                                                                      |
-| `OLD`    | Legacy Portal   | Archived | Project admin: Minh Lead (QAL). Member: Linh QA (QAE)                                                                                                                | 1.0 Released → M1 Completed                                                                                                     |
-| `SECRET` | Internal Tools  | Active   | Project admin: Oanh Owner (PM) only. Linh QA is not a member (404)                                                                                                   | —                                                                                                                               |
+| Key      | Name            | State    | Members (access, job title)                                                                                                                                                 | Releases → milestones                                                                                                           |
+| -------- | --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `SHOP`   | ShopEase Web    | Active   | Project admins: Oanh Owner (PO), Mai PM (PM). Members: Minh Lead (QAL), Linh QA (QAE), Tuan TeamLead (TL), Dev Nguyen (DEV), Pat Viewer (OTH). Guest: Sam Stakeholder (STK) | 2.3 Released → Sprint 1, Sprint 2 Completed · 2.4 Active → Sprint 3 Completed, Sprint 4 Active · 2.5 Planned → Sprint 5 Planned |
+| `MOBI`   | ShopEase Mobile | Active   | Project admin: Linh QA (QAE). Member: Minh Lead (QAL)                                                                                                                       | 1.0 Planned, no milestones                                                                                                      |
+| `OLD`    | Legacy Portal   | Archived | Project admin: Minh Lead (QAL). Member: Linh QA (QAE)                                                                                                                       | 1.0 Released → M1 Completed                                                                                                     |
+| `SECRET` | Internal Tools  | Active   | Project admin: Oanh Owner (PM) only. Linh QA is not a member (404)                                                                                                          | —                                                                                                                               |
 
 `SHOP` has two Project admins (so one can step down or leave) and Members with different job titles, so each column
-of the permission matrix can be tested by logging in as one seed user; Ada Admin covers the System admin column.
+of the permission matrix can be tested by logging in as one seed user (Sam Stakeholder covers the Guest column); Ada Admin covers the System admin column.
 Sprint dates are set relative to the day the seed runs, so "days left" stays meaningful. Tests only **read** the
 seed projects; a test that changes data creates its own project through the API (as Ada Admin).
 
@@ -198,7 +199,8 @@ seed projects; a test that changes data creates its own project through the API 
 
 ## Change log
 
-| Date       | Change                                                                                  | Why                        |
-| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
-| 2026-10-08 | First version, from the Phase 3 business requirements v2 and Linh's answers             | Phase 3A                   |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| Date       | Change                                                                                                           | Why                        |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version, from the Phase 3 business requirements v2 and Linh's answers                                      | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects                          | Linh's decision 2026-10-09 |
+| 2026-10-09 | Guest access level: row in Access levels, Guest column in the permission matrix, Sam Stakeholder a Guest of SHOP | Guest access (BR-GUEST-01) |

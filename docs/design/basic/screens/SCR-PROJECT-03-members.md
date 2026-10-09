@@ -22,6 +22,9 @@ traces:
       BR-PROJECT-24,
       BR-PROJECT-35,
       BR-PROJECT-37,
+      BR-GUEST-01,
+      BR-GUEST-03,
+      BR-GUEST-05,
     ]
   acceptance:
     [
@@ -37,6 +40,9 @@ traces:
       AC-PROJECT-51,
       AC-PROJECT-73,
       AC-PROJECT-75,
+      AC-GUEST-01,
+      AC-GUEST-04,
+      AC-GUEST-06,
     ]
   api: [API-PROJECT-08, API-PROJECT-09, API-PROJECT-10, API-PROJECT-11, API-USER-01]
   design: [FLW-PROJECT-02, DD-PROJECT-01]
@@ -46,7 +52,8 @@ updated: 2026-10-09
 # SCR-PROJECT-03 Members tab
 
 Who is in the project, with which access level and job title. Project admins (and System admins) manage members
-here; Members see the list.
+here; Members see the list. A Guest sees this tab only while the Members list area is switched on for Guests, and
+then by name only, without other Guests (BR-GUEST-03, BR-GUEST-05).
 
 ## Layout
 
@@ -61,6 +68,7 @@ here; Members see the list.
 └──────────────────┴──────────────────────┴──────────────────┴──────────────────────┴──────────┘
 
 As a Member: Access and Job title are text ("Member", "QA engineer · QAE", or "—"), no Add, no Remove.
+As a Guest: as a Member, without the Email column; other Guests are not listed (the API leaves them out).
 
 Dialog "Add member": User [select: name (email), existing members not listed], Access [select, default Member],
                      Job title [select, default "—"], [Cancel] [Add]
@@ -69,13 +77,13 @@ Dialog "Remove <name>?": [Cancel] [Remove]        Dialog "Leave project?": [Canc
 
 ## Fields
 
-| Field           | Input type | Required | Client validation                | Message         | Notes                                                                      |
-| --------------- | ---------- | -------- | -------------------------------- | --------------- | -------------------------------------------------------------------------- |
-| User (add)      | select     | yes      | a user from the list             | "Choose a user" | Options from `GET /api/users`, minus current members (AC-PROJECT-24)       |
-| Access (add)    | select     | yes      | Project admin or Member          | —               | Default Member; both levels offered to every Project admin (BR-PROJECT-23) |
-| Job title (add) | select     | no       | one of the 11 job titles, or "—" | —               | Default "—" (none); options read "QA engineer (QAE)" (BR-PROJECT-37)       |
-| Access (row)    | select     | —        | —                                | —               | Saves on change; shown as plain text on your own row (BR-PROJECT-24)       |
-| Job title (row) | select     | —        | —                                | —               | Saves on change; editable on every row, your own included; "—" removes it  |
+| Field           | Input type | Required | Client validation                | Message         | Notes                                                                                        |
+| --------------- | ---------- | -------- | -------------------------------- | --------------- | -------------------------------------------------------------------------------------------- |
+| User (add)      | select     | yes      | a user from the list             | "Choose a user" | Options from `GET /api/users`, minus current members (AC-PROJECT-24)                         |
+| Access (add)    | select     | yes      | Project admin, Member or Guest   | —               | Default Member; all three levels offered to every Project admin (BR-PROJECT-23, BR-GUEST-01) |
+| Job title (add) | select     | no       | one of the 11 job titles, or "—" | —               | Default "—" (none); options read "QA engineer (QAE)" (BR-PROJECT-37)                         |
+| Access (row)    | select     | —        | —                                | —               | Saves on change; shown as plain text on your own row (BR-PROJECT-24)                         |
+| Job title (row) | select     | —        | —                                | —               | Saves on change; editable on every row, your own included; "—" removes it                    |
 
 ## Actions
 
@@ -98,6 +106,8 @@ Dialog "Remove <name>?": [Cancel] [Remove]        Dialog "Leave project?": [Canc
 | Empty                  | Not possible: a project always has a Project admin                                 | BR-PROJECT-12 |
 | Error                  | MSG-COMMON-01 with "Try again"                                                     |               |
 | No permission (Member) | Table without Add; Access and Job title shown as text; no Remove; Leave on own row | AC-PROJECT-29 |
+| Guest                  | As a Member, without the Email column and without other Guests                     | AC-GUEST-04   |
+| Guest, area off        | No Members tab or nav item; the URL shows "Page not found" (MSG-COMMON-13)         | AC-GUEST-01   |
 | Archived project       | Read-only for everyone, no Leave                                                   | BR-PROJECT-08 |
 | Success                | Toast MSG-PROJECT-19                                                               |               |
 
@@ -105,10 +115,11 @@ Dialog "Remove <name>?": [Cancel] [Remove]        Dialog "Leave project?": [Canc
 
 Job titles play no part (BR-PROJECT-37).
 
-| Access level                | Can see     | Can do                                                                                                                                                 |
-| --------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Project admin, System admin | All members | Add, change access level and job title, remove anyone (other Project admins included); change own job title; leave while another Project admin remains |
-| Member                      | All members | Leave                                                                                                                                                  |
+| Access level                | Can see                                                                                    | Can do                                                                                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Project admin, System admin | All members                                                                                | Add, change access level and job title, remove anyone (other Project admins included); change own job title; leave while another Project admin remains |
+| Member                      | All members                                                                                | Leave                                                                                                                                                  |
+| Guest                       | Names, access and job titles of everyone but other Guests, while the area is on; no emails | Leave                                                                                                                                                  |
 
 ## Accessibility
 
@@ -132,7 +143,8 @@ Below 768 px each member is a card: name and email, then access, job title and a
 
 ## Change log
 
-| Date       | Change                                                                                  | Why                        |
-| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
-| 2026-10-08 | First version                                                                           | Phase 3A                   |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| Date       | Change                                                                                                                | Why                                                  |
+| ---------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| 2026-10-08 | First version                                                                                                         | Phase 3A                                             |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects                               | Linh's decision 2026-10-09                           |
+| 2026-10-09 | Guest access level in the Access selects; for a Guest no Email column, no other Guests, tab only while the area is on | Guest access (BR-GUEST-01, BR-GUEST-03, BR-GUEST-05) |

@@ -12,6 +12,7 @@ traces:
   requirements:
     [
       US-PROJECT-05,
+      BR-GUEST-01,
       US-PROJECT-14,
       BR-PROJECT-10,
       BR-PROJECT-11,
@@ -96,6 +97,7 @@ flowchart TD
 | A3  | 5       | A member clicks "Leave" on their own row                                              | Their row is deleted; they go to `/projects`                                      | AC-PROJECT-28                |
 | A4  | 3       | The Project admin changes only a job title (anyone's, their own included)             | Saved; the access level is unchanged; entry "… changed …'s job title from … to …" | AC-PROJECT-73, AC-PROJECT-76 |
 | A5  | 3       | The body changes nothing                                                              | 200, no activity entry                                                            | BR-PROJECT-19                |
+| A6  | 1, 3    | The Project admin picks the access Guest, or changes a Member to Guest and back       | Allowed; the person then sees only the areas switched on for Guests (BR-GUEST-02) | AC-GUEST-06                  |
 
 ## Exception flows
 
@@ -115,3 +117,4 @@ E2 (a PM or QA lead touching an Owner) was removed on 2026-10-09: there is no Ow
 | ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
 | 2026-10-08 | First version                                                                           | Phase 3A                   |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| 2026-10-09 | A6: add a Guest, turn a Member into a Guest and back                                    | Guest access (BR-GUEST-01) |

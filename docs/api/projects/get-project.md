@@ -9,15 +9,24 @@ owner: Claude
 reviewers: [Linh]
 approved:
 traces:
-  requirements: [US-PROJECT-03, US-PROJECT-12, BR-PROJECT-06, BR-PROJECT-34, BR-PROJECT-36]
-  acceptance: [AC-PROJECT-15, AC-PROJECT-16, AC-PROJECT-64]
+  requirements:
+    [
+      US-PROJECT-03,
+      US-PROJECT-12,
+      BR-PROJECT-06,
+      BR-PROJECT-34,
+      BR-PROJECT-36,
+      BR-GUEST-02,
+      BR-GUEST-03,
+    ]
+  acceptance: [AC-PROJECT-15, AC-PROJECT-16, AC-PROJECT-64, AC-GUEST-01]
   design: [SCR-PROJECT-02, DD-PROJECT-01]
 updated: 2026-10-09
 ---
 
 # GET /api/projects/:key
 
-Returns one project with the caller's access level, for the project page header and Overview (SCR-PROJECT-02). Status codes follow RFC 9110; errors are RFC 9457 problem details
+Returns one project with the caller's access level, for the project page header, its tabs and the Settings tab (SCR-PROJECT-02). Status codes follow RFC 9110; errors are RFC 9457 problem details
 ([README.md](../README.md#error-format), [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 
 |                 |                                                     |
@@ -57,6 +66,7 @@ Returns one project with the caller's access level, for the project page header 
       "name": "Sprint 4",
       "endDate": "2026-10-12"
     },
+    "guestAreas": ["dashboard", "releases"],
     "createdBy": {
       "id": "cm…",
       "name": "Oanh Owner"
@@ -67,21 +77,23 @@ Returns one project with the caller's access level, for the project page header 
 }
 ```
 
-| Field                   | Type                          | Description                                                                                      |
-| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------ |
-| `key`                   | string                        | Project key, upper-case (BR-PROJECT-02)                                                          |
-| `name`                  | string                        | Display name                                                                                     |
-| `description`           | string \| null                | Description                                                                                      |
-| `archivedAt`            | string (ISO 8601) \| null     | When it was archived; `null` = active                                                            |
-| `version`               | integer                       | Send back on `PATCH` (DD-PROJECT-03)                                                             |
-| `myAccess`              | ProjectAccess \| null         | Caller's access level (`PROJECT_ADMIN`, `MEMBER`); `null` for a System admin who is not a member |
-| `memberCount`           | integer                       | Number of members                                                                                |
-| `activeRelease`         | { id, name } \| null          | The `ACTIVE` release                                                                             |
-| `activeMilestone`       | { id, name, endDate } \| null | The `ACTIVE` milestone (header "days left")                                                      |
-| `createdBy`             | { id, name }                  | Creator                                                                                          |
-| `createdAt / updatedAt` | string (ISO 8601)             | Timestamps (UTC)                                                                                 |
+| Field                   | Type                          | Description                                                                                                                                                                    |
+| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `key`                   | string                        | Project key, upper-case (BR-PROJECT-02)                                                                                                                                        |
+| `name`                  | string                        | Display name                                                                                                                                                                   |
+| `description`           | string \| null                | Description                                                                                                                                                                    |
+| `archivedAt`            | string (ISO 8601) \| null     | When it was archived; `null` = active                                                                                                                                          |
+| `version`               | integer                       | Send back on `PATCH` (DD-PROJECT-03)                                                                                                                                           |
+| `myAccess`              | ProjectAccess \| null         | Caller's access level (`PROJECT_ADMIN`, `MEMBER`, `GUEST`); `null` for a System admin who is not a member                                                                      |
+| `memberCount`           | integer                       | Number of members                                                                                                                                                              |
+| `activeRelease`         | { id, name } \| null          | The `ACTIVE` release                                                                                                                                                           |
+| `activeMilestone`       | { id, name, endDate } \| null | The `ACTIVE` milestone (header "days left")                                                                                                                                    |
+| `guestAreas`            | string[]                      | Areas a Guest of this project may see (BR-GUEST-02), values of `GUEST_AREAS` in `packages/shared/src/guest.ts`; returned to every caller so the UI can hide tabs and nav items |
+| `createdBy`             | { id, name }                  | Creator                                                                                                                                                                        |
+| `createdAt / updatedAt` | string (ISO 8601)             | Timestamps (UTC)                                                                                                                                                               |
 
-Archived projects are returned too (with `archivedAt`), so the page can show the banner.
+Archived projects are returned too (with `archivedAt`), so the page can show the banner. A Guest gets the project
+whatever its switches; the areas that are off answer 404 on their own endpoints (BR-GUEST-03).
 
 ### Errors
 
@@ -116,16 +128,18 @@ curl -b cookies.txt http://localhost:3000/api/projects/SHOP
 
 ## Test ideas
 
-| Type       | Case                           | Expected                                                         |
-| ---------- | ------------------------------ | ---------------------------------------------------------------- |
-| Happy path | Linh QA gets SHOP              | 200, `myAccess` MEMBER                                           |
-| Negative   | Linh QA gets SECRET; gets NOPE | Both 404 with identical bodies except `requestId` and `instance` |
-| Boundary   | Key in lower case `shop`       | 200 (same project)                                               |
-| Permission | Ada Admin gets SHOP            | 200, `myAccess` null                                             |
+| Type       | Case                              | Expected                                                         |
+| ---------- | --------------------------------- | ---------------------------------------------------------------- |
+| Happy path | Linh QA gets SHOP                 | 200, `myAccess` MEMBER                                           |
+| Negative   | Linh QA gets SECRET; gets NOPE    | Both 404 with identical bodies except `requestId` and `instance` |
+| Boundary   | Key in lower case `shop`          | 200 (same project)                                               |
+| Permission | Ada Admin gets SHOP               | 200, `myAccess` null                                             |
+| Permission | Sam Stakeholder (Guest) gets SHOP | 200, `myAccess` GUEST, `guestAreas` `["dashboard", "releases"]`  |
 
 ## Change log
 
-| Date       | Change                                                                                  | Why                        |
-| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| Date       | Change                                                                                  | Why                                     |
+| ---------- | --------------------------------------------------------------------------------------- | --------------------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                                |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09              |
+| 2026-10-09 | Added `guestAreas` and the `GUEST` access level                                         | Guest access (BR-GUEST-01, BR-GUEST-02) |

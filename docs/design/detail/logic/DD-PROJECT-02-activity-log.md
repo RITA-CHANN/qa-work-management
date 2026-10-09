@@ -10,9 +10,19 @@ owner: Claude
 reviewers: [Linh]
 approved:
 traces:
-  requirements: [US-PROJECT-09, BR-PROJECT-19, BR-PROJECT-20, BR-PROJECT-21, BR-PROJECT-22]
-  acceptance: [AC-PROJECT-08, AC-PROJECT-44, AC-PROJECT-45, AC-PROJECT-46, AC-PROJECT-47]
-  api: [API-PROJECT-12]
+  requirements:
+    [
+      US-PROJECT-09,
+      BR-PROJECT-19,
+      BR-PROJECT-20,
+      BR-PROJECT-21,
+      BR-PROJECT-22,
+      BR-GUEST-06,
+      BR-ADMIN-04,
+    ]
+  acceptance:
+    [AC-PROJECT-08, AC-PROJECT-44, AC-PROJECT-45, AC-PROJECT-46, AC-PROJECT-47, AC-GUEST-02]
+  api: [API-PROJECT-12, API-PROJECT-13, API-ADMIN-12]
   design: [SCR-PROJECT-05]
 updated: 2026-10-09
 ---
@@ -43,6 +53,7 @@ sequenceDiagram
 | `project.created`                                               | {actor} created the project; a second entry `member.added` names the first Project admin ("Ada Admin added Oanh Owner as Project admin")                | `null`                                   |
 | `project.updated`                                               | {actor} edited the project                                                                                                                              | `name`, `description`                    |
 | `project.archived` / `project.restored`                         | {actor} archived / restored the project                                                                                                                 | `null`                                   |
+| `project.guest_visibility_changed`                              | {actor} changed what Guests can see (API-PROJECT-13)                                                                                                    | `guestAreas` (old and new list)          |
 | `member.added`                                                  | {actor} added {member} as {access} ({job title}); the bracket only when a job title is set                                                              | `null`                                   |
 | `member.updated`                                                | {actor} changed {member}'s access from {old} to {new} and job title from {old} to {new}; one clause per changed field, a missing job title reads "none" | `access`, `jobTitle` (changed ones only) |
 | `member.removed` / `member.left`                                | {actor} removed {member} / {actor} left the project                                                                                                     | `null`                                   |
@@ -56,14 +67,15 @@ entry: the log is deleted with the project.
 
 ## Rules in code
 
-| Topic          | Behaviour                                                                                                                             | Rule                          |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| One helper     | Services call `recordActivity(tx, input)` with the transaction client; it has no way to run outside a transaction                     | BR-PROJECT-22                 |
-| Summary frozen | The sentence is built at write time, so renaming a user later does not change old entries                                             | BR-PROJECT-20                 |
-| Diff           | `diff(before, after)` keeps only fields whose value changed; an edit that changes nothing writes no entry and does not bump `version` | BR-PROJECT-20                 |
-| Append-only    | No update or delete code path; the API has only `GET` for activity                                                                    | BR-PROJECT-21                 |
-| Page           | `GET …/activity?limit=20&cursor=<id>`: `ORDER BY created_at DESC, id DESC`, rows after the cursor row; `limit` 1–100                  | BR-PROJECT-21, NFR-PROJECT-05 |
-| Next cursor    | `meta.nextCursor` is the last row's id, or `null` when there are no more                                                              | BR-PROJECT-21                 |
+| Topic          | Behaviour                                                                                                                                                                                                                                                  | Rule                                  |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| One helper     | Services call `recordActivity(tx, input)` with the transaction client; it has no way to run outside a transaction                                                                                                                                          | BR-PROJECT-22                         |
+| Summary frozen | The sentence is built at write time, so renaming a user later does not change old entries                                                                                                                                                                  | BR-PROJECT-20                         |
+| Diff           | `diff(before, after)` keeps only fields whose value changed; an edit that changes nothing writes no entry and does not bump `version`                                                                                                                      | BR-PROJECT-20                         |
+| Audit too      | `recordActivity` with `audit: true` also writes an audit event in the same transaction, whoever acts (`actedAs` is `ADMIN` only for a System admin who is not a member). Used by Guest visibility (API-PROJECT-13) and Change project admin (API-ADMIN-12) | BR-GUEST-06, BR-ADMIN-04, BR-ADMIN-16 |
+| Append-only    | No update or delete code path; the API has only `GET` for activity                                                                                                                                                                                         | BR-PROJECT-21                         |
+| Page           | `GET …/activity?limit=20&cursor=<id>`: `ORDER BY created_at DESC, id DESC`, rows after the cursor row; `limit` 1–100                                                                                                                                       | BR-PROJECT-21, NFR-PROJECT-05         |
+| Next cursor    | `meta.nextCursor` is the last row's id, or `null` when there are no more                                                                                                                                                                                   | BR-PROJECT-21                         |
 
 ## Errors
 
@@ -75,7 +87,8 @@ entry: the log is deleted with the project.
 
 ## Security
 
-Only members (and Admins) can read a project's log (loader in DD-PROJECT-01). Entries contain names, not emails
+Only members (and Admins) can read a project's log (loader in DD-PROJECT-01); a Guest only while the `activity`
+area is on, otherwise 404 (BR-GUEST-03). Entries contain names, not emails
 or ids of other projects. No endpoint can change or delete an entry (AC-PROJECT-46).
 
 ## Testability
@@ -87,7 +100,8 @@ or ids of other projects. No endpoint can change or delete an entry (AC-PROJECT-
 
 ## Change log
 
-| Date       | Change                                                                                  | Why                        |
-| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
-| 2026-10-08 | First version                                                                           | Phase 3A                   |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| Date       | Change                                                                                           | Why                                |
+| ---------- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| 2026-10-08 | First version                                                                                    | Phase 3A                           |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects          | Linh's decision 2026-10-09         |
+| 2026-10-09 | Added `project.guest_visibility_changed`, the `audit: true` option and the Guest `activity` area | Guest access, change project admin |

@@ -7,7 +7,7 @@ import type {
   projectListQuerySchema,
   projectUpdateSchema,
 } from '@qawm/shared';
-import { GUEST_AREAS } from '@qawm/shared';
+import { canSeeArea, GUEST_AREAS } from '@qawm/shared';
 import type { z } from 'zod';
 import { isUniqueViolation } from '../../lib/db-types';
 import {
@@ -56,7 +56,10 @@ export async function listProjects(
     archivedAt: row.archivedAt?.toISOString() ?? null,
     myAccess: row.members[0]?.access ?? null,
     memberCount: row._count.members,
-    activeRelease: row.releases[0] ?? null,
+    // BR-GUEST-03: a Guest without the releases area doesn't see the active release.
+    activeRelease: canSeeArea(row.members[0]?.access, row.guestAreas, 'releases')
+      ? (row.releases[0] ?? null)
+      : null,
     updatedAt: row.updatedAt.toISOString(),
   }));
 }
@@ -69,7 +72,7 @@ export async function createProject(
   user: AuthUser,
   body: z.output<typeof projectCreateSchema>,
 ): Promise<ProjectDto> {
-  if (user.globalRole !== 'ADMIN') throw new ForbiddenError();
+  if (user.globalRole !== 'ADMIN') throw new ForbiddenError('FORBIDDEN', 'MSG-ADMIN-09');
   const firstAdmin = await prisma.user.findUnique({ where: { id: body.firstAdminId } });
   if (firstAdmin?.status !== 'ACTIVE')
     throw ValidationError.field('/firstAdminId', 'MSG-PROJECT-33');

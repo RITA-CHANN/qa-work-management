@@ -23,6 +23,7 @@ traces:
       BR-PROJECT-06,
       BR-PROJECT-08,
       BR-PROJECT-36,
+      BR-ADMIN-18,
     ]
   acceptance:
     [
@@ -41,16 +42,19 @@ traces:
       AC-PROJECT-14,
       AC-PROJECT-71,
       AC-PROJECT-72,
+      AC-ADMIN-13,
+      AC-ADMIN-22,
     ]
   api: [API-PROJECT-01, API-PROJECT-02, API-USER-01]
-  design: [FLW-PROJECT-01]
+  design: [FLW-PROJECT-01, SCR-ADMIN-02]
 updated: 2026-10-09
 ---
 
 # SCR-PROJECT-01 Project list and new project dialog
 
-Where every user starts: the projects they are in (all projects for a System admin), a search box and, for System
-admins only, the "New project" dialog (BR-PROJECT-01). Follows ISO 9241-110 and WCAG 2.2 level AA.
+Where every user starts: the projects they are in (all projects for a System admin) and a search box. This page has
+no "New project" button for anyone: projects are created in Admin console › Projects (SCR-ADMIN-02, BR-ADMIN-18),
+which opens the "New project" dialog specified here. Follows ISO 9241-110 and WCAG 2.2 level AA.
 
 ## Layout
 
@@ -58,7 +62,7 @@ admins only, the "New project" dialog (BR-PROJECT-01). Follows ISO 9241-110 and 
 ┌───────────────────────────────────────────────────────────────────────────────┐
 │ header (Phase 2)                                                              │
 ├──────────┬────────────────────────────────────────────────────────────────────┤
-│ nav      │  Projects                       [ New project ] (System admin only) │  <h1>
+│ nav      │  Projects                                                          │  <h1>, no button
 │ Projects │  Search [______________]   [x] Show archived                      │
 │          │ ┌──────┬──────────────┬────────────┬─────────┬────────────┬──────┐ │
 │          │ │ Key  │ Name         │ My access  │ Members │ Active rel.│Updated│ │  <table>
@@ -69,7 +73,7 @@ admins only, the "New project" dialog (BR-PROJECT-01). Follows ISO 9241-110 and 
 │          │  (empty / no match message in role="status")                       │
 └──────────┴────────────────────────────────────────────────────────────────────┘
 
-Dialog "New project"                     role="dialog", aria-labelledby = title
+Dialog "New project" (opened from SCR-ADMIN-02)   role="dialog", aria-labelledby = title
 ┌──────────────────────────────────────┐
 │ New project                       ✕  │
 │ Key          [______]                │  hint: 2–10 letters or digits, can't change later
@@ -96,47 +100,47 @@ Dialog "New project"                     role="dialog", aria-labelledby = title
 
 ## Actions
 
-| Action                                   | Result                                                            | Criteria                                    |
-| ---------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------- |
-| Open `/projects`                         | `GET /api/projects`; table of active projects sorted by name      | AC-PROJECT-09, AC-PROJECT-13                |
-| Type in Search                           | Table shows only matching rows                                    | AC-PROJECT-10, AC-PROJECT-11                |
-| Turn on "Show archived"                  | Archived projects appear with an "Archived" badge                 | AC-PROJECT-12                               |
-| Click a project name                     | Go to `/projects/<KEY>` (SCR-PROJECT-02)                          | AC-PROJECT-15                               |
-| Click "New project" (System admins only) | Dialog opens, focus in Key                                        | AC-PROJECT-01                               |
-| Click "Create" with errors               | Messages under the fields, no request                             | AC-PROJECT-02, AC-PROJECT-03, AC-PROJECT-06 |
-| Click "Create", server 201               | Dialog closes, go to the new project's page, toast MSG-PROJECT-19 | AC-PROJECT-01, AC-PROJECT-04                |
-| Server 409 `KEY_TAKEN`                   | MSG-PROJECT-04 under Key, focus on Key                            | AC-PROJECT-05                               |
-| Server 400 at `/firstAdminId`            | MSG-PROJECT-33 under First project admin                          | AC-PROJECT-72                               |
-| Cancel, ✕ or Esc                         | Dialog closes without saving, focus back on "New project"         |                                             |
+| Action                                   | Result                                                                                                                   | Criteria                                    |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| Open `/projects`                         | `GET /api/projects`; table of active projects sorted by name                                                             | AC-PROJECT-09, AC-PROJECT-13                |
+| Type in Search                           | Table shows only matching rows                                                                                           | AC-PROJECT-10, AC-PROJECT-11                |
+| Turn on "Show archived"                  | Archived projects appear with an "Archived" badge                                                                        | AC-PROJECT-12                               |
+| Click a project name                     | Go to `/projects/<KEY>` (SCR-PROJECT-02)                                                                                 | AC-PROJECT-15                               |
+| Admin console › Projects › "New project" | Dialog opens, focus in Key                                                                                               | AC-PROJECT-01, AC-ADMIN-12                  |
+| Click "Create" with errors               | Messages under the fields, no request                                                                                    | AC-PROJECT-02, AC-PROJECT-03, AC-PROJECT-06 |
+| Click "Create", server 201               | Dialog closes, toast MSG-PROJECT-19; the System admin stays in Admin console › Projects, where the new project is listed | AC-PROJECT-01, AC-PROJECT-04, AC-ADMIN-12   |
+| Server 409 `KEY_TAKEN`                   | MSG-PROJECT-04 under Key, focus on Key                                                                                   | AC-PROJECT-05                               |
+| Server 400 at `/firstAdminId`            | MSG-PROJECT-33 under First project admin                                                                                 | AC-PROJECT-72                               |
+| Cancel, ✕ or Esc                         | Dialog closes without saving, focus back on "New project" (SCR-ADMIN-02)                                                 |                                             |
 
 ## States
 
-| State                      | What the user sees                                                                                     | Criteria      |
-| -------------------------- | ------------------------------------------------------------------------------------------------------ | ------------- |
-| Loading                    | Table skeleton rows; `aria-busy="true"` on the table                                                   |               |
-| Empty (no projects at all) | MSG-PROJECT-21; no "New project" button unless I am a System admin                                     | AC-PROJECT-14 |
-| No match                   | MSG-PROJECT-20 in place of the rows                                                                    | AC-PROJECT-11 |
-| Error                      | MSG-COMMON-01 with a "Try again" button                                                                |               |
-| No permission              | A user who is not a System admin sees the list without "New project"; `POST /api/projects` returns 403 | AC-PROJECT-71 |
-| Success                    | Rows; a System admin sees "—" in My access for projects they are not in                                | AC-PROJECT-13 |
-| Creating                   | "Create" disabled while the request runs                                                               |               |
+| State                      | What the user sees                                                                             | Criteria                   |
+| -------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------- |
+| Loading                    | Table skeleton rows; `aria-busy="true"` on the table                                           |                            |
+| Empty (no projects at all) | MSG-ADMIN-10 (replaces MSG-PROJECT-21); no "New project" button                                | AC-PROJECT-14, AC-ADMIN-22 |
+| No match                   | MSG-PROJECT-20 in place of the rows                                                            | AC-PROJECT-11              |
+| Error                      | MSG-COMMON-01 with a "Try again" button                                                        |                            |
+| No permission              | Nobody sees "New project" here; `POST /api/projects` returns 403 for anyone but a System admin | AC-PROJECT-71, AC-ADMIN-13 |
+| Success                    | Rows; a System admin sees "—" in My access for projects they are not in                        | AC-PROJECT-13              |
+| Creating                   | "Create" disabled while the request runs                                                       |                            |
 
 ## Permissions
 
-| Who          | Can see                                | Can do                                                    |
-| ------------ | -------------------------------------- | --------------------------------------------------------- |
-| User         | Projects they are a member of          | Search                                                    |
-| System admin | Every project                          | Search; create a project and pick its first Project admin |
-| Guest        | Nothing (redirected to login, Phase 2) | —                                                         |
+| Who           | Can see                                                                                 | Can do                                                              |
+| ------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| User          | Projects they are a member of, as Project admin, Member or Guest ("Guest" in My access) | Search                                                              |
+| System admin  | Every project                                                                           | Search (creates projects in Admin console › Projects, SCR-ADMIN-02) |
+| Not logged in | Nothing (redirected to login, Phase 2)                                                  | —                                                                   |
 
 ## Accessibility
 
 - Page title "Projects · QA Work Management"; one `<h1>` "Projects".
 - Landmarks: `header`, `nav`, `main`.
 - The table has a `<caption>` (visually hidden) "Your projects"; column headers are `<th scope="col">`.
-- Tab order: New project (System admins) → Search → Show archived → project links in row order.
+- Tab order: Search → Show archived → project links in row order.
 - Dialog: `role="dialog"`, `aria-modal="true"`, labelled by its title; focus starts in Key, is trapped inside, and
-  returns to "New project" on close.
+  returns to "New project" of SCR-ADMIN-02 on close.
 - Field errors linked with `aria-describedby`, `aria-invalid="true"`; on submit with errors, focus moves to the first
   invalid field.
 - Empty and no-match messages are in `role="status"`; the "Archived" badge is text, not colour only.
@@ -149,14 +153,15 @@ Members and Updated are hidden. The dialog takes the full width.
 
 ## Locators for tests
 
-`getByRole('heading', { name: 'Projects' })`, `getByRole('button', { name: 'New project' })`,
+`getByRole('heading', { name: 'Projects' })` (no "New project" button here; it is in SCR-ADMIN-02),
 `getByRole('searchbox', { name: 'Search' })`, `getByRole('checkbox', { name: 'Show archived' })`,
 `getByRole('row', { name: /SHOP/ })`, `getByRole('dialog', { name: 'New project' })`, `getByLabel('Key')`,
 `getByLabel('Name')`, `getByLabel('First project admin')`, `getByRole('button', { name: 'Create' })`. No `data-testid` needed.
 
 ## Change log
 
-| Date       | Change                                                                                  | Why                        |
-| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
-| 2026-10-08 | First version                                                                           | Phase 3A                   |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| Date       | Change                                                                                                                                                | Why                        |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version                                                                                                                                         | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects                                                               | Linh's decision 2026-10-09 |
+| 2026-10-09 | No "New project" button: the dialog opens from Admin console › Projects and the System admin stays there; empty text MSG-ADMIN-10; Guest in My access | BR-ADMIN-18, Phase 3C      |

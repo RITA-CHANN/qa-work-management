@@ -125,13 +125,17 @@ export type AdminOverview = z.infer<typeof adminOverviewSchema>;
 /** Workspace settings (Admin console › Settings): Guest defaults and audit retention (BR-GUEST-02, BR-ADMIN-17). */
 export const workspaceSettingsSchema = z.strictObject({
   defaultGuestAreas: z.array(guestAreaSchema).max(GUEST_AREAS.length),
-  auditRetentionDays: z.number().int().min(30).max(3650),
+  auditRetentionDays: z
+    .number({ error: msg('MSG-ADMIN-18') })
+    .int(msg('MSG-ADMIN-18'))
+    .min(30, msg('MSG-ADMIN-18'))
+    .max(3650, msg('MSG-ADMIN-18')),
 });
 export type WorkspaceSettings = z.infer<typeof workspaceSettingsSchema>;
 
 /** Body of POST /api/admin/projects/:key/project-admin (BR-ADMIN-04). */
 export const changeProjectAdminSchema = z.strictObject({
-  userId: z.string().min(1),
+  userId: z.string({ error: msg('MSG-ADMIN-17') }).min(1, msg('MSG-ADMIN-17')),
   /** Turn the current Project admins into Members in the same step. */
   demoteCurrent: z.boolean().default(false),
 });

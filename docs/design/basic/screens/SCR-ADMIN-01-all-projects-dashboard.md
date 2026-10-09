@@ -35,7 +35,7 @@ ISO 9241-110 and WCAG 2.2 level AA.
 │ ▦ Projects   │ ┌──────────┐┌──────────┐┌──────┐┌────────────────┐┌───────────────────┐   │
 │ 👥 Users      │ │Active    ││Active    ││Admins││Failed sign-ins ││Actions as Admin   │   │ KPIs
 │ ☰ Audit log  │ │projects 3││users 10/11││ 1    ││(7 days) 2      ││(7 days) 1         │   │
-│              │ │1 archived│└──────────┘└──────┘└────────────────┘└───────────────────┘   │
+│ ⚙ Settings   │ │1 archived│└──────────┘└──────┘└────────────────┘└───────────────────┘   │
 │              │ └──────────┘                                                               │
 │              │ ┌─ Projects ─────────────────────────────────────────── Manage projects ┐ │ <h2>
 │              │ │ Project | Status | Project admins | Members | Active release |         │ │ <table>
@@ -51,7 +51,7 @@ ISO 9241-110 and WCAG 2.2 level AA.
 | Element                         | What it shows                                                                                                                                                                                       | Rule        |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | Top bar                         | "QA Work Management · Admin console", link "Back to workspace" (→ `/`), the account menu of SCR-SHELL-01                                                                                            | BR-ADMIN-01 |
-| Side nav "Admin"                | Links "Dashboard" (`/admin`), "Projects", "Users", "Audit log". Pages not built yet are not listed (Q-ADMIN-03)                                                                                     | BR-ADMIN-01 |
+| Side nav "Admin"                | Links "Dashboard" (`/admin`), "Projects", "Users", "Audit log", "Settings" (SCR-ADMIN-05). Pages not built yet are not listed (Q-ADMIN-03)                                                          | BR-ADMIN-01 |
 | KPI "Active projects"           | Count, hint "N archived"                                                                                                                                                                            | BR-ADMIN-02 |
 | KPI "Active users"              | `active/total`                                                                                                                                                                                      | BR-ADMIN-02 |
 | KPI "Admins"                    | Active Admins                                                                                                                                                                                       | BR-ADMIN-02 |
@@ -103,7 +103,7 @@ KPIs: 5 columns from 1280 px, 2 from 640 px, 1 below. The table scrolls horizont
 ## Locators for tests
 
 Layout (all Admin pages): `getByRole('banner')`, `getByRole('link', { name: 'Back to workspace' })`,
-`getByRole('navigation', { name: 'Admin' })` with links `Dashboard`, `Projects`, `Users`, `Audit log`,
+`getByRole('navigation', { name: 'Admin' })` with links `Dashboard`, `Projects`, `Users`, `Audit log`, `Settings`,
 `getByRole('button', { name: 'Account: Ada Admin' })`.
 
 This page: `getByRole('heading', { level: 1, name: 'All projects' })`, `getByText('Failed sign-ins (7 days)')`,
@@ -112,6 +112,7 @@ This page: `getByRole('heading', { level: 1, name: 'All projects' })`, `getByTex
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-09 | First version | Phase 3C |
+| Date       | Change                                  | Why                                 |
+| ---------- | --------------------------------------- | ----------------------------------- |
+| 2026-10-09 | First version                           | Phase 3C                            |
+| 2026-10-09 | Side nav link "Settings" (SCR-ADMIN-05) | Phase 3C (BR-ADMIN-17, BR-GUEST-02) |

@@ -30,6 +30,7 @@ traces:
       BR-PROJECT-32,
       BR-PROJECT-33,
       BR-PROJECT-34,
+      BR-GUEST-03,
     ]
   acceptance:
     [
@@ -74,7 +75,9 @@ updated: 2026-10-09
 
 # SCR-PROJECT-04 Releases and milestones tab
 
-The release plan: each release with its status and dates, and its milestones (sprints) listed under it.
+The release plan: each release with its status and dates, and its milestones (sprints) listed under it. The tab is
+named "Releases & sprints" in the project page and the side nav (SCR-PROJECT-02, SCR-SHELL-01); a Guest sees it only
+while the `releases` area is switched on for Guests (BR-GUEST-03).
 
 ## Layout
 
@@ -140,10 +143,11 @@ There is no button that moves a status backwards; the API refuses it too (AC-PRO
 
 ## Permissions
 
-| Access level                               | Can see    | Can do                            |
-| ------------------------------------------ | ---------- | --------------------------------- |
-| Project admin, System admin                | Everything | All release and milestone actions |
-| Member (any job title, Team lead included) | Everything | Nothing                           |
+| Access level                               | Can see                                                                           | Can do                            |
+| ------------------------------------------ | --------------------------------------------------------------------------------- | --------------------------------- |
+| Project admin, System admin                | Everything                                                                        | All release and milestone actions |
+| Member (any job title, Team lead included) | Everything                                                                        | Nothing                           |
+| Guest                                      | Everything while the `releases` area is on; otherwise no tab and "Page not found" | Nothing (BR-GUEST-04)             |
 
 ## Accessibility
 
@@ -170,3 +174,4 @@ Below 768 px the milestone table becomes cards; release action buttons move into
 | ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
 | 2026-10-08 | First version                                                                           | Phase 3A                   |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| 2026-10-09 | Tab named "Releases & sprints"; Guest row                                               | Phase 3C (BR-GUEST-03)     |

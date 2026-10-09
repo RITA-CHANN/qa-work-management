@@ -62,12 +62,19 @@ export async function readProjectView(
     where: { id: projectId },
     include: {
       createdBy: { select: { id: true, name: true } },
-      _count: { select: { members: true } },
+      // A Guest never counts other Guests (BR-GUEST-05).
+      _count: {
+        select: {
+          members: myAccess === 'GUEST' ? { where: { access: { not: 'GUEST' } } } : true,
+        },
+      },
       releases: { where: { status: 'ACTIVE' }, select: { id: true, name: true } },
       milestones: { where: { status: 'ACTIVE' }, select: { id: true, name: true, endDate: true } },
     },
   });
-  const milestone = row.milestones[0];
+  // BR-GUEST-03: a Guest without the releases area sees no release or sprint here either.
+  const showPlan = canSeeArea(myAccess ?? 'PROJECT_ADMIN', row.guestAreas, 'releases');
+  const milestone = showPlan ? row.milestones[0] : undefined;
   return {
     key: row.key,
     name: row.name,
@@ -76,8 +83,8 @@ export async function readProjectView(
     version: row.version,
     myAccess,
     guestAreas: row.guestAreas,
-    memberCount: row._count.members,
-    activeRelease: row.releases[0] ?? null,
+    memberCount: row._count.members + (myAccess === 'GUEST' ? 1 : 0),
+    activeRelease: showPlan ? (row.releases[0] ?? null) : null,
     activeMilestone: milestone
       ? { id: milestone.id, name: milestone.name, endDate: fromDbDate(milestone.endDate) }
       : null,

@@ -11,15 +11,15 @@ Back to the [overview](README.md). Requirements: [../requirements/dash/](../requ
 Requirement → design → API → test. **Tests** lists where a test is tagged with the criterion; ⚠ means the
 criterion should be automated (Verify) but no test is tagged yet.
 
-| AC                                               | Priority | Risk   | Verify  | Covers                             | Screens and flows                                                       | Detail design | API | Tests  |
-| ------------------------------------------------ | -------- | ------ | ------- | ---------------------------------- | ----------------------------------------------------------------------- | ------------- | --- | ------ |
-| [AC-DASH-01](../requirements/dash/acceptance.md) | Must     | Medium | Auto-UI | US-DASH-01, BR-DASH-03, BR-DASH-04 | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md) | —             | —   | ⚠ none |
-| [AC-DASH-02](../requirements/dash/acceptance.md) | Must     | Low    | Auto-UI | BR-DASH-03, BR-DASH-04             | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md) | —             | —   | ⚠ none |
-| [AC-DASH-03](../requirements/dash/acceptance.md) | Must     | High   | Auto-UI | US-DASH-02, BR-DASH-02, BR-DASH-08 | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md) | —             | —   | ⚠ none |
-| [AC-DASH-04](../requirements/dash/acceptance.md) | Must     | Medium | Auto-UI | BR-DASH-01                         | —                                                                       | —             | —   | ⚠ none |
-| [AC-DASH-05](../requirements/dash/acceptance.md) | Should   | Medium | Auto-UI | BR-DASH-05                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md) | —             | —   | ⚠ none |
-| [AC-DASH-06](../requirements/dash/acceptance.md) | Should   | Low    | Auto-UI | BR-DASH-06                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md) | —             | —   | ⚠ none |
-| [AC-DASH-07](../requirements/dash/acceptance.md) | Should   | Low    | Auto-UI | US-DASH-01, BR-DASH-07             | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md) | —             | —   | ⚠ none |
+| AC                                               | Priority | Risk   | Verify  | Covers                             | Screens and flows                                                        | Detail design | API | Tests  |
+| ------------------------------------------------ | -------- | ------ | ------- | ---------------------------------- | ------------------------------------------------------------------------ | ------------- | --- | ------ |
+| [AC-DASH-01](../requirements/dash/acceptance.md) | Must     | Medium | Auto-UI | US-DASH-01, BR-DASH-03, BR-DASH-04 | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
+| [AC-DASH-02](../requirements/dash/acceptance.md) | Must     | Low    | Auto-UI | BR-DASH-03, BR-DASH-04             | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
+| [AC-DASH-03](../requirements/dash/acceptance.md) | Must     | High   | Auto-UI | US-DASH-02, BR-DASH-02, BR-DASH-08 | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
+| [AC-DASH-04](../requirements/dash/acceptance.md) | Must     | Medium | Auto-UI | BR-DASH-01                         | [SCR-PROJECT-02](../design/basic/screens/SCR-PROJECT-02-project-page.md) | —             | —   | ⚠ none |
+| [AC-DASH-05](../requirements/dash/acceptance.md) | Should   | Medium | Auto-UI | BR-DASH-05                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
+| [AC-DASH-06](../requirements/dash/acceptance.md) | Should   | Low    | Auto-UI | BR-DASH-06                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
+| [AC-DASH-07](../requirements/dash/acceptance.md) | Should   | Low    | Auto-UI | US-DASH-01, BR-DASH-07             | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
 
 ## Automation gaps, highest risk first
 

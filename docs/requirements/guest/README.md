@@ -16,12 +16,12 @@ Business requirements for the **Guest** access level and the per-project Guest v
 plus a job title) comes with PR #13; Guest is added here because it needs the new Project settings page.
 Technical plan: [phase-3c-plan.md](../../phases/phase-3c-plan.md).
 
-| File                           | Contains                            |
-| ------------------------------ | ----------------------------------- |
-| [stories.md](stories.md)       | User stories `US-GUEST-NN`          |
-| [rules.md](rules.md)           | Business rules `BR-GUEST-NN`        |
-| [acceptance.md](acceptance.md) | Acceptance criteria `AC-GUEST-NN`   |
-| [messages.md](messages.md)     | Exact UI and error texts (none yet) |
+| File                           | Contains                                |
+| ------------------------------ | --------------------------------------- |
+| [stories.md](stories.md)       | User stories `US-GUEST-NN`              |
+| [rules.md](rules.md)           | Business rules `BR-GUEST-NN`            |
+| [acceptance.md](acceptance.md) | Acceptance criteria `AC-GUEST-NN`       |
+| [messages.md](messages.md)     | Exact UI and error texts `MSG-GUEST-NN` |
 
 ## Goal
 
@@ -102,3 +102,4 @@ None. The Phase 3C questions are decided; see [Decisions in the admin README](..
 | Date       | Change                                                      | Why      |
 | ---------- | ----------------------------------------------------------- | -------- |
 | 2026-10-09 | First version, from the Phase 3C business requirements v1.3 | Phase 3C |
+| 2026-10-09 | messages.md now has MSG-GUEST-01 and MSG-GUEST-02           | 3C code  |

@@ -9,8 +9,18 @@ owner: Claude
 reviewers: [Linh]
 approved:
 traces:
-  requirements: [US-PROJECT-09, BR-PROJECT-19, BR-PROJECT-20, BR-PROJECT-21, BR-PROJECT-22]
-  acceptance: [AC-PROJECT-08, AC-PROJECT-44, AC-PROJECT-45, AC-PROJECT-46, AC-PROJECT-47]
+  requirements:
+    [US-PROJECT-09, BR-PROJECT-19, BR-PROJECT-20, BR-PROJECT-21, BR-PROJECT-22, BR-GUEST-03]
+  acceptance:
+    [
+      AC-PROJECT-08,
+      AC-PROJECT-44,
+      AC-PROJECT-45,
+      AC-PROJECT-46,
+      AC-PROJECT-47,
+      AC-GUEST-01,
+      AC-GUEST-02,
+    ]
   design: [SCR-PROJECT-05, DD-PROJECT-02]
 updated: 2026-10-09
 ---
@@ -22,7 +32,7 @@ Pages through the project's activity log, newest first (SCR-PROJECT-05). Status 
 
 |                 |                                                                                  |
 | --------------- | -------------------------------------------------------------------------------- |
-| **Auth**        | Any member, or System admin                                                      |
+| **Auth**        | Any member, or System admin; a Guest only while the `activity` area is on        |
 | **Since phase** | 3                                                                                |
 | **Schema**      | `packages/shared/src/activity.ts` (`activityQuerySchema`, `activityEntrySchema`) |
 
@@ -98,6 +108,7 @@ Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-
 | 400    | `VALIDATION_ERROR` | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`               |
 | 401    | `UNAUTHENTICATED`  | MSG-COMMON-05  | Not logged in                                                                                    |
 | 404    | `NOT_FOUND`        | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
+| 404    | `NOT_FOUND`        | MSG-COMMON-07  | The caller is a Guest and the `activity` area is off for Guests (BR-GUEST-03)                    |
 
 ## Security
 
@@ -109,7 +120,7 @@ Checked against the OWASP API Security Top 10 (2023):
 | API2 Broken authentication                                                       | Session cookie required (Phase 2); 401 otherwise                                                       |
 | API3 Broken object property level authorization (data exposure, mass assignment) | Names only, no emails                                                                                  |
 | API4 Unrestricted resource consumption                                           | `limit` at most 100 (NFR-PROJECT-05); cursor must belong to this project                               |
-| API5 Broken function level authorization                                         | Any member                                                                                             |
+| API5 Broken function level authorization                                         | Any member; `assertArea(ctx, "activity")` for a Guest, checked on the server (BR-GUEST-03)             |
 
 ## Side effects
 
@@ -123,16 +134,18 @@ curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/activity?limit=20'
 
 ## Test ideas
 
-| Type       | Case                                     | Expected                     |
-| ---------- | ---------------------------------------- | ---------------------------- |
-| Happy path | After an edit, `limit=1`                 | The edit's entry first       |
-| Boundary   | 25 entries: page 1 then page 2           | 20 then 5, `nextCursor` null |
-| Negative   | `limit=101`; cursor from another project | 400; 400                     |
-| Security   | PATCH or DELETE on the path              | 404 route not found          |
+| Type       | Case                                                              | Expected                     |
+| ---------- | ----------------------------------------------------------------- | ---------------------------- |
+| Happy path | After an edit, `limit=1`                                          | The edit's entry first       |
+| Boundary   | 25 entries: page 1 then page 2                                    | 20 then 5, `nextCursor` null |
+| Negative   | `limit=101`; cursor from another project                          | 400; 400                     |
+| Security   | PATCH or DELETE on the path                                       | 404 route not found          |
+| Permission | Sam Stakeholder (Guest of SHOP), `activity` off, then switched on | 404 MSG-COMMON-07, then 200  |
 
 ## Change log
 
-| Date       | Change                                                                                  | Why                        |
-| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| Date       | Change                                                                                     | Why                        |
+| ---------- | ------------------------------------------------------------------------------------------ | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                       | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects    | Linh's decision 2026-10-09 |
+| 2026-10-09 | Guest: 404 while the `activity` area is off; new action `project.guest_visibility_changed` | BR-GUEST-03, BR-GUEST-06   |

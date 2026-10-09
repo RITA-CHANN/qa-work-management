@@ -24,7 +24,9 @@ import {
   auditQuerySchema,
   authUserSchema,
   changePasswordSchema,
+  changeProjectAdminSchema,
   emptyBodySchema,
+  guestVisibilitySchema,
   healthResponseSchema,
   loginRequestSchema,
   memberAddSchema,
@@ -49,6 +51,7 @@ import {
   searchResultSchema,
   userListQuerySchema,
   userOptionSchema,
+  workspaceSettingsSchema,
 } from '@qawm/shared';
 import * as prettier from 'prettier';
 import { stringify } from 'yaml';
@@ -97,6 +100,7 @@ const responseSchemas = {
   OneTimePassword: oneTimePasswordSchema,
   SignOutResult: signOutResultSchema,
   AuditEvent: auditEventSchema,
+  WorkspaceSettings: workspaceSettingsSchema,
 } as const;
 const bodySchemas = {
   LoginRequest: loginRequestSchema,
@@ -113,6 +117,9 @@ const bodySchemas = {
   CurrentProjectUpdate: currentProjectUpdateSchema,
   AdminUserCreate: adminUserCreateSchema,
   AdminUserUpdate: adminUserUpdateSchema,
+  GuestVisibility: guestVisibilitySchema,
+  ChangeProjectAdmin: changeProjectAdminSchema,
+  WorkspaceSettingsUpdate: workspaceSettingsSchema,
 } as const;
 type ResponseName = keyof typeof responseSchemas;
 type BodyName = keyof typeof bodySchemas;
@@ -167,6 +174,7 @@ const OPERATIONS: Operation[] = [
   { id: 'API-PROJECT-10', method: 'patch', path: '/api/projects/{key}/members/{userId}', summary: "Change a member's access level or job title", tag: 'Members', body: 'MemberUpdate', ok: { status: 200, schema: 'Member', shape: 'item' } },
   { id: 'API-PROJECT-11', method: 'delete', path: '/api/projects/{key}/members/{userId}', summary: 'Remove a member, or leave', tag: 'Members', ok: { status: 204 } },
   { id: 'API-PROJECT-12', method: 'get', path: '/api/projects/{key}/activity', summary: 'Activity log, newest first', tag: 'Activity', query: activityQuerySchema, ok: { status: 200, schema: 'ActivityEntry', shape: 'page' } },
+  { id: 'API-PROJECT-13', method: 'put', path: '/api/projects/{key}/guest-visibility', summary: 'Set which areas Guests see', tag: 'Projects', body: 'GuestVisibility', ok: { status: 200, schema: 'Project', shape: 'item' } },
   { id: 'API-RELEASE-01', method: 'get', path: '/api/projects/{key}/releases', summary: 'Releases of a project', tag: 'Releases', ok: { status: 200, schema: 'Release', shape: 'list' } },
   { id: 'API-RELEASE-02', method: 'post', path: '/api/projects/{key}/releases', summary: 'Create a release', tag: 'Releases', body: 'ReleaseCreate', ok: { status: 201, schema: 'Release', shape: 'item' } },
   { id: 'API-RELEASE-03', method: 'patch', path: '/api/projects/{key}/releases/{id}', summary: 'Edit a release or move its status', tag: 'Releases', body: 'ReleaseUpdate', ok: { status: 200, schema: 'Release', shape: 'item' } },
@@ -190,6 +198,9 @@ const OPERATIONS: Operation[] = [
   { id: 'API-ADMIN-09', method: 'post', path: '/api/admin/users/{id}/reset-password', summary: 'Reset a password to a new one-time password', tag: 'Admin', body: 'EmptyBody', ok: { status: 200, schema: 'OneTimePassword', shape: 'item' } },
   { id: 'API-ADMIN-10', method: 'post', path: '/api/admin/users/{id}/sign-out', summary: 'Sign a user out everywhere', tag: 'Admin', body: 'EmptyBody', ok: { status: 200, schema: 'SignOutResult', shape: 'item' } },
   { id: 'API-ADMIN-11', method: 'get', path: '/api/admin/audit', summary: 'Audit log, newest first', tag: 'Admin', query: auditQuerySchema, ok: { status: 200, schema: 'AuditEvent', shape: 'page' } },
+  { id: 'API-ADMIN-12', method: 'post', path: '/api/admin/projects/{key}/project-admin', summary: 'Change the project admin of a project', tag: 'Admin', body: 'ChangeProjectAdmin', ok: { status: 200, schema: 'Member', shape: 'list' } },
+  { id: 'API-ADMIN-13', method: 'get', path: '/api/admin/settings', summary: 'Workspace settings', tag: 'Admin', ok: { status: 200, schema: 'WorkspaceSettings', shape: 'item' } },
+  { id: 'API-ADMIN-14', method: 'put', path: '/api/admin/settings', summary: 'Save the workspace settings', tag: 'Admin', body: 'WorkspaceSettingsUpdate', ok: { status: 200, schema: 'WorkspaceSettings', shape: 'item' } },
 ];
 
 // prettier-ignore

@@ -1173,6 +1173,105 @@ paths:
                       code:
                         enum:
                           - NOT_FOUND
+  /api/projects/{key}/guest-visibility:
+    put:
+      operationId: API-PROJECT-13
+      summary: Set which areas Guests see
+      description: 'Docs: docs/api/projects/put-project-guest-visibility.md'
+      tags:
+        - Projects
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Project key, case-insensitive
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestVisibility'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED, FORBIDDEN'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+                          - FORBIDDEN
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PROJECT_ARCHIVED
   /api/projects/{key}/releases:
     get:
       operationId: API-RELEASE-01
@@ -3095,6 +3194,237 @@ paths:
                       code:
                         enum:
                           - NOT_FOUND
+  /api/admin/projects/{key}/project-admin:
+    post:
+      operationId: API-ADMIN-12
+      summary: Change the project admin of a project
+      description: 'Docs: docs/api/admin/post-project-admin.md'
+      tags:
+        - Admin
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Project key, case-insensitive
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeProjectAdmin'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Member'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PROJECT_ARCHIVED
+  /api/admin/settings:
+    get:
+      operationId: API-ADMIN-13
+      summary: Workspace settings
+      description: 'Docs: docs/api/admin/get-settings.md'
+      tags:
+        - Admin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/WorkspaceSettings'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+    put:
+      operationId: API-ADMIN-14
+      summary: Save the workspace settings
+      description: 'Docs: docs/api/admin/put-settings.md'
+      tags:
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkspaceSettingsUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/WorkspaceSettings'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
 components:
   securitySchemes:
     session:
@@ -3254,6 +3584,7 @@ components:
               enum:
                 - PROJECT_ADMIN
                 - MEMBER
+                - GUEST
             - type: 'null'
         memberCount:
           type: integer
@@ -3304,6 +3635,7 @@ components:
               enum:
                 - PROJECT_ADMIN
                 - MEMBER
+                - GUEST
             - type: 'null'
         memberCount:
           type: integer
@@ -3352,6 +3684,10 @@ components:
                 - endDate
               additionalProperties: false
             - type: 'null'
+        guestAreas:
+          type: array
+          items:
+            type: string
         createdBy:
           type: object
           properties:
@@ -3378,6 +3714,7 @@ components:
         - description
         - version
         - activeMilestone
+        - guestAreas
         - createdBy
         - createdAt
       additionalProperties: false
@@ -3389,14 +3726,17 @@ components:
         name:
           type: string
         email:
-          type: string
-          format: email
-          pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+          anyOf:
+            - type: string
+              format: email
+              pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+            - type: 'null'
         access:
           type: string
           enum:
             - PROJECT_ADMIN
             - MEMBER
+            - GUEST
         jobTitle:
           anyOf:
             - type: string
@@ -3545,6 +3885,7 @@ components:
             - project.updated
             - project.archived
             - project.restored
+            - project.guest_visibility_changed
             - member.added
             - member.updated
             - member.removed
@@ -3930,14 +4271,35 @@ components:
                 type: string
               name:
                 type: string
-              role:
+              access:
                 type: string
+                enum:
+                  - PROJECT_ADMIN
+                  - MEMBER
+                  - GUEST
+              jobTitle:
+                anyOf:
+                  - type: string
+                    enum:
+                      - QAE
+                      - QAL
+                      - QAA
+                      - PM
+                      - PO
+                      - BA
+                      - DEV
+                      - TL
+                      - DES
+                      - STK
+                      - OTH
+                  - type: 'null'
               archived:
                 type: boolean
             required:
               - key
               - name
-              - role
+              - access
+              - jobTitle
               - archived
             additionalProperties: false
         activeSessions:
@@ -4088,6 +4450,33 @@ components:
         - actedAs
         - ip
       additionalProperties: false
+    WorkspaceSettings:
+      type: object
+      properties:
+        defaultGuestAreas:
+          maxItems: 10
+          type: array
+          items:
+            type: string
+            enum:
+              - dashboard
+              - releases
+              - requirements
+              - test_cases
+              - test_runs
+              - defects
+              - reports
+              - members
+              - activity
+              - files
+        auditRetentionDays:
+          type: integer
+          minimum: 30
+          maximum: 3650
+      required:
+        - defaultGuestAreas
+        - auditRetentionDays
+      additionalProperties: false
     LoginRequest:
       type: object
       properties:
@@ -4158,6 +4547,7 @@ components:
           enum:
             - PROJECT_ADMIN
             - MEMBER
+            - GUEST
         jobTitle:
           anyOf:
             - type: string
@@ -4186,6 +4576,7 @@ components:
           enum:
             - PROJECT_ADMIN
             - MEMBER
+            - GUEST
         jobTitle:
           anyOf:
             - type: string
@@ -4367,4 +4758,65 @@ components:
             - USER
       required:
         - globalRole
+      additionalProperties: false
+    GuestVisibility:
+      type: object
+      properties:
+        areas:
+          maxItems: 10
+          type: array
+          items:
+            type: string
+            enum:
+              - dashboard
+              - releases
+              - requirements
+              - test_cases
+              - test_runs
+              - defects
+              - reports
+              - members
+              - activity
+              - files
+      required:
+        - areas
+      additionalProperties: false
+    ChangeProjectAdmin:
+      type: object
+      properties:
+        userId:
+          type: string
+          minLength: 1
+        demoteCurrent:
+          default: false
+          type: boolean
+      required:
+        - userId
+      additionalProperties: false
+    WorkspaceSettingsUpdate:
+      type: object
+      properties:
+        defaultGuestAreas:
+          maxItems: 10
+          type: array
+          items:
+            type: string
+            enum:
+              - dashboard
+              - releases
+              - requirements
+              - test_cases
+              - test_runs
+              - defects
+              - reports
+              - members
+              - activity
+              - files
+        auditRetentionDays:
+          type: integer
+          minimum: 30
+          maximum: 3650
+      required:
+        - defaultGuestAreas
+        - auditRetentionDays
       additionalProperties: false
