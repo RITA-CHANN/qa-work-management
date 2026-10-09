@@ -1,9 +1,11 @@
 import {
   MILESTONE_STATUS_LABELS,
   RELEASE_STATUS_LABELS,
-  ROLE_LABELS,
+  ACCESS_LABELS,
+  JOB_TITLE_NAMES,
+  type JobTitle,
   type MilestoneStatus,
-  type ProjectRole,
+  type ProjectAccess,
   type ReleaseStatus,
 } from '@qawm/shared';
 
@@ -13,10 +15,22 @@ export const summaries = {
   projectUpdated: (actor: string) => `${actor} edited the project`,
   projectArchived: (actor: string) => `${actor} archived the project`,
   projectRestored: (actor: string) => `${actor} restored the project`,
-  memberAdded: (actor: string, member: string, role: ProjectRole) =>
-    `${actor} added ${member} as ${ROLE_LABELS[role]}`,
-  memberRoleChanged: (actor: string, member: string, from: ProjectRole, to: ProjectRole) =>
-    `${actor} changed ${member}'s role from ${ROLE_LABELS[from]} to ${ROLE_LABELS[to]}`,
+  memberAdded: (actor: string, member: string, access: ProjectAccess, jobTitle: JobTitle | null) =>
+    `${actor} added ${member} as ${ACCESS_LABELS[access]}${jobTitle ? ` (${JOB_TITLE_NAMES[jobTitle]})` : ''}`,
+  /** One clause per changed field: "access from Member to Project admin and job title from QA engineer to QA lead". */
+  memberUpdated: (
+    actor: string,
+    member: string,
+    access?: { from: ProjectAccess; to: ProjectAccess },
+    jobTitle?: { from: JobTitle | null; to: JobTitle | null },
+  ) => {
+    const title = (value: JobTitle | null) => (value ? JOB_TITLE_NAMES[value] : 'none');
+    const parts = [
+      access && `access from ${ACCESS_LABELS[access.from]} to ${ACCESS_LABELS[access.to]}`,
+      jobTitle && `job title from ${title(jobTitle.from)} to ${title(jobTitle.to)}`,
+    ].filter(Boolean);
+    return `${actor} changed ${member}'s ${parts.join(' and ')}`;
+  },
   memberRemoved: (actor: string, member: string) => `${actor} removed ${member}`,
   memberLeft: (actor: string) => `${actor} left the project`,
   releaseCreated: (actor: string, name: string) => `${actor} created release ${name}`,

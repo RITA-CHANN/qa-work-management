@@ -1,4 +1,11 @@
-import { PROJECT_ROLES, type Member, type MemberAdd, type ProjectRole } from '@qawm/shared';
+import {
+  PROJECT_ACCESS,
+  type JobTitle,
+  type Member,
+  type MemberAdd,
+  type MemberUpdate,
+  type ProjectAccess,
+} from '@qawm/shared';
 import type { Tx } from '../../lib/db-types';
 import { isUniqueViolation } from '../../lib/db-types';
 import { ConflictError, NotFoundError, UnprocessableError } from '../../lib/errors';
@@ -10,7 +17,8 @@ import { lockActiveProject } from './lock';
 import { assertCan, assertNotArchived } from './permissions';
 
 type MemberRow = {
-  role: ProjectRole;
+  access: ProjectAccess;
+  jobTitle: JobTitle | null;
   createdAt: Date;
   user: { id: string; name: string; email: string };
 };
@@ -22,12 +30,13 @@ function toMember(row: MemberRow): Member {
     userId: row.user.id,
     name: row.user.name,
     email: row.user.email,
-    role: row.role,
+    access: row.access,
+    jobTitle: row.jobTitle,
     addedAt: row.createdAt.toISOString(),
   };
 }
 
-/** API-PROJECT-08: Owners first (role order), then by name. */
+/** API-PROJECT-08: Project admins first, then by name. */
 export async function listMembers(ctx: ProjectContext): Promise<Member[]> {
   const rows = await prisma.projectMember.findMany({
     where: { projectId: ctx.project.id },
@@ -36,7 +45,7 @@ export async function listMembers(ctx: ProjectContext): Promise<Member[]> {
   return rows
     .sort(
       (a, b) =>
-        PROJECT_ROLES.indexOf(a.role) - PROJECT_ROLES.indexOf(b.role) ||
+        PROJECT_ACCESS.indexOf(a.access) - PROJECT_ACCESS.indexOf(b.access) ||
         a.user.name.localeCompare(b.user.name),
     )
     .map(toMember);
@@ -52,16 +61,15 @@ async function findMember(tx: Tx, projectId: string, userId: string) {
 }
 
 /** BR-PROJECT-12: checked after the change, inside its transaction, so a refused change is rolled back. */
-async function assertOwnerRemains(tx: Tx, projectId: string): Promise<void> {
-  const owners = await tx.projectMember.count({ where: { projectId, role: 'OWNER' } });
-  if (owners === 0) throw new UnprocessableError('LAST_OWNER', 'MSG-PROJECT-12');
+async function assertProjectAdminRemains(tx: Tx, projectId: string): Promise<void> {
+  const admins = await tx.projectMember.count({ where: { projectId, access: 'PROJECT_ADMIN' } });
+  if (admins === 0) throw new UnprocessableError('LAST_PROJECT_ADMIN', 'MSG-PROJECT-12');
 }
 
-/** API-PROJECT-09. Only an Owner (or Admin) may add an Owner (BR-PROJECT-23). */
+/** API-PROJECT-09: a Project admin adds any existing user, as Project admin or Member (BR-PROJECT-23). */
 export async function addMember(ctx: ProjectContext, body: MemberAdd): Promise<Member> {
   const { project, user } = ctx;
-  assertCan(ctx.role, 'member:manage');
-  if (body.role === 'OWNER') assertCan(ctx.role, 'member:manage-owner');
+  assertCan(ctx.access, 'member:manage');
   assertNotArchived(project);
 
   const newMember = await prisma.user.findUnique({ where: { id: body.userId } });
@@ -77,7 +85,12 @@ export async function addMember(ctx: ProjectContext, body: MemberAdd): Promise<M
       });
       if (existing) throw alreadyMember(); // BR-PROJECT-10
       const row = await tx.projectMember.create({
-        data: { projectId: project.id, userId: body.userId, role: body.role },
+        data: {
+          projectId: project.id,
+          userId: body.userId,
+          access: body.access,
+          jobTitle: body.jobTitle ?? null,
+        },
         include: memberInclude,
       });
       await recordActivity(tx, {
@@ -86,7 +99,12 @@ export async function addMember(ctx: ProjectContext, body: MemberAdd): Promise<M
         action: 'member.added',
         entityType: 'member',
         entityId: body.userId,
-        summary: summaries.memberAdded(user.name, newMember.name, body.role),
+        summary: summaries.memberAdded(
+          user.name,
+          newMember.name,
+          body.access,
+          body.jobTitle ?? null,
+        ),
       });
       return toMember(row);
     });
@@ -97,67 +115,76 @@ export async function addMember(ctx: ProjectContext, body: MemberAdd): Promise<M
 }
 
 /**
- * API-PROJECT-10. Owner roles need an Owner (BR-PROJECT-23); nobody changes their own role except an
- * Owner stepping down while another Owner remains (BR-PROJECT-24); a project keeps an Owner (BR-PROJECT-12).
+ * API-PROJECT-10: access level and job title. Nobody changes their own access level except a Project admin
+ * stepping down to Member (BR-PROJECT-24); a project keeps a Project admin (BR-PROJECT-12).
  */
-export async function changeMemberRole(
+export async function updateMember(
   ctx: ProjectContext,
   userId: string,
-  role: ProjectRole,
+  body: MemberUpdate,
 ): Promise<Member> {
   const { project, user } = ctx;
-  assertCan(ctx.role, 'member:manage');
+  assertCan(ctx.access, 'member:manage');
   assertNotArchived(project);
 
   return prisma.$transaction(async (tx) => {
     await lockActiveProject(tx, project.id);
     const target = await findMember(tx, project.id, userId);
-    if (target.role === 'OWNER' || role === 'OWNER') assertCan(ctx.role, 'member:manage-owner');
-    // Same role again: nothing to do, no activity entry (idempotent).
-    if (target.role === role) return toMember(target);
-    const steppingDown = target.role === 'OWNER' && role !== 'OWNER';
-    if (userId === user.id && !steppingDown) {
-      throw new UnprocessableError('OWN_ROLE', 'MSG-PROJECT-22');
+    const access =
+      body.access !== undefined && body.access !== target.access
+        ? { from: target.access, to: body.access }
+        : undefined;
+    const jobTitle =
+      body.jobTitle !== undefined && body.jobTitle !== target.jobTitle
+        ? { from: target.jobTitle, to: body.jobTitle }
+        : undefined;
+    // Nothing changes: no write, no activity entry (idempotent).
+    if (!access && !jobTitle) return toMember(target);
+    const steppingDown = access?.from === 'PROJECT_ADMIN';
+    if (access && userId === user.id && !steppingDown) {
+      throw new UnprocessableError('OWN_ACCESS', 'MSG-PROJECT-22');
     }
 
     const row = await tx.projectMember.update({
       where: { projectId_userId: { projectId: project.id, userId } },
-      data: { role },
+      data: {
+        ...(access ? { access: access.to } : {}),
+        ...(jobTitle ? { jobTitle: jobTitle.to } : {}),
+      },
       include: memberInclude,
     });
-    await assertOwnerRemains(tx, project.id);
+    await assertProjectAdminRemains(tx, project.id);
     await recordActivity(tx, {
       projectId: project.id,
       actorId: user.id,
-      action: 'member.role_changed',
+      action: 'member.updated',
       entityType: 'member',
       entityId: userId,
-      summary: summaries.memberRoleChanged(user.name, target.user.name, target.role, role),
-      changes: { role: { from: target.role, to: role } },
+      summary: summaries.memberUpdated(user.name, target.user.name, access, jobTitle),
+      changes: { ...(access ? { access } : {}), ...(jobTitle ? { jobTitle } : {}) },
     });
     return toMember(row);
   });
 }
 
 /**
- * API-PROJECT-11. Removing someone else needs member:manage (and member:manage-owner for an Owner);
- * leaving needs nothing but membership. Either way an Owner must remain (BR-PROJECT-12).
+ * API-PROJECT-11. Removing someone else needs member:manage; leaving needs nothing but membership.
+ * Either way a Project admin must remain (BR-PROJECT-12).
  */
 export async function removeMember(ctx: ProjectContext, userId: string): Promise<void> {
   const { project, user } = ctx;
   const leaving = userId === user.id;
-  if (!leaving) assertCan(ctx.role, 'member:manage');
+  if (!leaving) assertCan(ctx.access, 'member:manage');
   assertNotArchived(project);
 
   await prisma.$transaction(async (tx) => {
     await lockActiveProject(tx, project.id);
     const target = await findMember(tx, project.id, userId);
-    if (!leaving && target.role === 'OWNER') assertCan(ctx.role, 'member:manage-owner');
 
     await tx.projectMember.delete({
       where: { projectId_userId: { projectId: project.id, userId } },
     });
-    await assertOwnerRemains(tx, project.id);
+    await assertProjectAdminRemains(tx, project.id);
     await recordActivity(tx, {
       projectId: project.id,
       actorId: user.id,

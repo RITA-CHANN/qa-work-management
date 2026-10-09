@@ -144,7 +144,7 @@ export function ArchiveProjectDialog({ project, open, onClose }: DialogProps) {
       onClose={onClose}
       role="alertdialog"
       title="Archive project?"
-      description={`${project.name} becomes read-only for everyone and leaves the project list. An Owner can restore it at any time.`}
+      description={`${project.name} becomes read-only for everyone and leaves the project list. A project admin can restore it at any time.`}
     >
       {alert && <Alert>{alert}</Alert>}
       <DialogActions>
@@ -159,7 +159,7 @@ export function ArchiveProjectDialog({ project, open, onClose }: DialogProps) {
   );
 }
 
-/** "Delete project?" (FLW-PROJECT-03): the Owner must type the key (MSG-PROJECT-10) (BR-PROJECT-09). */
+/** "Delete project?" (FLW-PROJECT-03): a project admin must type the key (MSG-PROJECT-10) (BR-PROJECT-09). */
 export function DeleteProjectDialog({ project, open, onClose }: DialogProps) {
   const remove = useDeleteProject(project.key);
   const navigate = useNavigate();

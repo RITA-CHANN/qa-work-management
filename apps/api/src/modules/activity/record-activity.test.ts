@@ -24,9 +24,22 @@ describe('diff', () => {
 });
 
 describe('summaries', () => {
-  it('uses display names for roles and statuses (DD-PROJECT-02)', () => {
-    expect(summaries.memberRoleChanged('Minh Lead', 'Linh QA', 'VIEWER', 'QA_ENGINEER')).toBe(
-      "Minh Lead changed Linh QA's role from Viewer to QA engineer",
+  it('uses display names for access, job titles and statuses (DD-PROJECT-02)', () => {
+    expect(summaries.memberAdded('Oanh Owner', 'Linh QA', 'MEMBER', 'QAE')).toBe(
+      'Oanh Owner added Linh QA as Member (QA engineer)',
+    );
+    expect(
+      summaries.memberUpdated('Oanh Owner', 'Linh QA', { from: 'MEMBER', to: 'PROJECT_ADMIN' }),
+    ).toBe("Oanh Owner changed Linh QA's access from Member to Project admin");
+    expect(
+      summaries.memberUpdated(
+        'Oanh Owner',
+        'Linh QA',
+        { from: 'MEMBER', to: 'PROJECT_ADMIN' },
+        { from: 'QAE', to: null },
+      ),
+    ).toBe(
+      "Oanh Owner changed Linh QA's access from Member to Project admin and job title from QA engineer to none",
     );
     expect(summaries.releaseStatusChanged('Mai PM', '2.4', 'ACTIVE', 'RELEASED')).toBe(
       'Mai PM moved release 2.4 from Active to Released',

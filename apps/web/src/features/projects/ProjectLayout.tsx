@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { useProject, useProjectAction } from './api';
 import type { ProjectOutletContext } from './project-outlet';
 import { useProjectAccess } from './access';
-import { roleLabel } from './labels';
+import { accessLabel } from './labels';
 import { timeLeft } from './milestone-time';
 import { ArchiveProjectDialog, DeleteProjectDialog, EditProjectDialog } from './ProjectDialogs';
 import { errorText, isNotFound } from './server-error';
@@ -98,7 +98,7 @@ function ProjectPage({ project }: { project: Project }) {
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
           <span className="font-mono text-sm text-muted-foreground">{project.key}</span>
-          <Badge>{project.myRole ? roleLabel(project.myRole) : 'Admin'}</Badge>
+          <Badge>{project.myAccess ? accessLabel(project.myAccess) : 'System admin'}</Badge>
           {project.archivedAt && <Badge tone="warning">Archived</Badge>}
         </div>
         <div className="flex items-center gap-2">

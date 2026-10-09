@@ -88,7 +88,7 @@ export async function createRelease(
   body: z.output<typeof releaseCreateSchema>,
 ): Promise<Release> {
   const { project, user } = ctx;
-  assertCan(ctx.role, 'release:write');
+  assertCan(ctx.access, 'release:write');
   assertNotArchived(project);
   try {
     return await prisma.$transaction(async (tx) => {
@@ -129,7 +129,7 @@ export async function updateRelease(
   body: z.output<typeof releaseUpdateSchema>,
 ): Promise<Release> {
   const { project, user } = ctx;
-  assertCan(ctx.role, 'release:write');
+  assertCan(ctx.access, 'release:write');
   assertNotArchived(project);
 
   try {
@@ -269,7 +269,7 @@ async function assertMilestonesStillFit(
 /** API-RELEASE-04: only a PLANNED release without milestones (BR-PROJECT-18). */
 export async function deleteRelease(ctx: ProjectContext, id: string): Promise<void> {
   const { project, user } = ctx;
-  assertCan(ctx.role, 'release:write');
+  assertCan(ctx.access, 'release:write');
   assertNotArchived(project);
   await prisma.$transaction(async (tx) => {
     await lockActiveProject(tx, project.id);

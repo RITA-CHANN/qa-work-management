@@ -43,10 +43,9 @@ describe('AppError subclasses', () => {
 
 describe('parseOrThrow', () => {
   it('returns the parsed value', () => {
-    expect(parseOrThrow(projectCreateSchema, { key: ' demo ', name: 'Demo' })).toEqual({
-      key: 'DEMO',
-      name: 'Demo',
-    });
+    expect(
+      parseOrThrow(projectCreateSchema, { key: ' demo ', name: 'Demo', firstAdminId: 'u1' }),
+    ).toEqual({ key: 'DEMO', name: 'Demo', firstAdminId: 'u1' });
   });
 
   it('lists every invalid field as a JSON Pointer with its message ID', () => {

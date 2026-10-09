@@ -7,8 +7,8 @@ import { describe, expect, it } from 'vitest';
 const MODULES = join(import.meta.dirname, '..');
 const WRITE =
   /^export async function ((?:create|update|archive|restore|delete|add|change|remove)\w*)\(/;
-// Creating a project is open to every logged-in user (BR-PROJECT-01); there is no project yet.
-const OPEN_TO_ALL = new Set(['createProject']);
+// Creating a project has no project yet: it checks the global role instead (BR-PROJECT-01).
+const SYSTEM_ADMIN_ONLY = new Set(['createProject']);
 
 function writeFunctions() {
   const found: { file: string; name: string; body: string }[] = [];
@@ -35,8 +35,11 @@ describe('project-scoped write functions', () => {
   it.each(functions.map((f) => [`${f.file} ${f.name}`, f] as const))(
     '%s calls assertCan',
     (_label, { name, body }) => {
-      if (OPEN_TO_ALL.has(name)) return;
-      expect(body).toMatch(/assertCan\(ctx\.role, '[a-z-]+:[a-z-]+'\)/);
+      if (SYSTEM_ADMIN_ONLY.has(name)) {
+        expect(body).toMatch(/if \(user\.globalRole !== 'ADMIN'\) throw new ForbiddenError\(\)/);
+        return;
+      }
+      expect(body).toMatch(/assertCan\(ctx\.access, '[a-z-]+:[a-z-]+'\)/);
     },
   );
 });

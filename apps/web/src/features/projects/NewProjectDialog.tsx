@@ -4,10 +4,10 @@ import { msg, projectCreateSchema } from '@qawm/shared';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogActions } from '@/components/ui/dialog';
-import { TextAreaField, TextField } from '@/components/ui/field';
+import { SelectField, TextAreaField, TextField } from '@/components/ui/field';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiRequestError } from '@/lib/api-client';
-import { useCreateProject } from './api';
+import { useCreateProject, useUsers } from './api';
 import {
   focusFirstInvalid,
   serverFieldErrors,
@@ -16,9 +16,10 @@ import {
 } from './form-errors';
 import { errorText } from './server-error';
 
-/** "New project" dialog of SCR-PROJECT-01 (FLW-PROJECT-01). */
+/** "New project" dialog of SCR-PROJECT-01 (FLW-PROJECT-01), for System admins only (BR-PROJECT-01). */
 export function NewProjectDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const create = useCreateProject();
+  const users = useUsers(open);
   const navigate = useNavigate();
   const toast = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -42,6 +43,7 @@ export function NewProjectDialog({ open, onClose }: { open: boolean; onClose: ()
     const parsed = projectCreateSchema.safeParse({
       key: form.get('key'),
       name: form.get('name'),
+      firstAdminId: String(form.get('firstAdminId') ?? ''),
       description: String(form.get('description') ?? '') || null,
     });
     setAlert(null);
@@ -84,6 +86,21 @@ export function NewProjectDialog({ open, onClose }: { open: boolean; onClose: ()
           hint="2–10 letters or digits, starting with a letter. It can't be changed later."
         />
         <TextField label="Name" name="name" autoComplete="off" error={errors.name} />
+        <SelectField
+          label="First project admin"
+          name="firstAdminId"
+          defaultValue=""
+          error={errors.firstAdminId}
+        >
+          <option value="" disabled>
+            {users.isPending ? 'Loading…' : 'Choose a user'}
+          </option>
+          {(users.data ?? []).map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name} ({user.email})
+            </option>
+          ))}
+        </SelectField>
         <TextAreaField
           label="Description"
           name="description"
