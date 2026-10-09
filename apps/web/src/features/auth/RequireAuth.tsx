@@ -34,5 +34,9 @@ export function RequireAuth() {
   if (!user) {
     return <Navigate to={loginPathFor(location.pathname + location.search)} replace />;
   }
+  // A one-time password must be replaced before anything else (BR-ADMIN-07).
+  if (user.mustChangePassword && location.pathname !== '/change-password') {
+    return <Navigate to="/change-password" replace />;
+  }
   return <Outlet />;
 }

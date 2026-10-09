@@ -50,7 +50,7 @@ export const projects: SeedProject[] = [
       ['linh@qawm.test', 'MEMBER', 'QAE'],
       ['teamlead@qawm.test', 'MEMBER', 'TL'],
       ['dev@qawm.test', 'MEMBER', 'DEV'],
-      ['stakeholder@qawm.test', 'MEMBER', 'STK'],
+      ['stakeholder@qawm.test', 'GUEST', 'STK'],
       ['viewer@qawm.test', 'MEMBER', 'OTH'],
     ],
     releases: [

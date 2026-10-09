@@ -10,7 +10,7 @@ import { msg } from './messages';
  * What a member may do in a project (BR-PROJECT-35), Backlog style: a Project admin runs the project, a Member
  * sees it and does the daily work. A System admin (global ADMIN) acts as Project admin everywhere.
  */
-export const PROJECT_ACCESS = ['PROJECT_ADMIN', 'MEMBER'] as const;
+export const PROJECT_ACCESS = ['PROJECT_ADMIN', 'MEMBER', 'GUEST'] as const;
 
 export const projectAccessSchema = z.enum(PROJECT_ACCESS);
 export type ProjectAccess = z.infer<typeof projectAccessSchema>;
@@ -18,6 +18,7 @@ export type ProjectAccess = z.infer<typeof projectAccessSchema>;
 export const ACCESS_LABELS: Record<ProjectAccess, string> = {
   PROJECT_ADMIN: 'Project admin',
   MEMBER: 'Member',
+  GUEST: 'Guest',
 };
 
 /**
@@ -135,6 +136,8 @@ export const projectSchema = projectSummarySchema.extend({
   description: z.string().nullable(),
   version: z.number().int(),
   activeMilestone: ref.extend({ endDate: isoDate }).nullable(),
+  /** Areas a Guest of this project may see (BR-GUEST-02). */
+  guestAreas: z.array(z.string()),
   createdBy: ref,
   createdAt: isoDateTime,
 });
@@ -144,7 +147,8 @@ export type Project = z.infer<typeof projectSchema>;
 export const memberSchema = z.object({
   userId: z.string(),
   name: z.string(),
-  email: z.email(),
+  /** null when a Guest reads the list: Guests see names only (BR-GUEST-05). */
+  email: z.email().nullable(),
   access: projectAccessSchema,
   jobTitle: jobTitleSchema.nullable(),
   addedAt: isoDateTime,

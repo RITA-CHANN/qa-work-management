@@ -67,6 +67,7 @@ An empty object `{}`.
       "name": "Sprint 4",
       "endDate": "2026-10-12"
     },
+    "guestAreas": ["dashboard", "releases"],
     "createdBy": {
       "id": "cm…",
       "name": "Oanh Owner"
@@ -77,19 +78,20 @@ An empty object `{}`.
 }
 ```
 
-| Field                   | Type                          | Description                                                                                      |
-| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------ |
-| `key`                   | string                        | Project key, upper-case (BR-PROJECT-02)                                                          |
-| `name`                  | string                        | Display name                                                                                     |
-| `description`           | string \| null                | Description                                                                                      |
-| `archivedAt`            | string (ISO 8601) \| null     | When it was archived; `null` = active                                                            |
-| `version`               | integer                       | Send back on `PATCH` (DD-PROJECT-03)                                                             |
-| `myAccess`              | ProjectAccess \| null         | Caller's access level (`PROJECT_ADMIN`, `MEMBER`); `null` for a System admin who is not a member |
-| `memberCount`           | integer                       | Number of members                                                                                |
-| `activeRelease`         | { id, name } \| null          | The `ACTIVE` release                                                                             |
-| `activeMilestone`       | { id, name, endDate } \| null | The `ACTIVE` milestone (header "days left")                                                      |
-| `createdBy`             | { id, name }                  | Creator                                                                                          |
-| `createdAt / updatedAt` | string (ISO 8601)             | Timestamps (UTC)                                                                                 |
+| Field                   | Type                          | Description                                                                                               |
+| ----------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `key`                   | string                        | Project key, upper-case (BR-PROJECT-02)                                                                   |
+| `name`                  | string                        | Display name                                                                                              |
+| `description`           | string \| null                | Description                                                                                               |
+| `archivedAt`            | string (ISO 8601) \| null     | When it was archived; `null` = active                                                                     |
+| `version`               | integer                       | Send back on `PATCH` (DD-PROJECT-03)                                                                      |
+| `myAccess`              | ProjectAccess \| null         | Caller's access level (`PROJECT_ADMIN`, `MEMBER`, `GUEST`); `null` for a System admin who is not a member |
+| `memberCount`           | integer                       | Number of members                                                                                         |
+| `activeRelease`         | { id, name } \| null          | The `ACTIVE` release                                                                                      |
+| `activeMilestone`       | { id, name, endDate } \| null | The `ACTIVE` milestone (header "days left")                                                               |
+| `guestAreas`            | string[]                      | Areas a Guest of this project may see (BR-GUEST-02)                                                       |
+| `createdBy`             | { id, name }                  | Creator                                                                                                   |
+| `createdAt / updatedAt` | string (ISO 8601)             | Timestamps (UTC)                                                                                          |
 
 The body is an empty JSON object `{}` (the CSRF guard still needs `Content-Type: application/json`). No `version` needed; the call bumps it, so open edit forms become stale.
 
@@ -138,7 +140,8 @@ curl -i -b cookies.txt -X POST http://localhost:3000/api/projects/MOBI/archive -
 
 ## Change log
 
-| Date       | Change                                                                                  | Why                        |
-| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| Date       | Change                                                                                  | Why                                     |
+| ---------- | --------------------------------------------------------------------------------------- | --------------------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                                |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09              |
+| 2026-10-09 | Response has `guestAreas`; `myAccess` can be `GUEST`                                    | Guest access (BR-GUEST-01, BR-GUEST-02) |

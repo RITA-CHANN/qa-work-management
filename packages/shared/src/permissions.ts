@@ -9,8 +9,9 @@ import type { ProjectAccess } from './projects';
  */
 // prettier-ignore
 export const PERMISSIONS = {
-  'project:view': ['PROJECT_ADMIN', 'MEMBER'],
+  'project:view': ['PROJECT_ADMIN', 'MEMBER', 'GUEST'],
   'project:edit': ['PROJECT_ADMIN'],
+  'project:guests': ['PROJECT_ADMIN'],
   'release:write': ['PROJECT_ADMIN'],
   'milestone:write': ['PROJECT_ADMIN'],
   'member:manage': ['PROJECT_ADMIN'],

@@ -47,8 +47,8 @@ export class UnauthenticatedError extends AppError {
 }
 
 export class ForbiddenError extends AppError {
-  constructor() {
-    super(403, 'FORBIDDEN', 'MSG-COMMON-06');
+  constructor(code: ErrorCode = 'FORBIDDEN', messageId: MessageCode = 'MSG-COMMON-06') {
+    super(403, code, messageId);
   }
 }
 

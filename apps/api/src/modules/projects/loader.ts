@@ -1,5 +1,11 @@
 import type { Request } from 'express';
-import type { AuthUser, Project as ProjectDto, ProjectAccess } from '@qawm/shared';
+import {
+  canSeeArea,
+  type AuthUser,
+  type GuestArea,
+  type Project as ProjectDto,
+  type ProjectAccess,
+} from '@qawm/shared';
 import type { Project } from '../../generated/prisma/client';
 import { fromDbDate } from '../../lib/dates';
 import { NotFoundError } from '../../lib/errors';
@@ -36,6 +42,14 @@ export async function loadProject(key: string, user: AuthUser): Promise<ProjectC
 }
 
 /**
+ * BR-GUEST-03: an area switched off for Guests is hidden from them entirely, so the API answers 404, the same as an
+ * unknown project. Everyone else passes. Call it right after loadProject on every read of that area.
+ */
+export function assertArea(ctx: ProjectContext, area: GuestArea): void {
+  if (!canSeeArea(ctx.access, ctx.project.guestAreas, area)) throw new NotFoundError();
+}
+
+/**
  * A project as the API returns it (API-PROJECT-03). Called only after loadProject, with the id it found.
  * Takes a transaction client too, so a write can return the row it just changed.
  */
@@ -48,12 +62,19 @@ export async function readProjectView(
     where: { id: projectId },
     include: {
       createdBy: { select: { id: true, name: true } },
-      _count: { select: { members: true } },
+      // A Guest never counts other Guests (BR-GUEST-05).
+      _count: {
+        select: {
+          members: myAccess === 'GUEST' ? { where: { access: { not: 'GUEST' } } } : true,
+        },
+      },
       releases: { where: { status: 'ACTIVE' }, select: { id: true, name: true } },
       milestones: { where: { status: 'ACTIVE' }, select: { id: true, name: true, endDate: true } },
     },
   });
-  const milestone = row.milestones[0];
+  // BR-GUEST-03: a Guest without the releases area sees no release or sprint here either.
+  const showPlan = canSeeArea(myAccess ?? 'PROJECT_ADMIN', row.guestAreas, 'releases');
+  const milestone = showPlan ? row.milestones[0] : undefined;
   return {
     key: row.key,
     name: row.name,
@@ -61,8 +82,9 @@ export async function readProjectView(
     archivedAt: row.archivedAt?.toISOString() ?? null,
     version: row.version,
     myAccess,
-    memberCount: row._count.members,
-    activeRelease: row.releases[0] ?? null,
+    guestAreas: row.guestAreas,
+    memberCount: row._count.members + (myAccess === 'GUEST' ? 1 : 0),
+    activeRelease: showPlan ? (row.releases[0] ?? null) : null,
     activeMilestone: milestone
       ? { id: milestone.id, name: milestone.name, endDate: fromDbDate(milestone.endDate) }
       : null,

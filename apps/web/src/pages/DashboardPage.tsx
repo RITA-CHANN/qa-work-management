@@ -1,13 +1,10 @@
-import { EmptyState } from '@/components/EmptyState';
-import { PageHeader } from '@/components/PageHeader';
+import { NoProjectDashboard, ProjectDashboard } from '@/features/dashboard/ProjectDashboard';
+import { useCurrentProject } from '@/features/shell/api';
 
+/** "/": the dashboard of the current project (BR-SHELL-04, BR-DASH-01). */
 export function DashboardPage() {
-  return (
-    <>
-      <PageHeader title="Dashboard" description="Your QA overview across projects and releases." />
-      <EmptyState title="Nothing to show yet">
-        Metrics appear here once projects, test runs and bugs exist (Phase 7).
-      </EmptyState>
-    </>
-  );
+  const current = useCurrentProject();
+  if (current.isPending) return <p role="status">Loading…</p>;
+  if (!current.data) return <NoProjectDashboard />;
+  return <ProjectDashboard projectKey={current.data} />;
 }

@@ -10,8 +10,8 @@ reviewers: [Linh]
 approved:
 route: /projects/:key/activity
 traces:
-  requirements: [US-PROJECT-09, BR-PROJECT-19, BR-PROJECT-20, BR-PROJECT-21]
-  acceptance: [AC-PROJECT-08, AC-PROJECT-44, AC-PROJECT-45, AC-PROJECT-46]
+  requirements: [US-PROJECT-09, BR-PROJECT-19, BR-PROJECT-20, BR-PROJECT-21, BR-GUEST-03]
+  acceptance: [AC-PROJECT-08, AC-PROJECT-44, AC-PROJECT-45, AC-PROJECT-46, AC-GUEST-02]
   api: [API-PROJECT-12]
   design: [DD-PROJECT-02]
 updated: 2026-10-09
@@ -61,10 +61,11 @@ None: the tab is read-only.
 
 ## Permissions
 
-| Access level                        | Can see             | Can do          |
-| ----------------------------------- | ------------------- | --------------- |
-| Project admin, Member, System admin | All entries         | Read, load more |
-| Not a member                        | "Project not found" | —               |
+| Access level                        | Can see                                                                                          | Can do          |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------ | --------------- |
+| Project admin, Member, System admin | All entries                                                                                      | Read, load more |
+| Guest                               | All entries while the `activity` area is on; otherwise no tab and "Page not found" (BR-GUEST-03) | Read, load more |
+| Not a member                        | "Project not found"                                                                              | —               |
 
 ## Accessibility
 
@@ -88,3 +89,4 @@ Same layout; long summaries wrap.
 | ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
 | 2026-10-08 | First version                                                                           | Phase 3A                   |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| 2026-10-09 | Guest row                                                                               | Phase 3C (BR-GUEST-03)     |

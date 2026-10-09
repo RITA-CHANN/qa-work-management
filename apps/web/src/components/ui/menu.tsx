@@ -12,10 +12,16 @@ export function Menu({
   label,
   items,
   icon,
+  trigger,
+  align = 'right',
 }: {
+  /** Accessible name of the button (and its visible text unless `trigger` is given). */
   label: string;
   items: MenuItem[];
   icon?: ReactNode;
+  /** Custom visible content for the button, e.g. an avatar. */
+  trigger?: ReactNode;
+  align?: 'left' | 'right';
 }) {
   const [open, setOpen] = useState(false);
   const menuId = useId();
@@ -54,14 +60,19 @@ export function Menu({
     <div className="relative" data-menu={menuId} onKeyDown={onKeyDown}>
       <Button
         ref={buttonRef}
-        variant="outline"
+        variant={trigger ? 'ghost' : 'outline'}
+        aria-label={trigger ? label : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         onClick={() => setOpen((value) => !value)}
       >
-        {icon}
-        {label}
+        {trigger ?? (
+          <>
+            {icon}
+            {label}
+          </>
+        )}
         <ChevronDown aria-hidden="true" className="size-4" />
       </Button>
       {open && (
@@ -69,7 +80,7 @@ export function Menu({
           id={menuId}
           role="menu"
           aria-label={label}
-          className="absolute right-0 z-20 mt-1 flex min-w-40 flex-col rounded-md border bg-background p-1 shadow-md"
+          className={`absolute ${align === 'right' ? 'right-0' : 'left-0'} z-30 mt-1 flex min-w-44 flex-col rounded-lg border bg-popover p-1 shadow-md`}
         >
           {items.map((item, index) => (
             <button

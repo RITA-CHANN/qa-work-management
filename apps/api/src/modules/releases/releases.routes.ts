@@ -6,7 +6,7 @@ import {
   type Release,
 } from '@qawm/shared';
 import { parseOrThrow } from '../../lib/errors';
-import { keyOf, loadProject } from '../projects/loader';
+import { assertArea, keyOf, loadProject } from '../projects/loader';
 import { createRelease, deleteRelease, listReleases, updateRelease } from './releases.service';
 
 /** /api/projects/:key/releases. Mounted by projects.routes.ts, which already requires a session. */
@@ -15,6 +15,7 @@ export const releasesRouter = Router({ mergeParams: true });
 /** GET (API-RELEASE-01) */
 releasesRouter.get('/', async (req, res) => {
   const ctx = await loadProject(keyOf(req), req.user!);
+  assertArea(ctx, 'releases');
   res.json({ data: await listReleases(ctx) } satisfies ApiSuccess<Release[]>);
 });
 

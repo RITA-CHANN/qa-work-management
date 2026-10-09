@@ -6,24 +6,19 @@ import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { inputClass } from '@/components/ui/field';
-import { useMe } from '@/features/auth/use-me';
 import { useProjects } from './api';
 import { accessLabel, relativeDays } from './labels';
-import { NewProjectDialog } from './NewProjectDialog';
 
 /**
  * SCR-PROJECT-01: the projects I am in (all of them for a System admin), search, show archived.
- * Only a System admin creates projects (BR-PROJECT-01).
+ * Projects are created in the Admin console only (BR-ADMIN-18), so there is no "New project" here.
  */
 export function ProjectListPage() {
   const [params, setParams] = useSearchParams();
   const q = params.get('q') ?? '';
   const archived = params.get('archived') === '1';
   const [search, setSearch] = useState(q);
-  const [creating, setCreating] = useState(false);
   const projects = useProjects(q, archived);
-  const { data: me } = useMe();
-  const isSystemAdmin = me?.globalRole === 'ADMIN';
 
   // Search after 300 ms without typing, or on Enter; the text is kept in the URL (?q=).
   const applySearch = useCallback(
@@ -60,10 +55,7 @@ export function ProjectListPage() {
 
   return (
     <>
-      <PageHeader
-        title="Projects"
-        actions={isSystemAdmin && <Button onClick={() => setCreating(true)}>New project</Button>}
-      />
+      <PageHeader title="Projects" />
       <div className="mb-4 flex flex-wrap items-center gap-6">
         <label className="flex items-center gap-2 text-sm font-medium">
           Search
@@ -153,11 +145,9 @@ export function ProjectListPage() {
       )}
       {empty && (
         <p role="status" className="mt-6 text-center text-muted-foreground">
-          {q ? msg('MSG-PROJECT-20') : msg('MSG-PROJECT-21')}
+          {q ? msg('MSG-PROJECT-20') : msg('MSG-ADMIN-10')}
         </p>
       )}
-
-      {isSystemAdmin && <NewProjectDialog open={creating} onClose={() => setCreating(false)} />}
     </>
   );
 }

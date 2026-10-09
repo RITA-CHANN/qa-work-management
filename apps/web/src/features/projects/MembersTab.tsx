@@ -36,6 +36,8 @@ export function MembersTab() {
   const selfHintId = useId();
 
   const canManage = access.can('member:manage');
+  // A Guest sees people by name only (BR-GUEST-05).
+  const showEmail = access.access !== 'GUEST';
   const myId = access.me?.id;
 
   async function onChange(member: Member, body: MemberUpdate) {
@@ -80,9 +82,11 @@ export function MembersTab() {
             <th scope="col" className="py-2 pr-4 font-medium">
               Name
             </th>
-            <th scope="col" className="py-2 pr-4 font-medium">
-              Email
-            </th>
+            {showEmail && (
+              <th scope="col" className="py-2 pr-4 font-medium">
+                Email
+              </th>
+            )}
             <th scope="col" className="py-2 pr-4 font-medium">
               Access
             </th>
@@ -103,7 +107,7 @@ export function MembersTab() {
                   {member.name}
                   {isMe && <span className="text-muted-foreground"> (you)</span>}
                 </td>
-                <td className="py-2 pr-4">{member.email}</td>
+                {showEmail && <td className="py-2 pr-4">{member.email}</td>}
                 <td className="py-2 pr-4">
                   {canManage && !isMe ? (
                     <select

@@ -17,10 +17,19 @@ async function seedUsers(): Promise<Map<string, { id: string; name: string }>> {
   const passwordHash = await hashPassword(SEED_PASSWORD);
   const byEmail = new Map<string, { id: string; name: string }>();
   for (const user of users) {
+    // Reset everything an earlier run (or a test) may have changed on the account.
+    const state = {
+      name: user.name,
+      globalRole: user.globalRole,
+      status: user.status ?? 'ACTIVE',
+      passwordHash,
+      mustChangePassword: false,
+      lastProjectId: null,
+    } as const;
     const row = await prisma.user.upsert({
       where: { email: user.email },
-      update: { name: user.name, globalRole: user.globalRole, passwordHash },
-      create: { ...user, passwordHash },
+      update: state,
+      create: { ...state, email: user.email },
     });
     byEmail.set(row.email, { id: row.id, name: row.name });
   }
@@ -117,9 +126,81 @@ async function seedProject(seed: SeedProject, byEmail: Map<string, { id: string;
   });
 }
 
+/**
+ * A few audit events so the Admin console's audit log is not empty (BR-ADMIN-14). The table is emptied
+ * first, so counts like "failed sign-ins in 7 days" are the same on every run.
+ */
+async function seedAudit(byEmail: Map<string, { id: string; name: string }>) {
+  const at = (hoursAgo: number) => new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
+  const admin = byEmail.get('admin@qawm.test')!;
+  const linh = byEmail.get('linh@qawm.test')!;
+  await prisma.auditEvent.deleteMany();
+  await prisma.auditEvent.createMany({
+    data: [
+      {
+        createdAt: at(30),
+        actorId: linh.id,
+        action: 'auth.sign_in',
+        targetType: 'session',
+        targetName: 'linh@qawm.test',
+        ip: '10.0.0.12',
+      },
+      {
+        createdAt: at(26),
+        actorId: linh.id,
+        action: 'auth.sign_in_failed',
+        targetType: 'session',
+        targetName: 'linh@qawm.test',
+        ip: '10.0.0.12',
+      },
+      {
+        createdAt: at(25),
+        actorId: null,
+        action: 'auth.sign_in_failed',
+        targetType: 'session',
+        targetName: 'unknown@qawm.test',
+        ip: '203.0.113.7',
+      },
+      {
+        createdAt: at(5),
+        actorId: admin.id,
+        action: 'auth.sign_in',
+        targetType: 'session',
+        targetName: 'admin@qawm.test',
+        ip: '10.0.0.2',
+      },
+      {
+        createdAt: at(4),
+        actorId: admin.id,
+        action: 'user.deactivated',
+        targetType: 'user',
+        targetName: 'inactive@qawm.test',
+        before: { status: 'ACTIVE' },
+        after: { status: 'DEACTIVATED' },
+        ip: '10.0.0.2',
+      },
+      {
+        createdAt: at(3),
+        actorId: admin.id,
+        action: 'project.updated',
+        targetType: 'project',
+        targetName: 'Ada Admin changed the description',
+        projectKey: 'SECRET',
+        before: { description: null },
+        after: { description: 'Admin-only tools' },
+        actedAs: 'ADMIN',
+        ip: '10.0.0.2',
+      },
+    ],
+  });
+}
+
 async function main() {
   const byEmail = await seedUsers();
   for (const project of projects) await seedProject(project, byEmail);
+  await seedAudit(byEmail);
+  // Back to the default workspace settings: the API recreates the row with its defaults when read.
+  await prisma.workspaceSetting.deleteMany();
   console.log(`Seeded ${users.length} users and ${projects.length} projects`);
 }
 

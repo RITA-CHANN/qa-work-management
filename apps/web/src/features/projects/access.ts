@@ -1,4 +1,11 @@
-import { can, type Project, type ProjectAction, type ProjectAccess } from '@qawm/shared';
+import {
+  can,
+  canSeeArea,
+  type GuestArea,
+  type Project,
+  type ProjectAction,
+  type ProjectAccess,
+} from '@qawm/shared';
 import { useMe } from '@/features/auth/use-me';
 
 /**
@@ -19,5 +26,9 @@ export function useProjectAccess(project: Project | undefined) {
     can: (action: ProjectAction) => !archived && can(access, action),
     /** Allowed for the access level, whatever the archive state (archive, restore, delete). */
     canEvenArchived: (action: ProjectAction) => can(access, action),
+    /** False for an area switched off for Guests (BR-GUEST-03); true for everyone else. */
+    sees: (area: GuestArea) => canSeeArea(access, project?.guestAreas ?? [], area),
+    /** A System admin who is not a member of this project (BR-ADMIN-05). */
+    viewingAsAdmin: me?.globalRole === 'ADMIN' && !!project && !project.myAccess,
   };
 }

@@ -1,28 +1,45 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import '@fontsource-variable/plus-jakarta-sans';
+@import '@fontsource-variable/jetbrains-mono';
 
 @custom-variant dark (&:is(.dark *));
 
-/* shadcn/ui design tokens (neutral). Components read these via Tailwind classes. */
+/*
+ * Design tokens v2.1 (redesign proposal §10): light, indigo accent, soft grey ground.
+ * Text colours reach WCAG 2.2 AA (4.5:1) on both white and the ground colour.
+ */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --success: oklch(0.6 0.15 150);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --radius: 0.875rem;
+  --background: #f6f7fb;
+  --foreground: #1b1d2a;
+  --card: #ffffff;
+  --card-foreground: #1b1d2a;
+  --popover: #ffffff;
+  --primary: #4f46e5;
+  --primary-hover: #3730a3;
+  --primary-foreground: #ffffff;
+  --primary-tint: #eef0ff;
+  --primary-tint-foreground: #3b33c9;
+  --secondary: #f1f2f7;
+  --secondary-foreground: #1b1d2a;
+  --muted: #f1f2f7;
+  --muted-foreground: #5b6075;
+  --accent: #eef0ff;
+  --accent-foreground: #3b33c9;
+  --destructive: #9b1c14;
+  --destructive-tint: #fdecea;
+  --warning: #b54708;
+  --warning-tint: #fef0e1;
+  --warning-foreground: #8a3505;
+  --success: #1a6640;
+  --success-tint: #e6f4ec;
+  --border: #e8eaf0;
+  --input: #d6d9e3;
+  --ring: #4f46e5;
+  --admin: #312e81;
+  --admin-foreground: #ffffff;
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
 }
 
 @theme inline {
@@ -35,6 +52,20 @@
   --color-card-foreground: var(--card-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-tint: var(--primary-tint);
+  --color-primary-tint-foreground: var(--primary-tint-foreground);
+  --color-popover: var(--popover);
+  --color-destructive-tint: var(--destructive-tint);
+  --color-warning: var(--warning);
+  --color-warning-tint: var(--warning-tint);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-success-tint: var(--success-tint);
+  --color-admin: var(--admin);
+  --color-admin-foreground: var(--admin-foreground);
+  --shadow-card: var(--shadow-card);
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -53,6 +84,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground font-sans text-sm antialiased;
   }
 }

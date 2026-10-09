@@ -24,7 +24,13 @@ export function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
 }
 
-const userSelect = { id: true, email: true, name: true, globalRole: true } as const;
+const userSelect = {
+  id: true,
+  email: true,
+  name: true,
+  globalRole: true,
+  mustChangePassword: true,
+} as const;
 
 /** Creates a session and returns the raw token for the cookie. Expiry is fixed at login (BR-AUTH-05). */
 export async function createSession(userId: string): Promise<string> {
@@ -59,4 +65,10 @@ export async function deleteSessionByHash(idHash: string): Promise<void> {
 
 export async function deleteSession(token: string): Promise<void> {
   await deleteSessionByHash(hashToken(token));
+}
+
+/** Ends every session of a user: deactivation, password reset, "Sign out everywhere" (BR-ADMIN-10, 12, 13). */
+export async function deleteUserSessions(userId: string): Promise<number> {
+  const { count } = await prisma.session.deleteMany({ where: { userId } });
+  return count;
 }

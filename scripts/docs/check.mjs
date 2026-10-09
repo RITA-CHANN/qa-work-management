@@ -491,11 +491,12 @@ for (const app of ['api', 'web']) {
 
 // 6b. Permissions: the matrix in docs/requirements/project/README.md (BR-PROJECT-35) and the PERMISSIONS map of
 //     packages/shared/src/permissions.ts list the same actions in the same order and allow the same access levels.
-//     The matrix columns are System admin | Project admin | Member | Not a member; only the two access levels are
-//     in the map (a System admin acts as PROJECT_ADMIN, BR-PROJECT-36), so `null` skips the System admin column.
+//     The matrix columns are System admin | Project admin | Member | Guest | Not a member; only the three access
+//     levels are in the map (a System admin acts as PROJECT_ADMIN, BR-PROJECT-36), so `null` skips the System admin
+//     column.
 const PERMISSIONS_REL = 'packages/shared/src/permissions.ts';
 const MATRIX_REL = 'requirements/project/README.md';
-const MATRIX_COLUMNS = [null, 'PROJECT_ADMIN', 'MEMBER'];
+const MATRIX_COLUMNS = [null, 'PROJECT_ADMIN', 'MEMBER', 'GUEST'];
 const codePermissions = [
   ...(await readFile(join(ROOT, PERMISSIONS_REL), 'utf8')).matchAll(
     /^\s*'([a-z-]+:[a-z-]+)':\s*\[([^\]]*)\]/gm,

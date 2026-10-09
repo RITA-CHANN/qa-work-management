@@ -9,6 +9,7 @@ import type {
   ActivityEntry,
   ApiCursorPage,
   ApiSuccess,
+  GuestVisibility,
   Member,
   MemberAdd,
   Milestone,
@@ -52,39 +53,44 @@ export function useProjects(search: string, archived: boolean) {
   });
 }
 
-export function useProject(key: string) {
+export function useProject(key: string, enabled = true) {
   return useQuery({
     queryKey: projectKeys.one(key),
+    enabled,
     queryFn: () => apiFetch<ApiSuccess<Project>>(base(key)).then(data),
     retry: false,
   });
 }
 
-export function useMembers(key: string) {
+export function useMembers(key: string, enabled = true) {
   return useQuery({
     queryKey: projectKeys.members(key),
+    enabled,
     queryFn: () => apiFetch<ApiSuccess<Member[]>>(`${base(key)}/members`).then(data),
   });
 }
 
-export function useReleases(key: string) {
+export function useReleases(key: string, enabled = true) {
   return useQuery({
     queryKey: projectKeys.releases(key),
+    enabled,
     queryFn: () => apiFetch<ApiSuccess<Release[]>>(`${base(key)}/releases`).then(data),
   });
 }
 
-export function useMilestones(key: string) {
+export function useMilestones(key: string, enabled = true) {
   return useQuery({
     queryKey: projectKeys.milestones(key),
+    enabled,
     queryFn: () => apiFetch<ApiSuccess<Milestone[]>>(`${base(key)}/milestones`).then(data),
   });
 }
 
 /** Activity pages: "Load more" fetches the page after the last entry (cursor). */
-export function useActivity(key: string, limit = 20) {
+export function useActivity(key: string, limit = 20, enabled = true) {
   return useInfiniteQuery({
     queryKey: projectKeys.activity(key, limit),
+    enabled,
     initialPageParam: null as string | null,
     queryFn: ({ pageParam }) =>
       apiFetch<ApiCursorPage<ActivityEntry>>(
@@ -124,6 +130,15 @@ export function useUpdateProject(key: string) {
   return useWrite(
     (body: ProjectUpdate) => apiSend<ApiSuccess<Project>>('PATCH', base(key), body).then(data),
     [projectKeys.one(key), projectKeys.all],
+  );
+}
+
+/** PUT guest-visibility (API-PROJECT-13). Refreshes the whole project, the activity log included. */
+export function useGuestVisibility(key: string) {
+  return useWrite(
+    (body: GuestVisibility) =>
+      apiSend<ApiSuccess<Project>>('PUT', `${base(key)}/guest-visibility`, body).then(data),
+    [['project', key.toUpperCase()]],
   );
 }
 

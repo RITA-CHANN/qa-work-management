@@ -1,0 +1,67 @@
+---
+title: Admin console acceptance criteria
+type: acceptance
+feature: admin
+status: review
+owner: Claude
+reviewers: [Linh]
+phase: 3
+updated: 2026-10-09
+---
+
+# Admin console acceptance criteria
+
+Format: **Given** / **When** / **Then**. **Covers** lists the stories and rules it proves. **Priority**, **Risk**
+and **Verify** are explained in [docs/README.md](../../README.md#requirement-attributes). Tag the Playwright test
+that checks a criterion with its ID, for example `{ tag: '@AC-ADMIN-01' }`. Seed users and projects:
+[README.md](README.md#test-data) and [project README](../project/README.md#test-data). Tests that change accounts
+or projects create their own users and projects through the API; Ada Admin is never demoted or deactivated by a
+test except in AC-ADMIN-06, which is refused.
+
+## Console access (US-ADMIN-01)
+
+| ID          | Given                        | When                                            | Then                                                                                              | Covers                   | Priority | Risk | Verify            |
+| ----------- | ---------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------ | -------- | ---- | ----------------- |
+| AC-ADMIN-01 | I am Linh (global role User) | I open `/admin` and call `GET /api/admin/users` | I see the "Page not found" page (MSG-COMMON-13) and the API returns 404, as for any unknown route | US-ADMIN-01, BR-ADMIN-01 | Must     | High | Auto-UI, Auto-API |
+
+## All-projects dashboard and projects (US-ADMIN-02, US-ADMIN-03)
+
+| ID          | Given                                                           | When                                                                                                   | Then                                                                                                                                                | Covers                                             | Priority | Risk   | Verify            |
+| ----------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | -------- | ------ | ----------------- |
+| AC-ADMIN-02 | I am Ada (Admin)                                                | I open the Admin dashboard, then Projects                                                              | Every project is listed with its key, name, status, members, active release, current sprint and last activity, SECRET and the archived OLD included | US-ADMIN-02, US-ADMIN-03, BR-ADMIN-02, BR-ADMIN-03 | Must     | Medium | Auto-UI           |
+| AC-ADMIN-03 | I am an Admin, not a member of SHOP                             | I open SHOP and go through its pages                                                                   | MSG-ADMIN-08 is shown as a banner on every SHOP page                                                                                                | BR-ADMIN-05                                        | Must     | Medium | Auto-UI           |
+| AC-ADMIN-04 | I am an Admin, not a member of my test project                  | I rename the project                                                                                   | The audit log has the entry marked "as Admin" with the old → new name, my name, the time and my IP                                                  | BR-ADMIN-14, BR-ADMIN-15                           | Must     | High   | Auto-API          |
+| AC-ADMIN-09 | A test project has Project admins Oanh and Mai, and Member Linh | An Admin uses "Change project admin" to make Linh Project admin, ticking "make current admins Members" | Linh is the only Project admin; Oanh and Mai are Members; the change is in the activity log and the audit log                                       | US-ADMIN-03, BR-ADMIN-04, BR-ADMIN-14              | Must     | Medium | Auto-UI           |
+| AC-ADMIN-12 | I am an Admin                                                   | I create project WEB with Linh as first Project admin                                                  | WEB exists, Linh is its only Project admin, I am not a member, and the audit log has the entry                                                      | BR-ADMIN-18                                        | Must     | High   | Auto-UI           |
+| AC-ADMIN-13 | I am a Project admin or Member (global role User)               | I look for "New project" in the User UI, and call `POST /api/projects`                                 | There is no button; the API returns 403 with MSG-ADMIN-09                                                                                           | BR-ADMIN-18                                        | Must     | High   | Auto-UI, Auto-API |
+| AC-ADMIN-22 | I am a user who is not a member of any project                  | I open `/projects`                                                                                     | I see MSG-ADMIN-10 and no "New project" button                                                                                                      | BR-ADMIN-18                                        | Should   | Low    | Auto-UI           |
+
+## Users (US-ADMIN-04)
+
+| ID          | Given                                                    | When                                                                       | Then                                                                                                                      | Covers                   | Priority | Risk   | Verify   |
+| ----------- | -------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------ | -------- | ------ | -------- |
+| AC-ADMIN-05 | I am an Admin and I create user "Hoa" with a new email   | Hoa signs in with the one-time password                                    | The password was shown once with MSG-ADMIN-02; Hoa sees MSG-ADMIN-07 and must set a new password before anything else     | US-ADMIN-04, BR-ADMIN-07 | Must     | High   | Auto-UI  |
+| AC-ADMIN-20 | A user `linh@qawm.test` exists                           | An Admin creates a user with email `Linh@QAWM.test`                        | It is refused with MSG-ADMIN-01 (409) and no account is created                                                           | BR-ADMIN-07              | Must     | Medium | Auto-API |
+| AC-ADMIN-06 | Ada is the only active Admin                             | Ada tries to demote or deactivate her own account                          | Both are refused with MSG-ADMIN-04 (422); Ada stays an active Admin                                                       | BR-ADMIN-09              | Must     | High   | Auto-API |
+| AC-ADMIN-21 | Test Admins A and B are the only active Admins           | A demotes B and B demotes A at the same time                               | One change succeeds; the other is refused with MSG-ADMIN-03 (422), so one active Admin remains                            | BR-ADMIN-09              | Should   | Medium | Auto-API |
+| AC-ADMIN-15 | A test user is signed in with global role User           | An Admin makes them Admin                                                  | On their next request they can open `/admin`, without signing in again                                                    | BR-ADMIN-08              | Must     | Medium | Auto-API |
+| AC-ADMIN-07 | A test user is signed in on two browsers                 | An Admin deactivates them                                                  | Both browsers are signed out on the next request; signing in shows MSG-ADMIN-06; after Reactivate they can sign in again  | BR-ADMIN-10              | Must     | High   | Auto-UI  |
+| AC-ADMIN-08 | Linh is the only Project admin of an active test project | An Admin deactivates Linh                                                  | It is refused with MSG-ADMIN-05 naming the project; Linh stays active                                                     | BR-ADMIN-11              | Must     | Medium | Auto-API |
+| AC-ADMIN-16 | A test user is signed in                                 | An Admin resets their password                                             | A new one-time password is shown once; the user's session ends; their next sign-in asks for a new password (MSG-ADMIN-07) | BR-ADMIN-12              | Must     | High   | Auto-API |
+| AC-ADMIN-17 | A test user is signed in on two browsers                 | An Admin uses "Sign out everywhere" on them                                | Both sessions end on the next request; the user can sign in again with the same password                                  | BR-ADMIN-13              | Should   | Medium | Auto-API |
+| AC-ADMIN-14 | Seed users, including the Deactivated Hoa Inactive       | An Admin opens Users and filters by status Deactivated, then by role Admin | Each row shows name, email, role, status, projects count and last sign-in; the filters show only Hoa, then only Ada       | BR-ADMIN-06              | Should   | Low    | Auto-UI  |
+
+## Audit log (US-ADMIN-05)
+
+| ID          | Given                                                                                           | When                                                             | Then                                                                                  | Covers                                | Priority | Risk   | Verify           |
+| ----------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------- | -------- | ------ | ---------------- |
+| AC-ADMIN-10 | A wrong password was tried for `linh@qawm.test`                                                 | An Admin filters the audit log by action "Sign-in failed"        | The entry shows actor "unknown", the email tried and the IP, and no password anywhere | US-ADMIN-05, BR-ADMIN-14, BR-ADMIN-15 | Must     | High   | Auto-API         |
+| AC-ADMIN-11 | Any user, Admin included                                                                        | They look for a way to edit or delete an audit entry (UI or API) | There is none (no endpoint, no control)                                               | BR-ADMIN-15                           | Must     | Medium | Auto-API, Review |
+| AC-ADMIN-18 | An admin change is refused (MSG-ADMIN-05) or fails while saving (error injected in a unit test) | An Admin opens the audit log                                     | No entry was added for it, and the user or project is unchanged                       | BR-ADMIN-16                           | Must     | High   | Auto-API, Unit   |
+| AC-ADMIN-19 | Audit retention is set to 365 days                                                              | The clean-up runs with entries 364 and 366 days old              | The 364-day entry stays; the 366-day entry is removed                                 | BR-ADMIN-17                           | Could    | Low    | Unit             |
+
+## Change log
+
+| Date       | Change                                                                                        | Why                                  |
+| ---------- | --------------------------------------------------------------------------------------------- | ------------------------------------ |
+| 2026-10-09 | First version, from the Phase 3C business requirements v1.3; added AC-ADMIN-14 to AC-ADMIN-22 | Every story and rule has a criterion |
