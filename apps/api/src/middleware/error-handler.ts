@@ -13,7 +13,7 @@ import { AppError } from '../lib/errors';
 /** Short, fixed summary of each problem type (RFC 9457 `title`). */
 const TITLES: Record<ErrorCode, string> = {
   VALIDATION_ERROR: 'Validation error',
-  UNAUTHENTICATED: 'Authentication required',
+  UNAUTHENTICATED: 'Unauthenticated',
   FORBIDDEN: 'Forbidden',
   NOT_FOUND: 'Not found',
   CONFLICT: 'Conflict',

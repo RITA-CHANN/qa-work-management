@@ -23,7 +23,7 @@ traces:
       AC-PROJECT-60,
     ]
   design: [FLW-PROJECT-04, SCR-PROJECT-04, DD-PROJECT-04]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # POST /api/projects/:key/milestones
@@ -122,6 +122,7 @@ Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-
 | 409    | `MILESTONE_NAME_TAKEN`      | MSG-PROJECT-30 | Name already used in this project (BR-PROJECT-27)                                          |
 | 422    | `MILESTONE_OUTSIDE_RELEASE` | MSG-PROJECT-25 | Dates outside the release's dates (BR-PROJECT-29)                                          |
 | 422    | `MILESTONE_OVERLAP`         | MSG-PROJECT-26 | Overlaps another milestone of the same release, sharing one day counts (BR-PROJECT-30)     |
+| 422    | `RELEASE_CLOSED`            | MSG-PROJECT-32 | The release is already released, so it takes no new milestones                             |
 
 ## Security
 
@@ -156,6 +157,7 @@ curl -i -b cookies.txt http://localhost:3000/api/projects/SHOP/milestones -H 'Co
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                             | Why                              |
+| ---------- | ------------------------------------------------------------------ | -------------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)               | Phase 3A                         |
+| 2026-10-09 | Added 422 `RELEASE_CLOSED` (MSG-PROJECT-32) for a released release | Gap found while building the API |

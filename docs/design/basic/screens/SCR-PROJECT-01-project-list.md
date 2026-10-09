@@ -61,7 +61,7 @@ dialog. Follows ISO 9241-110 and WCAG 2.2 level AA.
 │          │ ┌──────┬──────────────┬────────────┬─────────┬────────────┬──────┐ │
 │          │ │ Key  │ Name         │ My role    │ Members │ Active rel.│Updated│ │  <table>
 │          │ ├──────┼──────────────┼────────────┼─────────┼────────────┼──────┤ │
-│          │ │ SHOP │ ShopEase Web │ QA Engineer│ 8       │ 2.4        │ 2 d  │ │  name is a link
+│          │ │ SHOP │ ShopEase Web │ QA engineer│ 8       │ 2.4        │ 2 d  │ │  name is a link
 │          │ │ OLD  │ Legacy…  [Archived]│ Viewer│ 2       │ —          │ 9 d  │ │  badge when archived
 │          │ └──────┴──────────────┴────────────┴─────────┴────────────┴──────┘ │
 │          │  (empty / no match message in role="status")                       │

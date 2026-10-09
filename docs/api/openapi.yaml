@@ -25,12 +25,12 @@ paths:
     get:
       operationId: API-HEALTH-01
       summary: Health of the API and its database
-      description: "Docs: docs/api/health/get-health.md"
+      description: 'Docs: docs/api/health/get-health.md'
       tags:
         - Health
       security: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -40,12 +40,12 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Health"
+                    $ref: '#/components/schemas/Health'
   /api/auth/login:
     post:
       operationId: API-AUTH-01
       summary: Log in
-      description: "Docs: docs/api/auth/post-login.md"
+      description: 'Docs: docs/api/auth/post-login.md'
       tags:
         - Auth
       security: []
@@ -54,9 +54,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginRequest"
+              $ref: '#/components/schemas/LoginRequest'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -66,47 +66,47 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/AuthUser"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/AuthUser'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "429":
-          description: "Too Many Requests: RATE_LIMITED"
+        '429':
+          description: 'Too Many Requests: RATE_LIMITED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -115,20 +115,20 @@ paths:
     post:
       operationId: API-AUTH-02
       summary: Log out
-      description: "Docs: docs/api/auth/post-logout.md"
+      description: 'Docs: docs/api/auth/post-logout.md'
       tags:
         - Auth
       security: []
       responses:
-        "204":
+        '204':
           description: No Content
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -137,11 +137,11 @@ paths:
     get:
       operationId: API-AUTH-03
       summary: The logged-in user
-      description: "Docs: docs/api/auth/get-me.md"
+      description: 'Docs: docs/api/auth/get-me.md'
       tags:
         - Auth
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -151,14 +151,14 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/AuthUser"
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+                    $ref: '#/components/schemas/AuthUser'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -167,7 +167,7 @@ paths:
     get:
       operationId: API-PROJECT-01
       summary: The caller's projects
-      description: "Docs: docs/api/projects/get-projects.md"
+      description: 'Docs: docs/api/projects/get-projects.md'
       tags:
         - Projects
       parameters:
@@ -184,10 +184,10 @@ paths:
           schema:
             type: string
             enum:
-              - "true"
-              - "false"
+              - 'true'
+              - 'false'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -199,25 +199,25 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/ProjectSummary"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                      $ref: '#/components/schemas/ProjectSummary'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -225,7 +225,7 @@ paths:
     post:
       operationId: API-PROJECT-02
       summary: Create a project
-      description: "Docs: docs/api/projects/post-project.md"
+      description: 'Docs: docs/api/projects/post-project.md'
       tags:
         - Projects
       requestBody:
@@ -233,9 +233,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectCreate"
+              $ref: '#/components/schemas/ProjectCreate'
       responses:
-        "201":
+        '201':
           description: Created
           headers:
             Location:
@@ -250,47 +250,47 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Project"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/Project'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "409":
-          description: "Conflict: KEY_TAKEN"
+        '409':
+          description: 'Conflict: KEY_TAKEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - KEY_TAKEN
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -299,7 +299,7 @@ paths:
     get:
       operationId: API-PROJECT-03
       summary: One project
-      description: "Docs: docs/api/projects/get-project.md"
+      description: 'Docs: docs/api/projects/get-project.md'
       tags:
         - Projects
       parameters:
@@ -310,7 +310,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -320,25 +320,25 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Project"
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+                    $ref: '#/components/schemas/Project'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -346,7 +346,7 @@ paths:
     patch:
       operationId: API-PROJECT-04
       summary: Edit a project
-      description: "Docs: docs/api/projects/patch-project.md"
+      description: 'Docs: docs/api/projects/patch-project.md'
       tags:
         - Projects
       parameters:
@@ -361,9 +361,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectUpdate"
+              $ref: '#/components/schemas/ProjectUpdate'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -373,80 +373,80 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Project"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/Project'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "409":
-          description: "Conflict: VERSION_CONFLICT"
+        '409':
+          description: 'Conflict: VERSION_CONFLICT'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VERSION_CONFLICT
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -454,7 +454,7 @@ paths:
     delete:
       operationId: API-PROJECT-07
       summary: Delete an archived project
-      description: "Docs: docs/api/projects/delete-project.md"
+      description: 'Docs: docs/api/projects/delete-project.md'
       tags:
         - Projects
       parameters:
@@ -465,48 +465,48 @@ paths:
           schema:
             type: string
       responses:
-        "204":
+        '204':
           description: No Content
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "422":
-          description: "Unprocessable Content: DELETE_NOT_ALLOWED"
+        '422':
+          description: 'Unprocessable Content: DELETE_NOT_ALLOWED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -515,7 +515,7 @@ paths:
     post:
       operationId: API-PROJECT-05
       summary: Archive a project
-      description: "Docs: docs/api/projects/post-project-archive.md"
+      description: 'Docs: docs/api/projects/post-project-archive.md'
       tags:
         - Projects
       parameters:
@@ -530,9 +530,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EmptyBody"
+              $ref: '#/components/schemas/EmptyBody'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -542,58 +542,58 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Project"
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+                    $ref: '#/components/schemas/Project'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -602,7 +602,7 @@ paths:
     post:
       operationId: API-PROJECT-06
       summary: Restore a project
-      description: "Docs: docs/api/projects/post-project-restore.md"
+      description: 'Docs: docs/api/projects/post-project-restore.md'
       tags:
         - Projects
       parameters:
@@ -617,9 +617,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EmptyBody"
+              $ref: '#/components/schemas/EmptyBody'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -629,47 +629,47 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Project"
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+                    $ref: '#/components/schemas/Project'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -678,7 +678,7 @@ paths:
     get:
       operationId: API-PROJECT-08
       summary: Members of a project
-      description: "Docs: docs/api/projects/get-project-members.md"
+      description: 'Docs: docs/api/projects/get-project-members.md'
       tags:
         - Members
       parameters:
@@ -689,7 +689,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -701,25 +701,25 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Member"
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+                      $ref: '#/components/schemas/Member'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -727,7 +727,7 @@ paths:
     post:
       operationId: API-PROJECT-09
       summary: Add a member
-      description: "Docs: docs/api/projects/post-project-member.md"
+      description: 'Docs: docs/api/projects/post-project-member.md'
       tags:
         - Members
       parameters:
@@ -742,9 +742,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MemberAdd"
+              $ref: '#/components/schemas/MemberAdd'
       responses:
-        "201":
+        '201':
           description: Created
           content:
             application/json:
@@ -754,80 +754,80 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Member"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/Member'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "409":
-          description: "Conflict: ALREADY_MEMBER"
+        '409':
+          description: 'Conflict: ALREADY_MEMBER'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - ALREADY_MEMBER
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -836,7 +836,7 @@ paths:
     patch:
       operationId: API-PROJECT-10
       summary: Change a member's role
-      description: "Docs: docs/api/projects/patch-project-member.md"
+      description: 'Docs: docs/api/projects/patch-project-member.md'
       tags:
         - Members
       parameters:
@@ -857,9 +857,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MemberUpdate"
+              $ref: '#/components/schemas/MemberUpdate'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -869,69 +869,69 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Member"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/Member'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED, OWN_ROLE, LAST_OWNER"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, OWN_ROLE, LAST_OWNER'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -941,7 +941,7 @@ paths:
     delete:
       operationId: API-PROJECT-11
       summary: Remove a member, or leave
-      description: "Docs: docs/api/projects/delete-project-member.md"
+      description: 'Docs: docs/api/projects/delete-project-member.md'
       tags:
         - Members
       parameters:
@@ -958,48 +958,48 @@ paths:
           schema:
             type: string
       responses:
-        "204":
+        '204':
           description: No Content
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED, LAST_OWNER"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, LAST_OWNER'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1009,7 +1009,7 @@ paths:
     get:
       operationId: API-PROJECT-12
       summary: Activity log, newest first
-      description: "Docs: docs/api/projects/get-project-activity.md"
+      description: 'Docs: docs/api/projects/get-project-activity.md'
       tags:
         - Activity
       parameters:
@@ -1034,7 +1034,7 @@ paths:
             type: string
             minLength: 1
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1047,7 +1047,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/ActivityEntry"
+                      $ref: '#/components/schemas/ActivityEntry'
                   meta:
                     type: object
                     required:
@@ -1056,36 +1056,36 @@ paths:
                       nextCursor:
                         type:
                           - string
-                          - "null"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                          - 'null'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1094,7 +1094,7 @@ paths:
     get:
       operationId: API-RELEASE-01
       summary: Releases of a project
-      description: "Docs: docs/api/releases/get-releases.md"
+      description: 'Docs: docs/api/releases/get-releases.md'
       tags:
         - Releases
       parameters:
@@ -1105,7 +1105,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1117,25 +1117,25 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Release"
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+                      $ref: '#/components/schemas/Release'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1143,7 +1143,7 @@ paths:
     post:
       operationId: API-RELEASE-02
       summary: Create a release
-      description: "Docs: docs/api/releases/post-release.md"
+      description: 'Docs: docs/api/releases/post-release.md'
       tags:
         - Releases
       parameters:
@@ -1158,9 +1158,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ReleaseCreate"
+              $ref: '#/components/schemas/ReleaseCreate'
       responses:
-        "201":
+        '201':
           description: Created
           content:
             application/json:
@@ -1170,80 +1170,80 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Release"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/Release'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "409":
-          description: "Conflict: RELEASE_NAME_TAKEN"
+        '409':
+          description: 'Conflict: RELEASE_NAME_TAKEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - RELEASE_NAME_TAKEN
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1252,7 +1252,7 @@ paths:
     patch:
       operationId: API-RELEASE-03
       summary: Edit a release or move its status
-      description: "Docs: docs/api/releases/patch-release.md"
+      description: 'Docs: docs/api/releases/patch-release.md'
       tags:
         - Releases
       parameters:
@@ -1273,9 +1273,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ReleaseUpdate"
+              $ref: '#/components/schemas/ReleaseUpdate'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1285,82 +1285,82 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Release"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/Release'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "409":
-          description: "Conflict: VERSION_CONFLICT, RELEASE_NAME_TAKEN, INVALID_TRANSITION"
+        '409':
+          description: 'Conflict: VERSION_CONFLICT, RELEASE_NAME_TAKEN, INVALID_TRANSITION'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VERSION_CONFLICT
                           - RELEASE_NAME_TAKEN
                           - INVALID_TRANSITION
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED, ACTIVE_RELEASE_EXISTS, OPEN_MILESTONES, MILESTONE_OUTSIDE_RELEASE"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, ACTIVE_RELEASE_EXISTS, OPEN_MILESTONES, MILESTONE_OUTSIDE_RELEASE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1371,7 +1371,7 @@ paths:
     delete:
       operationId: API-RELEASE-04
       summary: Delete a planned release
-      description: "Docs: docs/api/releases/delete-release.md"
+      description: 'Docs: docs/api/releases/delete-release.md'
       tags:
         - Releases
       parameters:
@@ -1388,48 +1388,48 @@ paths:
           schema:
             type: string
       responses:
-        "204":
+        '204':
           description: No Content
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED, DELETE_NOT_ALLOWED"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, DELETE_NOT_ALLOWED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1439,7 +1439,7 @@ paths:
     get:
       operationId: API-MILESTONE-01
       summary: Milestones of a project
-      description: "Docs: docs/api/milestones/get-milestones.md"
+      description: 'Docs: docs/api/milestones/get-milestones.md'
       tags:
         - Milestones
       parameters:
@@ -1456,7 +1456,7 @@ paths:
             type: string
             minLength: 1
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1468,36 +1468,36 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Milestone"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                      $ref: '#/components/schemas/Milestone'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1505,7 +1505,7 @@ paths:
     post:
       operationId: API-MILESTONE-02
       summary: Create a milestone
-      description: "Docs: docs/api/milestones/post-milestone.md"
+      description: 'Docs: docs/api/milestones/post-milestone.md'
       tags:
         - Milestones
       parameters:
@@ -1520,9 +1520,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MilestoneCreate"
+              $ref: '#/components/schemas/MilestoneCreate'
       responses:
-        "201":
+        '201':
           description: Created
           content:
             application/json:
@@ -1532,91 +1532,92 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Milestone"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/Milestone'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "409":
-          description: "Conflict: MILESTONE_NAME_TAKEN"
+        '409':
+          description: 'Conflict: MILESTONE_NAME_TAKEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - MILESTONE_NAME_TAKEN
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED, MILESTONE_OUTSIDE_RELEASE, MILESTONE_OVERLAP"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, MILESTONE_OUTSIDE_RELEASE, MILESTONE_OVERLAP, RELEASE_CLOSED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - PROJECT_ARCHIVED
                           - MILESTONE_OUTSIDE_RELEASE
                           - MILESTONE_OVERLAP
+                          - RELEASE_CLOSED
   /api/projects/{key}/milestones/{id}:
     patch:
       operationId: API-MILESTONE-03
       summary: Edit a milestone or move its status
-      description: "Docs: docs/api/milestones/patch-milestone.md"
+      description: 'Docs: docs/api/milestones/patch-milestone.md'
       tags:
         - Milestones
       parameters:
@@ -1637,9 +1638,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MilestoneUpdate"
+              $ref: '#/components/schemas/MilestoneUpdate'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1649,82 +1650,82 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/Milestone"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                    $ref: '#/components/schemas/Milestone'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "409":
-          description: "Conflict: VERSION_CONFLICT, INVALID_TRANSITION, MILESTONE_NAME_TAKEN"
+        '409':
+          description: 'Conflict: VERSION_CONFLICT, INVALID_TRANSITION, MILESTONE_NAME_TAKEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VERSION_CONFLICT
                           - INVALID_TRANSITION
                           - MILESTONE_NAME_TAKEN
-        "415":
-          description: "Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE"
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED, CANNOT_ACTIVATE_MILESTONE, MILESTONE_OUTSIDE_RELEASE, MILESTONE_OVERLAP"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, CANNOT_ACTIVATE_MILESTONE, MILESTONE_OUTSIDE_RELEASE, MILESTONE_OVERLAP'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1735,7 +1736,7 @@ paths:
     delete:
       operationId: API-MILESTONE-04
       summary: Delete a planned milestone
-      description: "Docs: docs/api/milestones/delete-milestone.md"
+      description: 'Docs: docs/api/milestones/delete-milestone.md'
       tags:
         - Milestones
       parameters:
@@ -1752,48 +1753,48 @@ paths:
           schema:
             type: string
       responses:
-        "204":
+        '204':
           description: No Content
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - UNAUTHENTICATED
-        "403":
-          description: "Forbidden: FORBIDDEN"
+        '403':
+          description: 'Forbidden: FORBIDDEN'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - FORBIDDEN
-        "404":
-          description: "Not Found: NOT_FOUND"
+        '404':
+          description: 'Not Found: NOT_FOUND'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - NOT_FOUND
-        "422":
-          description: "Unprocessable Content: PROJECT_ARCHIVED, DELETE_NOT_ALLOWED"
+        '422':
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, DELETE_NOT_ALLOWED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -1803,7 +1804,7 @@ paths:
     get:
       operationId: API-USER-01
       summary: Users for the member picker
-      description: "Docs: docs/api/users/get-users.md"
+      description: 'Docs: docs/api/users/get-users.md'
       tags:
         - Users
       parameters:
@@ -1823,7 +1824,7 @@ paths:
             minimum: 1
             maximum: 50
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1835,25 +1836,25 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/UserOption"
-        "400":
-          description: "Bad Request: VALIDATION_ERROR"
+                      $ref: '#/components/schemas/UserOption'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
                           - VALIDATION_ERROR
-        "401":
-          description: "Unauthorized: UNAUTHENTICATED"
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
           content:
             application/problem+json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Problem"
+                  - $ref: '#/components/schemas/Problem'
                   - properties:
                       code:
                         enum:
@@ -2002,7 +2003,7 @@ components:
             - type: string
               format: date-time
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
-            - type: "null"
+            - type: 'null'
         myRole:
           anyOf:
             - type: string
@@ -2015,7 +2016,7 @@ components:
                 - DEVELOPER
                 - STAKEHOLDER
                 - VIEWER
-            - type: "null"
+            - type: 'null'
         memberCount:
           type: integer
           minimum: -9007199254740991
@@ -2032,7 +2033,7 @@ components:
                 - id
                 - name
               additionalProperties: false
-            - type: "null"
+            - type: 'null'
         updatedAt:
           type: string
           format: date-time
@@ -2058,7 +2059,7 @@ components:
             - type: string
               format: date-time
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
-            - type: "null"
+            - type: 'null'
         myRole:
           anyOf:
             - type: string
@@ -2071,7 +2072,7 @@ components:
                 - DEVELOPER
                 - STAKEHOLDER
                 - VIEWER
-            - type: "null"
+            - type: 'null'
         memberCount:
           type: integer
           minimum: -9007199254740991
@@ -2088,7 +2089,7 @@ components:
                 - id
                 - name
               additionalProperties: false
-            - type: "null"
+            - type: 'null'
         updatedAt:
           type: string
           format: date-time
@@ -2096,7 +2097,7 @@ components:
         description:
           type:
             - string
-            - "null"
+            - 'null'
         version:
           type: integer
           minimum: -9007199254740991
@@ -2118,7 +2119,7 @@ components:
                 - name
                 - endDate
               additionalProperties: false
-            - type: "null"
+            - type: 'null'
         createdBy:
           type: object
           properties:
@@ -2199,13 +2200,13 @@ components:
             - type: string
               format: date
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
-            - type: "null"
+            - type: 'null'
         targetDate:
           anyOf:
             - type: string
               format: date
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
-            - type: "null"
+            - type: 'null'
         version:
           type: integer
           minimum: -9007199254740991
@@ -2245,7 +2246,7 @@ components:
         goal:
           type:
             - string
-            - "null"
+            - 'null'
         startDate:
           type: string
           format: date
@@ -2338,7 +2339,7 @@ components:
                   - from
                   - to
                 additionalProperties: false
-            - type: "null"
+            - type: 'null'
         actor:
           type: object
           properties:
@@ -2407,7 +2408,7 @@ components:
           anyOf:
             - type: string
               maxLength: 2000
-            - type: "null"
+            - type: 'null'
       required:
         - key
         - name
@@ -2427,7 +2428,7 @@ components:
           anyOf:
             - type: string
               maxLength: 2000
-            - type: "null"
+            - type: 'null'
       required:
         - version
       additionalProperties: false
@@ -2485,13 +2486,13 @@ components:
             - type: string
               format: date
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
-            - type: "null"
+            - type: 'null'
         targetDate:
           anyOf:
             - type: string
               format: date
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
-            - type: "null"
+            - type: 'null'
       required:
         - name
       additionalProperties: false
@@ -2511,13 +2512,13 @@ components:
             - type: string
               format: date
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
-            - type: "null"
+            - type: 'null'
         targetDate:
           anyOf:
             - type: string
               format: date
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
-            - type: "null"
+            - type: 'null'
         status:
           type: string
           enum:
@@ -2541,7 +2542,7 @@ components:
           anyOf:
             - type: string
               maxLength: 500
-            - type: "null"
+            - type: 'null'
         startDate:
           type: string
         endDate:
@@ -2567,7 +2568,7 @@ components:
           anyOf:
             - type: string
               maxLength: 500
-            - type: "null"
+            - type: 'null'
         startDate:
           type: string
           format: date

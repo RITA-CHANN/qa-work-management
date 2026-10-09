@@ -51,7 +51,7 @@ sequenceDiagram
 | `milestone.created` / `milestone.updated` / `milestone.deleted` | {actor} created / edited / deleted milestone {name} | edited fields         |
 | `milestone.status_changed`                                      | {actor} moved milestone {name} from {old} to {new}  | `status`              |
 
-Role and status names in summaries are the display names ("QA Engineer", "Active"). Project deletion writes no
+Role and status names in summaries are the display names ("QA engineer", "Active"). Project deletion writes no
 entry: the log is deleted with the project.
 
 ## Rules in code

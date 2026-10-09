@@ -53,7 +53,7 @@ Pages through the project's activity log, newest first (SCR-PROJECT-05). Status 
       "action": "member.role_changed",
       "entityType": "member",
       "entityId": "cm…",
-      "summary": "Minh Lead changed Linh QA's role from Viewer to QA Engineer",
+      "summary": "Minh Lead changed Linh QA's role from Viewer to QA engineer",
       "changes": {
         "role": {
           "from": "VIEWER",

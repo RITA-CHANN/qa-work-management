@@ -1,6 +1,6 @@
 # Phase 3A Plan: Projects
 
-Status: **Design in review** (design docs PR) · 2026-10-08
+Status: **Code in review** (Phase 3A code PR; design docs PR #12 merged) · 2026-10-09
 Business requirements: [requirements/project](../requirements/project/README.md) (what and why, with the
 US / BR / AC / MSG IDs). This file says **how** we build it.
 

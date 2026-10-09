@@ -37,7 +37,7 @@ traces:
       AC-AUTH-32,
     ]
   design: [SCR-AUTH-01, DD-AUTH-01, DD-AUTH-02]
-updated: 2026-10-07
+updated: 2026-10-09
 ---
 
 # POST /api/auth/login
@@ -107,25 +107,32 @@ If the request already carried a valid `qawm_sid`, that old session is deleted a
 
 Checked in this order: content type, body, rate limit, credentials.
 
-| Status | `code`                   | `message`                                          | When                                                                             |
-| ------ | ------------------------ | -------------------------------------------------- | -------------------------------------------------------------------------------- |
-| 415    | `UNSUPPORTED_MEDIA_TYPE` | `Content-Type must be application/json`            | Missing or other content type                                                    |
-| 400    | `VALIDATION_ERROR`       | `Request validation failed`                        | Missing field or bad email. `details` lists each field. Not counted as a failure |
-| 429    | `RATE_LIMITED`           | `Too many login attempts. Please try again later.` | 5 failures for this email in the window (BR-AUTH-04). Not counted again          |
-| 401    | `UNAUTHENTICATED`        | `Invalid email or password`                        | Unknown email **or** wrong password: same status, code and message (BR-AUTH-03)  |
+| Status | `code`                   | `detail`                                           | When                                                                            |
+| ------ | ------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 415    | `UNSUPPORTED_MEDIA_TYPE` | `Content-Type must be application/json`            | Missing or other content type                                                   |
+| 400    | `VALIDATION_ERROR`       | `Request validation failed`                        | Missing field or bad email. `errors` lists each field. Not counted as a failure |
+| 429    | `RATE_LIMITED`           | `Too many login attempts. Please try again later.` | 5 failures for this email in the window (BR-AUTH-04). Not counted again         |
+| 401    | `UNAUTHENTICATED`        | `Invalid email or password`                        | Unknown email **or** wrong password: same status, code and message (BR-AUTH-03) |
+
+Errors are RFC 9457 problem details (see the [API README](../README.md#error-format)):
 
 ```json
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Request validation failed",
-    "details": [{ "path": "email", "message": "Enter a valid email address" }],
-    "requestId": "…"
-  }
+  "type": "https://qawm.test/problems/validation-error",
+  "title": "Validation error",
+  "status": 400,
+  "detail": "Request validation failed",
+  "instance": "/api/auth/login",
+  "code": "VALIDATION_ERROR",
+  "messageId": "MSG-COMMON-04",
+  "errors": [
+    { "pointer": "/email", "detail": "Enter a valid email address", "messageId": "MSG-AUTH-04" }
+  ],
+  "requestId": "…"
 }
 ```
 
-The web app shows MSG-AUTH-01 for 401 and MSG-AUTH-02 for 429. The 400 `details` messages are the same texts
+The web app shows MSG-AUTH-01 for 401 and MSG-AUTH-02 for 429. The 400 `errors[].detail` texts are the same texts
 as the field messages MSG-AUTH-03, MSG-AUTH-04 and MSG-AUTH-05.
 
 ## Security
@@ -157,14 +164,15 @@ curl -i -c cookies.txt http://localhost:3000/api/auth/login \
 | ---------- | ------------------------------------------------------- | ------------------------------------------------- |
 | Happy path | Seed user, right password                               | 200, body matches `authUserSchema`, cookie is set |
 | Negative   | Wrong password; unknown email                           | Both 401 with identical bodies (except requestId) |
-| Validation | Empty body, `email: "abc"`, missing `password`          | 400 with one `details` entry per field            |
+| Validation | Empty body, `email: "abc"`, missing `password`          | 400 with one `errors` entry per field             |
 | Boundary   | 5th wrong password; 6th attempt with the right password | 401, then 429                                     |
 | Security   | Inspect `Set-Cookie`                                    | `HttpOnly`, `SameSite=Lax`, no token in the body  |
 | Security   | Send as `text/plain`                                    | 415                                               |
 
 ## Change log
 
-| Date       | Change                                             | Why                                         |
-| ---------- | -------------------------------------------------- | ------------------------------------------- |
-| 2026-10-07 | First version                                      | Phase 2                                     |
-| 2026-10-08 | Added Security (OWASP API Top 10) and Side effects | Documentation standards (docs/STANDARDS.md) |
+| Date       | Change                                                               | Why                                         |
+| ---------- | -------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                                        | Phase 2                                     |
+| 2026-10-08 | Added Security (OWASP API Top 10) and Side effects                   | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-09 | Errors use the RFC 9457 error body (`detail`, `errors`, `messageId`) | ADR-0010, Phase 3 code PR                   |

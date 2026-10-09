@@ -11,7 +11,7 @@ traces:
   requirements: [US-AUTH-03, BR-AUTH-06, BR-AUTH-07]
   acceptance: [AC-AUTH-18, AC-AUTH-20, AC-AUTH-21]
   design: [SCR-AUTH-02, FLW-AUTH-02, DD-AUTH-01]
-updated: 2026-10-07
+updated: 2026-10-09
 ---
 
 # POST /api/auth/logout
@@ -82,7 +82,8 @@ curl -i -b cookies.txt http://localhost:3000/api/auth/logout -H 'Content-Type: a
 
 ## Change log
 
-| Date       | Change                                             | Why                                         |
-| ---------- | -------------------------------------------------- | ------------------------------------------- |
-| 2026-10-07 | First version                                      | Phase 2                                     |
-| 2026-10-08 | Added Security (OWASP API Top 10) and Side effects | Documentation standards (docs/STANDARDS.md) |
+| Date       | Change                                                               | Why                                         |
+| ---------- | -------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                                        | Phase 2                                     |
+| 2026-10-08 | Added Security (OWASP API Top 10) and Side effects                   | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-09 | Errors use the RFC 9457 error body (`detail`, `errors`, `messageId`) | ADR-0010, Phase 3 code PR                   |

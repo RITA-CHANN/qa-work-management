@@ -36,7 +36,7 @@ traces:
     ]
   api: [API-PROJECT-03, API-PROJECT-09, API-PROJECT-10, API-PROJECT-11]
   design: [ADR-0008, FLW-PROJECT-02]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # DD-PROJECT-01 Project access and permissions
@@ -103,8 +103,8 @@ about the project because the 400 depends only on the body.
 
 - OWASP API1 (object level): every project-scoped route goes through `loadProject`; no route reads a project by
   key or id any other way. A lint rule bans `prisma.project.findUnique` outside the loader.
-- OWASP API5 (function level): every write route calls `assertCan` with a named action; a unit test fails if a
-  route file has a write handler without it.
+- OWASP API5 (function level): every write function in the `*.service.ts` files calls `assertCan` with a named
+  action (except `createProject`, open to every user); a unit test (`guards.test.ts`) fails if one doesn't.
 - 404 bodies for "unknown" and "not a member" are identical, including `type` and `detail` (NFR-PROJECT-01).
 - The member list returns `id`, `name`, `email`, `role` only, never `password_hash` or sessions.
 
@@ -119,6 +119,7 @@ about the project because the 400 depends only on the body.
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-08 | First version | Phase 3A |
+| Date       | Change                                                            | Why              |
+| ---------- | ----------------------------------------------------------------- | ---------------- |
+| 2026-10-08 | First version                                                     | Phase 3A         |
+| 2026-10-09 | The guard test checks service write functions, not route handlers | Matches the code |

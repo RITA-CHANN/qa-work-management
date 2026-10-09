@@ -159,7 +159,7 @@ export function ArchiveProjectDialog({ project, open, onClose }: DialogProps) {
   );
 }
 
-/** "Delete project?" (FLW-PROJECT-03): the Owner types the key to confirm (BR-PROJECT-09). */
+/** "Delete project?" (FLW-PROJECT-03): the Owner must type the key (MSG-PROJECT-10) (BR-PROJECT-09). */
 export function DeleteProjectDialog({ project, open, onClose }: DialogProps) {
   const remove = useDeleteProject(project.key);
   const navigate = useNavigate();
@@ -196,7 +196,7 @@ export function DeleteProjectDialog({ project, open, onClose }: DialogProps) {
     >
       {alert && <Alert>{alert}</Alert>}
       <TextField
-        label={`Type ${project.key} to confirm`}
+        label={msg('MSG-PROJECT-10', { key: project.key })}
         value={typed}
         autoComplete="off"
         onChange={(event) => setTyped(event.target.value)}

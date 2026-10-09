@@ -30,7 +30,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 - [AC-PROJECT-18](../requirements/project/acceptance.md): I get 403 and nothing changes
 - [AC-PROJECT-22](../requirements/project/acceptance.md): There is no Edit button; the API returns 403
 - [AC-PROJECT-23](../requirements/project/acceptance.md): Dev Nguyen appears in the members table with role Developer, and can now open the project
-- [AC-PROJECT-25](../requirements/project/acceptance.md): The table shows QA Engineer; Linh's next request uses the new role without logging in again
+- [AC-PROJECT-25](../requirements/project/acceptance.md): The table shows QA engineer; Linh's next request uses the new role without logging in again
 - [AC-PROJECT-26](../requirements/project/acceptance.md): Dev Nguyen disappears from the table and now gets 404 on the project
 - [AC-PROJECT-27](../requirements/project/acceptance.md): I see MSG-PROJECT-12 and nothing changes
 - [AC-PROJECT-29](../requirements/project/acceptance.md): I see members but no Add / Change role / Remove controls; the API returns 403

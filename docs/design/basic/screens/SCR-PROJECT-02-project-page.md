@@ -57,7 +57,7 @@ Members, SCR-PROJECT-04 Releases and milestones, SCR-PROJECT-05 Activity.
 
 ```
 ┌──────────┬────────────────────────────────────────────────────────────────────┐
-│ nav      │  ShopEase Web  SHOP  [QA Lead]          [ Edit ] [ ⋯ More ▾ ]       │ <h1> name, key, my-role badge
+│ nav      │  ShopEase Web  SHOP  [QA lead]          [ Edit ] [ ⋯ More ▾ ]       │ <h1> name, key, my-role badge
 │          │  ⚠ This project is archived. Restore it to make changes. [Restore] │ banner only when archived
 │          │  Current: Sprint 4 · release 2.4 · 3 days left                     │ or "Overdue by 2 days"
 │          │  [ Overview ] [ Members ] [ Releases & milestones ] [ Activity ]   │ tabs (links, URL per tab)

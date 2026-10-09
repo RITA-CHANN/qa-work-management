@@ -3,7 +3,7 @@ import { ToastContext } from './use-toast';
 
 type Toast = { id: number; text: string };
 
-/** Short success messages ("Changes saved", MSG-PROJECT-19) in a polite live region. */
+/** Short success messages (MSG-PROJECT-19 and the like) in a polite live region. */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const show = useCallback((text: string) => {

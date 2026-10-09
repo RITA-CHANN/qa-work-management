@@ -26,7 +26,7 @@ Who changed what and when in this project, newest first.
 ```
  Activity
  ┌──────────────────────────────────────────────────────────────────────────┐
- │ Minh Lead changed Linh QA's role from Viewer to QA Engineer              │
+ │ Minh Lead changed Linh QA's role from Viewer to QA engineer              │
  │ 2026-10-08 14:02                                         ▸ Show changes  │
  ├──────────────────────────────────────────────────────────────────────────┤
  │ Mai PM edited the project                                                │

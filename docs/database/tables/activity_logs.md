@@ -25,7 +25,7 @@ the code has no update or delete path (BR-PROJECT-21). Later phases write to the
 | `action`      | text         | no   |          |     | Machine name of what happened, `<entity>.<verb>`, for example `member.role_changed`                                                    | internal       | BR-PROJECT-19 | 3           |
 | `entity_type` | text         | no   |          |     | Kind of record changed: `project`, `member`, `release`, `milestone`                                                                    | internal       |               | 3           |
 | `entity_id`   | text         | no   |          |     | Id of the record changed (a user id for `member`)                                                                                      | internal       |               | 3           |
-| `summary`     | text         | no   |          |     | Sentence shown to people, written at the time of the change, for example "Minh Lead changed Linh QA's role from Viewer to QA Engineer" | personal       | BR-PROJECT-20 | 3           |
+| `summary`     | text         | no   |          |     | Sentence shown to people, written at the time of the change, for example "Minh Lead changed Linh QA's role from Viewer to QA engineer" | personal       | BR-PROJECT-20 | 3           |
 | `changes`     | jsonb        | yes  |          |     | Changed fields with old and new value: `{ "name": { "from": "A", "to": "B" } }`; `null` for create and delete                          | internal       | BR-PROJECT-20 | 3           |
 | `created_at`  | timestamp(3) | no   | `now()`  |     | Time of the change (UTC)                                                                                                               | internal       |               | 3           |
 

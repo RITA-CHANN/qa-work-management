@@ -3,7 +3,7 @@ import { ApiRequestError } from '@/lib/api-client';
 
 export type FieldErrors = Record<string, string | undefined>;
 
-/** First message per field from a Zod error: { key: 'Key is required', … }. */
+/** First message per field from a Zod error: { key: msg('MSG-PROJECT-01'), … }. */
 export function zodFieldErrors(error: z.ZodError): FieldErrors {
   const errors: FieldErrors = {};
   for (const issue of error.issues) {
