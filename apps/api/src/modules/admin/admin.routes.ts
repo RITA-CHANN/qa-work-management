@@ -5,7 +5,9 @@ import {
   adminUserListQuerySchema,
   adminUserUpdateSchema,
   auditQuerySchema,
+  changeProjectAdminSchema,
   emptyBodySchema,
+  workspaceSettingsSchema,
   type AdminOverview,
   type AdminProject,
   type AdminUser,
@@ -13,13 +15,17 @@ import {
   type ApiCursorPage,
   type ApiSuccess,
   type AuditEvent,
+  type Member,
   type OneTimePassword,
+  type WorkspaceSettings,
 } from '@qawm/shared';
 import { parseOrThrow } from '../../lib/errors';
 import { requireAuth } from '../../middleware/require-auth';
 import { listAudit } from './audit.service';
 import { adminOverview, listAdminProjects } from './overview.service';
+import { changeProjectAdmin } from './project-admin.service';
 import { requireAdmin } from './require-admin';
+import { getSettings, updateSettings } from './settings.service';
 import {
   changeGlobalRole,
   createUser,
@@ -46,6 +52,14 @@ adminRouter.get('/overview', async (_req, res) => {
 adminRouter.get('/projects', async (req, res) => {
   const query = parseOrThrow(adminProjectListQuerySchema, req.query);
   res.json({ data: await listAdminProjects(query) } satisfies ApiSuccess<AdminProject[]>);
+});
+
+/** POST /api/admin/projects/:key/project-admin (API-ADMIN-12) */
+adminRouter.post('/projects/:key/project-admin', async (req, res) => {
+  const body = parseOrThrow(changeProjectAdminSchema, req.body);
+  const key = (req.params as { key: string }).key;
+  const members = await changeProjectAdmin(req.user!, key, body);
+  res.json({ data: members } satisfies ApiSuccess<Member[]>);
 });
 
 /** GET /api/admin/users (API-ADMIN-03) */
@@ -109,4 +123,17 @@ adminRouter.get('/audit', async (req, res) => {
     data: page.data,
     meta: { nextCursor: page.nextCursor },
   } satisfies ApiCursorPage<AuditEvent>);
+});
+
+/** GET /api/admin/settings (API-ADMIN-13) */
+adminRouter.get('/settings', async (_req, res) => {
+  res.json({ data: await getSettings() } satisfies ApiSuccess<WorkspaceSettings>);
+});
+
+/** PUT /api/admin/settings (API-ADMIN-14) */
+adminRouter.put('/settings', async (req, res) => {
+  const body = parseOrThrow(workspaceSettingsSchema, req.body);
+  res.json({
+    data: await updateSettings(req.user!.id, body, req.ip ?? null),
+  } satisfies ApiSuccess<WorkspaceSettings>);
 });

@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
-import { msg, projectCreateSchema } from '@qawm/shared';
+import { msg, projectCreateSchema, type Project } from '@qawm/shared';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogActions } from '@/components/ui/dialog';
@@ -16,8 +16,19 @@ import {
 } from './form-errors';
 import { errorText } from './server-error';
 
-/** "New project" dialog of SCR-PROJECT-01 (FLW-PROJECT-01), for System admins only (BR-PROJECT-01). */
-export function NewProjectDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+/**
+ * "New project" dialog (FLW-PROJECT-01), on Admin console › Projects only: System admins create projects
+ * (BR-PROJECT-01, BR-ADMIN-18). `onCreated` replaces the default, which opens the new project.
+ */
+export function NewProjectDialog({
+  open,
+  onClose,
+  onCreated,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCreated?: (project: Project) => void;
+}) {
   const create = useCreateProject();
   const users = useUsers(open);
   const navigate = useNavigate();
@@ -57,7 +68,8 @@ export function NewProjectDialog({ open, onClose }: { open: boolean; onClose: ()
       const project = await create.mutateAsync(parsed.data);
       close();
       toast(msg('MSG-PROJECT-19'));
-      void navigate(`/projects/${project.key}`);
+      if (onCreated) onCreated(project);
+      else void navigate(`/projects/${project.key}`);
     } catch (error) {
       if (error instanceof ApiRequestError && error.code === 'KEY_TAKEN') {
         setErrors({ key: error.message });

@@ -85,6 +85,11 @@ export const MESSAGES = {
   'MSG-ADMIN-14': 'Choose a password different from the one-time password',
   'MSG-ADMIN-15': 'Password changed',
   'MSG-ADMIN-16': 'User not found',
+  'MSG-ADMIN-17': 'Choose an active user as project admin',
+  'MSG-ADMIN-18': 'Enter a number of days from 30 to 3650',
+  'MSG-ADMIN-19': 'Settings saved',
+  'MSG-GUEST-01': 'The project admins have not shared the dashboard with Guests.',
+  'MSG-GUEST-02': 'Guest access saved',
 
   // Shell: docs/requirements/shell/messages.md
   'MSG-SHELL-01': 'No results for "{query}"',

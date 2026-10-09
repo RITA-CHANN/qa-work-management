@@ -99,21 +99,25 @@ for example "QA lead · QAL"; pickers show "QA lead (QAL)". Later phases use it 
 ✅ allowed · ❌ refused with 403 · A System admin can do everything a Project admin can (BR-PROJECT-36). Job titles
 play no part. This table is BR-PROJECT-35 and also the permission test matrix: one row × one column = one test.
 
-| Action                                                             | System admin | Project admin | Member | Not a member |
-| ------------------------------------------------------------------ | ------------ | ------------- | ------ | ------------ |
-| See the project, members, releases, milestones, activity           | ✅           | ✅            | ✅     | 404          |
-| Edit name and description                                          | ✅           | ✅            | ❌     | 404          |
-| Create, edit, change status of, delete a release                   | ✅           | ✅            | ❌     | 404          |
-| Create, edit, change status of, delete a milestone                 | ✅           | ✅            | ❌     | 404          |
-| Add a member, change an access level or job title, remove a member | ✅           | ✅            | ❌     | 404          |
-| Archive or restore the project                                     | ✅           | ✅            | ❌     | 404          |
-| Delete the project                                                 | ✅           | ✅            | ❌     | 404          |
-| Leave the project                                                  | —¹           | ✅²           | ✅     | —            |
-| Create a project                                                   | ✅³          | ❌            | ❌     | ❌           |
+| Action                                                             | System admin | Project admin | Member | Guest | Not a member |
+| ------------------------------------------------------------------ | ------------ | ------------- | ------ | ----- | ------------ |
+| See the project (name, key, access)                                | ✅           | ✅            | ✅     | ✅    | 404          |
+| See members, releases, milestones, activity                        | ✅           | ✅            | ✅     | ✅⁴   | 404          |
+| Edit name and description                                          | ✅           | ✅            | ❌     | ❌    | 404          |
+| Change what Guests can see                                         | ✅           | ✅            | ❌     | ❌    | 404          |
+| Create, edit, change status of, delete a release                   | ✅           | ✅            | ❌     | ❌    | 404          |
+| Create, edit, change status of, delete a milestone                 | ✅           | ✅            | ❌     | ❌    | 404          |
+| Add a member, change an access level or job title, remove a member | ✅           | ✅            | ❌     | ❌    | 404          |
+| Archive or restore the project                                     | ✅           | ✅            | ❌     | ❌    | 404          |
+| Delete the project                                                 | ✅           | ✅            | ❌     | ❌    | 404          |
+| Leave the project                                                  | —¹           | ✅²           | ✅     | ✅    | —            |
+| Create a project                                                   | ✅³          | ❌            | ❌     | ❌    | ❌           |
 
 ¹ A System admin who is not a member has nothing to leave; one who is a member leaves like anyone else.
 ² Only while another Project admin remains (BR-PROJECT-12).
 ³ Only a System admin, anyone else gets 403 (BR-PROJECT-01); the System admin picks the first Project admin.
+⁴ Only the areas switched on for Guests; an area switched off answers 404 and a Guest sees people by name only,
+never other Guests (BR-GUEST-02 to BR-GUEST-05).
 On an archived project every change is refused with 422 for everyone (BR-PROJECT-08).
 
 ## Assumptions and constraints

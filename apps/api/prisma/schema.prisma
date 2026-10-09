@@ -66,6 +66,8 @@ model Session {
 enum ProjectAccess {
   PROJECT_ADMIN
   MEMBER
+  /// Read only, limited to projects.guest_areas (BR-GUEST-01..06, Phase 3C).
+  GUEST
 }
 
 /// What a member does (BR-PROJECT-37), stored as its short key. No effect on permissions.
@@ -104,6 +106,8 @@ model Project {
   description  String?
   /// null means active (BR-PROJECT-08).
   archivedAt   DateTime?       @map("archived_at")
+  /// Areas a Guest may see (BR-GUEST-02); copied from workspace_settings when the project is created.
+  guestAreas   String[]        @default(["dashboard", "releases"]) @map("guest_areas")
   /// Optimistic locking (DD-PROJECT-03).
   version      Int             @default(1)
   createdById  String          @map("created_by_id")
@@ -226,4 +230,17 @@ model AuditEvent {
   @@index([actorId])
   @@index([action])
   @@map("audit_events")
+}
+
+/// One row (id = "default"): workspace-wide settings an Admin changes in the Admin console.
+/// See docs/database/tables/workspace_settings.md.
+model WorkspaceSetting {
+  id                 String   @id @default("default")
+  /// Guest areas a new project starts with (BR-GUEST-02).
+  defaultGuestAreas  String[] @default(["dashboard", "releases"]) @map("default_guest_areas")
+  /// Audit events older than this are deleted (BR-ADMIN-17).
+  auditRetentionDays Int      @default(365) @map("audit_retention_days")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("workspace_settings")
 }

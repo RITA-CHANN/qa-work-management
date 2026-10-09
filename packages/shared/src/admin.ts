@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { msg } from './messages';
+import { GUEST_AREAS, guestAreaSchema } from './guest';
 import { jobTitleSchema, projectAccessSchema } from './projects';
 
 /**
@@ -121,6 +122,21 @@ export const adminOverviewSchema = z.object({
 });
 export type AdminOverview = z.infer<typeof adminOverviewSchema>;
 
+/** Workspace settings (Admin console › Settings): Guest defaults and audit retention (BR-GUEST-02, BR-ADMIN-17). */
+export const workspaceSettingsSchema = z.strictObject({
+  defaultGuestAreas: z.array(guestAreaSchema).max(GUEST_AREAS.length),
+  auditRetentionDays: z.number().int().min(30).max(3650),
+});
+export type WorkspaceSettings = z.infer<typeof workspaceSettingsSchema>;
+
+/** Body of POST /api/admin/projects/:key/project-admin (BR-ADMIN-04). */
+export const changeProjectAdminSchema = z.strictObject({
+  userId: z.string().min(1),
+  /** Turn the current Project admins into Members in the same step. */
+  demoteCurrent: z.boolean().default(false),
+});
+export type ChangeProjectAdmin = z.input<typeof changeProjectAdminSchema>;
+
 /** Audit actions (BR-ADMIN-14). `project.*` and `member.*` etc. come from Admin writes on projects. */
 export const AUDIT_ACTION_LABELS: Record<string, string> = {
   'auth.sign_in': 'Signed in',
@@ -138,8 +154,10 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   'project.archived': 'Archived project',
   'project.restored': 'Restored project',
   'project.deleted': 'Deleted project',
+  'project.guest_visibility_changed': 'Changed Guest visibility',
+  'settings.updated': 'Changed workspace settings',
   'member.added': 'Added member',
-  'member.role_changed': 'Changed member role',
+  'member.updated': 'Changed member access',
   'member.removed': 'Removed member',
   'release.created': 'Created release',
   'release.updated': 'Edited release',

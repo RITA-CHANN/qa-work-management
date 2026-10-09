@@ -33,6 +33,9 @@ validation): [../common/messages.md](../common/messages.md). `{name}` and simila
 | MSG-ADMIN-14 | Set new password: same as the one-time password      | error   | field    | Choose a password different from the one-time password                           |
 | MSG-ADMIN-15 | Toast after the new password is saved                | success | toast    | Password changed                                                                 |
 | MSG-ADMIN-16 | Admin users API: unknown user id (404)               | error   | api      | User not found                                                                   |
+| MSG-ADMIN-17 | Change project admin: user unknown or deactivated    | error   | field    | Choose an active user as project admin                                           |
+| MSG-ADMIN-18 | Settings: audit retention out of range               | error   | field    | Enter a number of days from 30 to 3650                                           |
+| MSG-ADMIN-19 | Toast after the workspace settings are saved         | success | toast    | Settings saved                                                                   |
 
 `Kind`: error, warning, info, success. `Shown as`: field, alert, status, toast, page, api (API response only).
 
@@ -45,3 +48,4 @@ MSG-ADMIN-10 replaces MSG-PROJECT-21 on the projects list, because users can no 
 | ---------- | ------------------------------------------------------------------------------------ | ----------------------- |
 | 2026-10-09 | First version, from the Phase 3C business requirements v1.3                          | Phase 3C                |
 | 2026-10-09 | Added MSG-ADMIN-11 to MSG-ADMIN-16 (field validation, password change, unknown user) | Texts the 3C code needs |
+| 2026-10-09 | Added MSG-ADMIN-17 to MSG-ADMIN-19 (change project admin, workspace settings)        | Texts the 3C code needs |

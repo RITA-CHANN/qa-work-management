@@ -12,6 +12,8 @@ export type ActivityInput = {
   /** The sentence people read, built now so later renames don't change it (BR-PROJECT-20). */
   summary: string;
   changes?: ActivityChanges | null;
+  /** Also write an audit event whoever acts (e.g. Guest visibility, BR-GUEST-06). */
+  audit?: boolean;
 };
 
 /**
@@ -36,7 +38,7 @@ export async function recordActivity(tx: Tx, input: ActivityInput): Promise<void
 
 /**
  * BR-ADMIN-14: a write by an Admin on a project they are not a member of is also an audit event,
- * marked actedAs = ADMIN, in the same transaction.
+ * marked actedAs = ADMIN, in the same transaction. With `audit: true` every actor's write is.
  */
 async function auditAdminWrite(tx: Tx, input: ActivityInput): Promise<void> {
   const actor = await tx.user.findUnique({
@@ -46,7 +48,8 @@ async function auditAdminWrite(tx: Tx, input: ActivityInput): Promise<void> {
       memberships: { where: { projectId: input.projectId }, select: { userId: true } },
     },
   });
-  if (actor?.globalRole !== 'ADMIN' || actor.memberships.length > 0) return;
+  const actedAsAdmin = actor?.globalRole === 'ADMIN' && actor.memberships.length === 0;
+  if (!actedAsAdmin && !input.audit) return;
   // The caller already passed loadProject() for this project; only its key is read here.
   // eslint-disable-next-line no-restricted-syntax
   const project = await tx.project.findUnique({
@@ -69,7 +72,7 @@ async function auditAdminWrite(tx: Tx, input: ActivityInput): Promise<void> {
     projectKey: project?.key ?? null,
     before: hasChanges ? before : null,
     after: hasChanges ? after : null,
-    actedAs: 'ADMIN',
+    actedAs: actedAsAdmin ? 'ADMIN' : null,
   });
 }
 

@@ -3,14 +3,26 @@ import {
   CalendarRange,
   FolderKanban,
   LayoutDashboard,
-  Info,
+  Settings,
   Users,
   type LucideIcon,
 } from 'lucide-react';
 import { NavLink } from 'react-router';
+import type { GuestArea } from '@qawm/shared';
+import { useProjectAccess } from '@/features/projects/access';
+import { useProject } from '@/features/projects/api';
 import { cn } from '@/lib/utils';
 
-type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean };
+type NavItem = {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  end?: boolean;
+  /** Hidden for a Guest when this area is switched off (BR-GUEST-03). */
+  area?: GuestArea;
+  /** Only for those who manage the project. */
+  adminOnly?: boolean;
+};
 type NavGroup = { label: string; items: NavItem[] };
 
 /**
@@ -22,19 +34,29 @@ function groupsFor(projectKey: string | null): NavGroup[] {
   return [
     {
       label: 'Overview',
-      items: [{ to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true }],
+      items: [{ to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true, area: 'dashboard' }],
     },
     ...(project
       ? [
           {
             label: 'Project & requirements',
             items: [
-              { to: project, label: 'Project overview', icon: Info, end: true },
-              { to: `${project}/releases`, label: 'Releases & sprints', icon: CalendarRange },
-              { to: `${project}/members`, label: 'Members', icon: Users },
-              { to: `${project}/activity`, label: 'Activity', icon: Activity },
+              {
+                to: `${project}/releases`,
+                label: 'Releases & sprints',
+                icon: CalendarRange,
+                area: 'releases',
+              },
+              { to: `${project}/members`, label: 'Members', icon: Users, area: 'members' },
+              { to: `${project}/activity`, label: 'Activity', icon: Activity, area: 'activity' },
+              {
+                to: `${project}/settings`,
+                label: 'Project settings',
+                icon: Settings,
+                adminOnly: true,
+              },
             ],
-          },
+          } satisfies NavGroup,
         ]
       : []),
     { label: 'Workspace', items: [{ to: '/projects', label: 'Projects', icon: FolderKanban }] },
@@ -42,9 +64,18 @@ function groupsFor(projectKey: string | null): NavGroup[] {
 }
 
 export function SideNav({ projectKey }: { projectKey: string | null }) {
+  // Same cache entry as the project page, so this costs no extra request there.
+  const project = useProject(projectKey ?? '', !!projectKey);
+  const access = useProjectAccess(project.data);
+  const shown = (item: NavItem) =>
+    (!item.area || access.sees(item.area)) &&
+    (!item.adminOnly || access.canEvenArchived('project:guests'));
+  const groups = groupsFor(projectKey)
+    .map((group) => ({ ...group, items: group.items.filter(shown) }))
+    .filter((group) => group.items.length > 0);
   return (
     <nav aria-label="Main" className="flex-1 overflow-y-auto px-3 pb-4">
-      {groupsFor(projectKey).map((group) => (
+      {groups.map((group) => (
         <div key={group.label} className="mt-4 first:mt-1">
           <p className="px-3 pb-1 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
             {group.label}

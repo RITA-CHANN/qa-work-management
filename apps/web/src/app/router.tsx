@@ -4,16 +4,19 @@ import { AdminAuditPage } from '@/features/admin/AdminAuditPage';
 import { AdminDashboardPage } from '@/features/admin/AdminDashboardPage';
 import { AdminLayout } from '@/features/admin/AdminLayout';
 import { AdminProjectsPage } from '@/features/admin/AdminProjectsPage';
+import { AdminSettingsPage } from '@/features/admin/AdminSettingsPage';
 import { AdminUsersPage } from '@/features/admin/AdminUsersPage';
 import { ChangePasswordPage } from '@/features/auth/ChangePasswordPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { ActivityTab } from '@/features/projects/ActivityTab';
 import { MembersTab } from '@/features/projects/MembersTab';
-import { OverviewTab } from '@/features/projects/OverviewTab';
+import { AreaRoute } from '@/features/projects/AreaRoute';
+import { DashboardTab } from '@/features/projects/DashboardTab';
 import { ProjectLayout } from '@/features/projects/ProjectLayout';
 import { ProjectListPage } from '@/features/projects/ProjectListPage';
 import { ReleasesTab } from '@/features/projects/ReleasesTab';
+import { SettingsRoute } from '@/features/projects/SettingsTab';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -33,6 +36,7 @@ export const router = createBrowserRouter([
           { path: 'projects', element: <AdminProjectsPage /> },
           { path: 'users', element: <AdminUsersPage /> },
           { path: 'audit', element: <AdminAuditPage /> },
+          { path: 'settings', element: <AdminSettingsPage /> },
         ],
       },
       {
@@ -41,14 +45,43 @@ export const router = createBrowserRouter([
           { index: true, element: <DashboardPage /> },
           { path: 'projects', element: <ProjectListPage /> },
           {
-            // SCR-PROJECT-02..05: one URL per tab.
+            // SCR-PROJECT-02..06: one URL per tab. A Guest gets "not found" for areas switched off.
             path: 'projects/:key',
             element: <ProjectLayout />,
             children: [
-              { index: true, element: <OverviewTab /> },
-              { path: 'members', element: <MembersTab /> },
-              { path: 'releases', element: <ReleasesTab /> },
-              { path: 'activity', element: <ActivityTab /> },
+              {
+                index: true,
+                element: (
+                  <AreaRoute area="dashboard">
+                    <DashboardTab />
+                  </AreaRoute>
+                ),
+              },
+              {
+                path: 'members',
+                element: (
+                  <AreaRoute area="members">
+                    <MembersTab />
+                  </AreaRoute>
+                ),
+              },
+              {
+                path: 'releases',
+                element: (
+                  <AreaRoute area="releases">
+                    <ReleasesTab />
+                  </AreaRoute>
+                ),
+              },
+              {
+                path: 'activity',
+                element: (
+                  <AreaRoute area="activity">
+                    <ActivityTab />
+                  </AreaRoute>
+                ),
+              },
+              { path: 'settings', element: <SettingsRoute /> },
             ],
           },
           { path: '*', element: <NotFoundPage /> },

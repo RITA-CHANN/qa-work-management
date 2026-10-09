@@ -19,6 +19,15 @@ searchRouter.get('/', async (req, res) => {
   const isAdmin = user.globalRole === 'ADMIN';
   // Same visibility as the API: members see their projects, Admins see all (BR-PROJECT-06).
   const visibleProject = isAdmin ? {} : { members: { some: { userId: user.id } } };
+  // Releases and sprints of a project where the caller is a Guest only if the area is on (BR-GUEST-03).
+  const releasesVisible = isAdmin
+    ? {}
+    : {
+        OR: [
+          { members: { some: { userId: user.id, access: { not: 'GUEST' as const } } } },
+          { members: { some: { userId: user.id } }, guestAreas: { has: 'releases' } },
+        ],
+      };
   const like = { contains: q, mode: 'insensitive' as const };
   const take = SEARCH_GROUP_LIMIT;
 
@@ -30,13 +39,13 @@ searchRouter.get('/', async (req, res) => {
       take,
     }),
     prisma.release.findMany({
-      where: { project: visibleProject, name: like },
+      where: { project: releasesVisible, name: like },
       orderBy: [{ project: { key: 'asc' } }, { name: 'asc' }],
       select: { id: true, name: true, status: true, project: { select: { key: true } } },
       take,
     }),
     prisma.milestone.findMany({
-      where: { project: visibleProject, name: like },
+      where: { project: releasesVisible, name: like },
       orderBy: [{ project: { key: 'asc' } }, { name: 'asc' }],
       select: {
         id: true,

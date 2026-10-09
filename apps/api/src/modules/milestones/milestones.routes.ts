@@ -8,7 +8,7 @@ import {
 } from '@qawm/shared';
 import { env } from '../../config/env';
 import { parseOrThrow } from '../../lib/errors';
-import { keyOf, loadProject } from '../projects/loader';
+import { assertArea, keyOf, loadProject } from '../projects/loader';
 import {
   createMilestone,
   deleteMilestone,
@@ -27,6 +27,7 @@ export const milestonesRouter = Router({ mergeParams: true });
 milestonesRouter.get('/', async (req, res) => {
   const query = parseOrThrow(milestoneListQuerySchema, req.query);
   const ctx = await loadProject(keyOf(req), req.user!);
+  assertArea(ctx, 'releases');
   const milestones = await listMilestones(ctx, query.releaseId);
   res.json({ data: milestones } satisfies ApiSuccess<Milestone[]>);
 });

@@ -1,5 +1,11 @@
 import type { Request } from 'express';
-import type { AuthUser, Project as ProjectDto, ProjectAccess } from '@qawm/shared';
+import {
+  canSeeArea,
+  type AuthUser,
+  type GuestArea,
+  type Project as ProjectDto,
+  type ProjectAccess,
+} from '@qawm/shared';
 import type { Project } from '../../generated/prisma/client';
 import { fromDbDate } from '../../lib/dates';
 import { NotFoundError } from '../../lib/errors';
@@ -36,6 +42,14 @@ export async function loadProject(key: string, user: AuthUser): Promise<ProjectC
 }
 
 /**
+ * BR-GUEST-03: an area switched off for Guests is hidden from them entirely, so the API answers 404, the same as an
+ * unknown project. Everyone else passes. Call it right after loadProject on every read of that area.
+ */
+export function assertArea(ctx: ProjectContext, area: GuestArea): void {
+  if (!canSeeArea(ctx.access, ctx.project.guestAreas, area)) throw new NotFoundError();
+}
+
+/**
  * A project as the API returns it (API-PROJECT-03). Called only after loadProject, with the id it found.
  * Takes a transaction client too, so a write can return the row it just changed.
  */
@@ -61,6 +75,7 @@ export async function readProjectView(
     archivedAt: row.archivedAt?.toISOString() ?? null,
     version: row.version,
     myAccess,
+    guestAreas: row.guestAreas,
     memberCount: row._count.members,
     activeRelease: row.releases[0] ?? null,
     activeMilestone: milestone

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import { msg, type AdminProject } from '@qawm/shared';
 import { EmptyState } from '@/components/EmptyState';
@@ -11,8 +12,10 @@ import { Dialog, DialogActions } from '@/components/ui/dialog';
 import { SelectField, TextField } from '@/components/ui/field';
 import { Menu } from '@/components/ui/menu';
 import { useToast } from '@/components/ui/use-toast';
+import { useUsers } from '@/features/projects/api';
+import { NewProjectDialog } from '@/features/projects/NewProjectDialog';
 import { errorText } from '@/features/projects/server-error';
-import { useAdminProjectAction, useAdminProjects } from './api';
+import { adminKeys, useAdminProjectAction, useAdminProjects, useChangeProjectAdmin } from './api';
 import { formatDateTime, tableClass, tdClass, thClass } from './format';
 
 type Status = 'all' | 'active' | 'archived';
@@ -26,6 +29,9 @@ export function AdminProjectsPage() {
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<AdminProject | null>(null);
+  const [changingAdmin, setChangingAdmin] = useState<AdminProject | null>(null);
+  const [creating, setCreating] = useState(false);
+  const queryClient = useQueryClient();
 
   async function run(key: string, kind: 'archive' | 'restore') {
     setError(null);
@@ -39,7 +45,10 @@ export function AdminProjectsPage() {
 
   return (
     <>
-      <PageHeader title="Projects" description="Open, archive, restore or delete any project" />
+      <PageHeader
+        title="Projects"
+        actions={<Button onClick={() => setCreating(true)}>New project</Button>}
+      />
       <Card>
         <div className="mb-4 flex flex-wrap items-end gap-3">
           <TextField
@@ -119,7 +128,13 @@ export function AdminProjectsPage() {
                                     destructive: true,
                                   },
                                 ]
-                              : [{ label: 'Archive', onSelect: () => void run(p.key, 'archive') }]
+                              : [
+                                  {
+                                    label: 'Change project admin',
+                                    onSelect: () => setChangingAdmin(p),
+                                  },
+                                  { label: 'Archive', onSelect: () => void run(p.key, 'archive') },
+                                ]
                           }
                         />
                       </div>
@@ -132,6 +147,15 @@ export function AdminProjectsPage() {
         )}
       </Card>
       {deleting && <DeleteDialog project={deleting} onClose={() => setDeleting(null)} />}
+      {changingAdmin && (
+        <ChangeAdminDialog project={changingAdmin} onClose={() => setChangingAdmin(null)} />
+      )}
+      {/* BR-ADMIN-18: the new project shows up in this list; the Admin stays in the console. */}
+      <NewProjectDialog
+        open={creating}
+        onClose={() => setCreating(false)}
+        onCreated={() => void queryClient.invalidateQueries({ queryKey: adminKeys.all })}
+      />
     </>
   );
 }
@@ -169,6 +193,69 @@ function DeleteDialog({ project, onClose }: { project: AdminProject; onClose: ()
           }}
         >
           Delete project
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+/** BR-ADMIN-04: make someone Project admin, optionally turning the current ones into Members. */
+function ChangeAdminDialog({ project, onClose }: { project: AdminProject; onClose: () => void }) {
+  const users = useUsers(true);
+  const change = useChangeProjectAdmin(project.key);
+  const toast = useToast();
+  const [userId, setUserId] = useState('');
+  const [demoteCurrent, setDemoteCurrent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const current = project.projectAdmins.map((a) => a.name).join(', ') || '—';
+
+  async function save() {
+    setError(null);
+    try {
+      await change.mutateAsync({ userId, demoteCurrent });
+      toast(msg('MSG-PROJECT-19'));
+      onClose();
+    } catch (e) {
+      setError(errorText(e));
+    }
+  }
+
+  return (
+    <Dialog open onClose={onClose} title={`Change project admin of ${project.name}`}>
+      <div className="flex flex-col gap-4">
+        {error && <Alert>{error}</Alert>}
+        <p className="text-sm">
+          <span className="text-muted-foreground">Current project admins:</span> {current}
+        </p>
+        <SelectField
+          label="New project admin"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+        >
+          <option value="" disabled>
+            {users.isPending ? 'Loading…' : 'Choose a user'}
+          </option>
+          {(users.data ?? []).map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name} ({user.email})
+            </option>
+          ))}
+        </SelectField>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={demoteCurrent}
+            onChange={(e) => setDemoteCurrent(e.target.checked)}
+          />
+          Make the current project admins members
+        </label>
+      </div>
+      <DialogActions>
+        <Button variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button disabled={!userId || change.isPending} onClick={() => void save()}>
+          Save
         </Button>
       </DialogActions>
     </Dialog>

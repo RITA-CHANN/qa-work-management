@@ -8,9 +8,12 @@ import type {
   ApiCursorPage,
   ApiSuccess,
   AuditEvent,
+  ChangeProjectAdmin,
   GlobalRole,
+  Member,
   OneTimePassword,
   UserStatus,
+  WorkspaceSettings,
 } from '@qawm/shared';
 import { apiFetch, apiSend } from '@/lib/api-client';
 
@@ -30,6 +33,7 @@ export const adminKeys = {
   users: (filters: object) => ['admin', 'users', filters] as const,
   user: (id: string) => ['admin', 'user', id] as const,
   audit: (filters: object) => ['admin', 'audit', filters] as const,
+  settings: ['admin', 'settings'] as const,
 };
 
 export function useAdminOverview() {
@@ -105,6 +109,24 @@ export const useAdminProjectAction = () =>
     action === 'delete'
       ? apiSend<null>('DELETE', `/projects/${key}`)
       : apiSend<unknown>('POST', `/projects/${key}/${action}`, {}),
+  );
+
+/** API-ADMIN-12: hand a project to a new Project admin (BR-ADMIN-04). */
+export const useChangeProjectAdmin = (key: string) =>
+  useAdminWrite((body: ChangeProjectAdmin) =>
+    apiSend<ApiSuccess<Member[]>>('POST', `/admin/projects/${key}/project-admin`, body).then(data),
+  );
+
+export function useWorkspaceSettings() {
+  return useQuery({
+    queryKey: adminKeys.settings,
+    queryFn: () => apiFetch<ApiSuccess<WorkspaceSettings>>('/admin/settings').then(data),
+  });
+}
+
+export const useSaveSettings = () =>
+  useAdminWrite((body: WorkspaceSettings) =>
+    apiSend<ApiSuccess<WorkspaceSettings>>('PUT', '/admin/settings', body).then(data),
   );
 
 export type AuditFilters = {

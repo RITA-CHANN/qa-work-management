@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useParams } from 'react-router';
-import { msg, type Project } from '@qawm/shared';
+import { msg, type GuestArea, type Project } from '@qawm/shared';
 import { PageHeader } from '@/components/PageHeader';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -16,11 +16,15 @@ import { timeLeft } from './milestone-time';
 import { ArchiveProjectDialog, DeleteProjectDialog, EditProjectDialog } from './ProjectDialogs';
 import { errorText, isNotFound } from './server-error';
 
-const TABS = [
-  { to: '', label: 'Overview', end: true },
-  { to: 'members', label: 'Members' },
-  { to: 'releases', label: 'Releases & milestones' },
-  { to: 'activity', label: 'Activity' },
+type Tab = { to: string; label: string; end?: boolean; area?: GuestArea; adminOnly?: boolean };
+
+/** Tabs of SCR-PROJECT-02. A Guest sees only areas switched on (BR-GUEST-03); Settings is for admins. */
+const TABS: Tab[] = [
+  { to: '', label: 'Dashboard', end: true, area: 'dashboard' },
+  { to: 'releases', label: 'Releases & sprints', area: 'releases' },
+  { to: 'members', label: 'Members', area: 'members' },
+  { to: 'activity', label: 'Activity', area: 'activity' },
+  { to: 'settings', label: 'Settings', adminOnly: true },
 ];
 
 /** SCR-PROJECT-02: header, archived banner, current milestone and tabs, shared by every tab. */
@@ -111,6 +115,15 @@ function ProjectPage({ project }: { project: Project }) {
         </div>
       </div>
 
+      {access.viewingAsAdmin && (
+        <p
+          role="status"
+          className="mb-4 rounded-lg bg-admin px-4 py-2 text-sm font-medium text-admin-foreground"
+        >
+          {msg('MSG-ADMIN-08')}
+        </p>
+      )}
+
       {project.archivedAt && (
         <div
           role="status"
@@ -141,7 +154,11 @@ function ProjectPage({ project }: { project: Project }) {
 
       <nav aria-label="Project sections" className="mb-6 overflow-x-auto border-b">
         <ul className="flex gap-1">
-          {TABS.map((tab) => (
+          {TABS.filter(
+            (tab) =>
+              (!tab.area || access.sees(tab.area)) &&
+              (!tab.adminOnly || access.canEvenArchived('project:guests')),
+          ).map((tab) => (
             <li key={tab.label}>
               <NavLink
                 to={tab.to}

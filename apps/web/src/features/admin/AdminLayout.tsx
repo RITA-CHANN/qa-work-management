@@ -3,6 +3,7 @@ import {
   FolderKanban,
   LayoutDashboard,
   ScrollText,
+  Settings,
   Users,
   type LucideIcon,
 } from 'lucide-react';
@@ -17,10 +18,11 @@ const NAV: { to: string; label: string; icon: LucideIcon; end?: boolean }[] = [
   { to: '/admin/projects', label: 'Projects', icon: FolderKanban },
   { to: '/admin/users', label: 'Users', icon: Users },
   { to: '/admin/audit', label: 'Audit log', icon: ScrollText },
+  { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
 /**
- * Admin UI (SCR-ADMIN-01..04): its own deep-indigo top bar and side nav (BR-ADMIN-01). A non-Admin gets
+ * Admin UI (SCR-ADMIN-01..05): its own deep-indigo top bar and side nav (BR-ADMIN-01). A non-Admin gets
  * the normal not-found page (MSG-COMMON-13), the same as any unknown URL.
  */
 export function AdminLayout() {

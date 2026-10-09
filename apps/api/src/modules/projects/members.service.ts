@@ -36,19 +36,29 @@ function toMember(row: MemberRow): Member {
   };
 }
 
-/** API-PROJECT-08: Project admins first, then by name. */
+/**
+ * API-PROJECT-08: Project admins first, then by name. A Guest sees people by name only and never other Guests
+ * (BR-GUEST-04).
+ */
 export async function listMembers(ctx: ProjectContext): Promise<Member[]> {
+  const isGuest = ctx.access === 'GUEST';
   const rows = await prisma.projectMember.findMany({
-    where: { projectId: ctx.project.id },
+    where: {
+      projectId: ctx.project.id,
+      ...(isGuest ? { OR: [{ access: { not: 'GUEST' } }, { userId: ctx.user.id }] } : {}),
+    },
     include: memberInclude,
   });
-  return rows
+  const members = rows
     .sort(
       (a, b) =>
         PROJECT_ACCESS.indexOf(a.access) - PROJECT_ACCESS.indexOf(b.access) ||
         a.user.name.localeCompare(b.user.name),
     )
     .map(toMember);
+  return isGuest
+    ? members.map((m) => ({ ...m, email: m.userId === ctx.user.id ? m.email : null }))
+    : members;
 }
 
 async function findMember(tx: Tx, projectId: string, userId: string) {
@@ -66,7 +76,7 @@ async function assertProjectAdminRemains(tx: Tx, projectId: string): Promise<voi
   if (admins === 0) throw new UnprocessableError('LAST_PROJECT_ADMIN', 'MSG-PROJECT-12');
 }
 
-/** API-PROJECT-09: a Project admin adds any existing user, as Project admin or Member (BR-PROJECT-23). */
+/** API-PROJECT-09: a Project admin adds any existing user, as Project admin, Member or Guest (BR-PROJECT-23). */
 export async function addMember(ctx: ProjectContext, body: MemberAdd): Promise<Member> {
   const { project, user } = ctx;
   assertCan(ctx.access, 'member:manage');

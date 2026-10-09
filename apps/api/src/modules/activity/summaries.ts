@@ -15,6 +15,7 @@ export const summaries = {
   projectUpdated: (actor: string) => `${actor} edited the project`,
   projectArchived: (actor: string) => `${actor} archived the project`,
   projectRestored: (actor: string) => `${actor} restored the project`,
+  guestVisibilityChanged: (actor: string) => `${actor} changed what Guests can see`,
   memberAdded: (actor: string, member: string, access: ProjectAccess, jobTitle: JobTitle | null) =>
     `${actor} added ${member} as ${ACCESS_LABELS[access]}${jobTitle ? ` (${JOB_TITLE_NAMES[jobTitle]})` : ''}`,
   /** One clause per changed field: "access from Member to Project admin and job title from QA engineer to QA lead". */

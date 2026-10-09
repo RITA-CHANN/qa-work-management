@@ -5,7 +5,7 @@ import type { prisma } from '../../lib/prisma';
 export type AuditInput = {
   actorId: string | null;
   action: string;
-  targetType: 'user' | 'project' | 'release' | 'milestone' | 'member' | 'session';
+  targetType: 'user' | 'project' | 'release' | 'milestone' | 'member' | 'session' | 'settings';
   targetId?: string | null;
   /** Readable name frozen now: an email, a project key, a release name. */
   targetName: string;
