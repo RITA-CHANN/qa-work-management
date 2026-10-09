@@ -13,12 +13,14 @@ import {
   type ApiSuccess,
   type Member,
   type Project,
+  type ProjectDashboard,
   type ProjectSummary,
 } from '@qawm/shared';
 import { parseOrThrow } from '../../lib/errors';
 import { prisma } from '../../lib/prisma';
 import { requireAuth } from '../../middleware/require-auth';
 import { listActivity } from '../activity/activity.service';
+import { readDashboard } from '../dashboard/dashboard.service';
 import { milestonesRouter } from '../milestones/milestones.routes';
 import { releasesRouter } from '../releases/releases.routes';
 import { assertArea, keyOf, loadProject, readProjectView } from './loader';
@@ -139,6 +141,13 @@ projectsRouter.get('/:key/activity', async (req, res) => {
     data: page.data,
     meta: { nextCursor: page.nextCursor },
   } satisfies ApiCursorPage<ActivityEntry>);
+});
+
+/** GET /api/projects/:key/dashboard (API-DASH-01): the project dashboard's data in one call (SCR-DASH-01). */
+projectsRouter.get('/:key/dashboard', async (req, res) => {
+  const ctx = await loadProject(keyOf(req), req.user!);
+  assertArea(ctx, 'dashboard');
+  res.json({ data: await readDashboard(ctx) } satisfies ApiSuccess<ProjectDashboard>);
 });
 
 projectsRouter.use('/:key/releases', releasesRouter);
