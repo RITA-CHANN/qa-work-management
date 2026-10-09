@@ -12,7 +12,7 @@ traces:
   requirements: [US-PROJECT-09, BR-PROJECT-19, BR-PROJECT-20, BR-PROJECT-21, BR-PROJECT-22]
   acceptance: [AC-PROJECT-08, AC-PROJECT-44, AC-PROJECT-45, AC-PROJECT-46, AC-PROJECT-47]
   design: [SCR-PROJECT-05, DD-PROJECT-02]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # GET /api/projects/:key/activity
@@ -22,7 +22,7 @@ Pages through the project's activity log, newest first (SCR-PROJECT-05). Status 
 
 |                 |                                                                                  |
 | --------------- | -------------------------------------------------------------------------------- |
-| **Auth**        | Project role: any member, or Admin                                               |
+| **Auth**        | Any member, or System admin                                                      |
 | **Since phase** | 3                                                                                |
 | **Schema**      | `packages/shared/src/activity.ts` (`activityQuerySchema`, `activityEntrySchema`) |
 
@@ -50,19 +50,23 @@ Pages through the project's activity log, newest first (SCR-PROJECT-05). Status 
   "data": [
     {
       "id": "cm…",
-      "action": "member.role_changed",
+      "action": "member.updated",
       "entityType": "member",
       "entityId": "cm…",
-      "summary": "Minh Lead changed Linh QA's role from Viewer to QA engineer",
+      "summary": "Oanh Owner changed Linh QA's access from Member to Project admin and job title from QA engineer to QA lead",
       "changes": {
-        "role": {
-          "from": "VIEWER",
-          "to": "QA_ENGINEER"
+        "access": {
+          "from": "MEMBER",
+          "to": "PROJECT_ADMIN"
+        },
+        "jobTitle": {
+          "from": "QAE",
+          "to": "QAL"
         }
       },
       "actor": {
         "id": "cm…",
-        "name": "Minh Lead"
+        "name": "Oanh Owner"
       },
       "createdAt": "2026-10-08T14:02:00.000Z"
     }
@@ -89,11 +93,11 @@ There is no POST, PATCH or DELETE for activity (BR-PROJECT-21).
 
 Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-01).
 
-| Status | `code`             | `messageId`    | When                                                                                       |
-| ------ | ------------------ | -------------- | ------------------------------------------------------------------------------------------ |
-| 400    | `VALIDATION_ERROR` | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`         |
-| 401    | `UNAUTHENTICATED`  | MSG-COMMON-05  | Not logged in                                                                              |
-| 404    | `NOT_FOUND`        | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not an Admin (same body for both, ADR-0008) |
+| Status | `code`             | `messageId`    | When                                                                                             |
+| ------ | ------------------ | -------------- | ------------------------------------------------------------------------------------------------ |
+| 400    | `VALIDATION_ERROR` | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`               |
+| 401    | `UNAUTHENTICATED`  | MSG-COMMON-05  | Not logged in                                                                                    |
+| 404    | `NOT_FOUND`        | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
 
 ## Security
 
@@ -128,6 +132,7 @@ curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/activity?limit=20'
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

@@ -490,19 +490,12 @@ for (const app of ['api', 'web']) {
 }
 
 // 6b. Permissions: the matrix in docs/requirements/project/README.md (BR-PROJECT-35) and the PERMISSIONS map of
-//     packages/shared/src/permissions.ts list the same actions in the same order and allow the same roles.
+//     packages/shared/src/permissions.ts list the same actions in the same order and allow the same access levels.
+//     The matrix columns are System admin | Project admin | Member | Not a member; only the two access levels are
+//     in the map (a System admin acts as PROJECT_ADMIN, BR-PROJECT-36), so `null` skips the System admin column.
 const PERMISSIONS_REL = 'packages/shared/src/permissions.ts';
 const MATRIX_REL = 'requirements/project/README.md';
-const MATRIX_ROLES = [
-  'OWNER',
-  'PROJECT_MANAGER',
-  'QA_LEAD',
-  'QA_ENGINEER',
-  'TEAM_LEAD',
-  'DEVELOPER',
-  'STAKEHOLDER',
-  'VIEWER',
-];
+const MATRIX_COLUMNS = [null, 'PROJECT_ADMIN', 'MEMBER'];
 const codePermissions = [
   ...(await readFile(join(ROOT, PERMISSIONS_REL), 'utf8')).matchAll(
     /^\s*'([a-z-]+:[a-z-]+)':\s*\[([^\]]*)\]/gm,
@@ -521,14 +514,22 @@ const matrixRows = matrixText
       .split('|')
       .slice(1, -1)
       .map((c) => c.trim());
-    return { label: cells[0], cells: cells.slice(1, 1 + MATRIX_ROLES.length) };
+    return { label: cells[0], cells: cells.slice(1, 1 + MATRIX_COLUMNS.length) };
   })
-  // A row with a footnote (✅¹, "Leave the project") is a rule the services check by hand, not a map entry.
+  // A row with a footnote (✅², "Leave the project", "Create a project") is a rule the services check by hand,
+  // not a map entry.
   .filter((row) => row.cells.every((cell) => cell === '✅' || cell === '❌'))
   .map((row) => ({
     label: row.label,
-    roles: MATRIX_ROLES.filter((_, i) => row.cells[i] === '✅'),
+    systemAdmin: row.cells[0],
+    roles: MATRIX_COLUMNS.filter((access, i) => access && row.cells[i] === '✅'),
   }));
+// A System admin can do everything a Project admin can (BR-PROJECT-36).
+for (const row of matrixRows.filter((r) => r.systemAdmin !== '✅')) {
+  errors.push(
+    `docs/${MATRIX_REL}: matrix row "${row.label}" must allow the System admin (BR-PROJECT-36)`,
+  );
+}
 if (matrixRows.length !== codePermissions.length) {
   errors.push(
     `docs/${MATRIX_REL}: the permission matrix has ${matrixRows.length} rows, ${PERMISSIONS_REL} has ${codePermissions.length} actions`,

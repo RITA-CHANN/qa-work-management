@@ -112,7 +112,7 @@ The request logger redacts the `cookie` and `set-cookie` headers and the `passwo
 - CSRF: `SameSite=Lax` plus the JSON-only rule above.
 - No secrets in logs: cookies and passwords are redacted.
 - Object- and role-level checks (OWASP API1, API5) are not needed in Phase 2: every logged-in user may call every
-  protected route. Phase 3 adds project roles here.
+  protected route. Phase 3 adds project access levels (Project admin, Member; DD-PROJECT-01).
 
 ## Testability
 
@@ -123,9 +123,10 @@ The request logger redacts the `cookie` and `set-cookie` headers and the `passwo
 
 ## Change log
 
-| Date       | Change                                                             | Why                                         |
-| ---------- | ------------------------------------------------------------------ | ------------------------------------------- |
-| 2026-10-07 | First version                                                      | Phase 2                                     |
-| 2026-10-07 | Protected routers start with `requireAuth`; unknown paths stay 404 | Keep the Phase 1 404 behaviour              |
-| 2026-10-08 | Added viewpoint, Errors, Security and Testability                  | Documentation standards (docs/STANDARDS.md) |
-| 2026-10-09 | A DELETE without a body passes the JSON check                      | Phase 3 delete endpoints take no body       |
+| Date       | Change                                                                                  | Why                                         |
+| ---------- | --------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                                                           | Phase 2                                     |
+| 2026-10-07 | Protected routers start with `requireAuth`; unknown paths stay 404                      | Keep the Phase 1 404 behaviour              |
+| 2026-10-08 | Added viewpoint, Errors, Security and Testability                                       | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-09 | A DELETE without a body passes the JSON check                                           | Phase 3 delete endpoints take no body       |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09                  |

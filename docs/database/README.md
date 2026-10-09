@@ -2,7 +2,7 @@
 title: Database
 type: database
 status: review
-updated: 2026-10-07
+updated: 2026-10-09
 ---
 
 # Database
@@ -14,15 +14,15 @@ The full entity plan for later phases is in
 
 ## Tables
 
-| Table                                        | Holds                                       | Prisma model    | Since phase | Status                         |
-| -------------------------------------------- | ------------------------------------------- | --------------- | ----------- | ------------------------------ |
-| [users](tables/users.md)                     | People who can log in                       | `User`          | 1           | built (Phase 2 added a column) |
-| [sessions](tables/sessions.md)               | Login sessions (one per browser)            | `Session`       | 2           | built                          |
-| [projects](tables/projects.md)               | Projects                                    | `Project`       | 3           | designed                       |
-| [project_members](tables/project_members.md) | Who is in a project, with which role        | `ProjectMember` | 3           | designed                       |
-| [releases](tables/releases.md)               | Releases of a project                       | `Release`       | 3           | designed                       |
-| [milestones](tables/milestones.md)           | Agile milestones (sprints) inside a release | `Milestone`     | 3           | designed                       |
-| [activity_logs](tables/activity_logs.md)     | Who changed what in a project               | `ActivityLog`   | 3           | designed                       |
+| Table                                        | Holds                                                      | Prisma model    | Since phase | Status                         |
+| -------------------------------------------- | ---------------------------------------------------------- | --------------- | ----------- | ------------------------------ |
+| [users](tables/users.md)                     | People who can log in                                      | `User`          | 1           | built (Phase 2 added a column) |
+| [sessions](tables/sessions.md)               | Login sessions (one per browser)                           | `Session`       | 2           | built                          |
+| [projects](tables/projects.md)               | Projects                                                   | `Project`       | 3           | designed                       |
+| [project_members](tables/project_members.md) | Who is in a project, with which access level and job title | `ProjectMember` | 3           | designed                       |
+| [releases](tables/releases.md)               | Releases of a project                                      | `Release`       | 3           | designed                       |
+| [milestones](tables/milestones.md)           | Agile milestones (sprints) inside a release                | `Milestone`     | 3           | designed                       |
+| [activity_logs](tables/activity_logs.md)     | Who changed what in a project                              | `ActivityLog`   | 3           | designed                       |
 
 ## Relationships
 
@@ -58,9 +58,11 @@ erDiagram
 
 ## Enums
 
-| Enum         | Values          | Used by             |
-| ------------ | --------------- | ------------------- |
-| `GlobalRole` | `ADMIN`, `USER` | `users.global_role` |
+| Enum            | Values                                                                  | Used by                     |
+| --------------- | ----------------------------------------------------------------------- | --------------------------- |
+| `GlobalRole`    | `ADMIN`, `USER`                                                         | `users.global_role`         |
+| `ProjectAccess` | `PROJECT_ADMIN`, `MEMBER`                                               | `project_members.access`    |
+| `JobTitle`      | `QAE`, `QAL`, `QAA`, `PM`, `PO`, `BA`, `DEV`, `TL`, `DES`, `STK`, `OTH` | `project_members.job_title` |
 
 ## Conventions
 
@@ -84,10 +86,12 @@ creates `qawm_test` the first time the volume is created.
 
 ## Migrations
 
-| Migration  | Phase | Changes                                      |
-| ---------- | ----- | -------------------------------------------- |
-| `init`     | 1     | Create `users` and `GlobalRole`              |
-| `add_auth` | 2     | Add `users.password_hash`, create `sessions` |
+| Migration                  | Phase | Changes                                                                                                                              |
+| -------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `init`                     | 1     | Create `users` and `GlobalRole`                                                                                                      |
+| `add_auth`                 | 2     | Add `users.password_hash`, create `sessions`                                                                                         |
+| `add_projects`             | 3     | Create `projects`, `project_members`, `releases`, `milestones`, `activity_logs`                                                      |
+| `project_access_job_title` | 3     | Replace `project_members.role` (`ProjectRole`) with `access` (`ProjectAccess`) and `job_title` (`JobTitle`), migrating existing rows |
 
 ```bash
 # 1. Edit apps/api/prisma/schema.prisma
@@ -108,6 +112,7 @@ The rows for each table are listed in its table file, for example [users](tables
 
 ## Change log
 
-| Date       | Change                                                                        | Why                                           |
-| ---------- | ----------------------------------------------------------------------------- | --------------------------------------------- |
-| 2026-10-07 | Split `DATABASE.md` into this overview and one file per table; Phase 2 tables | One file per table, easier to find and review |
+| Date       | Change                                                                                                                                          | Why                                           |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| 2026-10-07 | Split `DATABASE.md` into this overview and one file per table; Phase 2 tables                                                                   | One file per table, easier to find and review |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects (enums `ProjectAccess`, `JobTitle`; Phase 3 migrations) | Linh's decision 2026-10-09                    |

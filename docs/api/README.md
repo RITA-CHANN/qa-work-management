@@ -17,33 +17,33 @@ In Playwright API tests: `http://localhost:3100/api` (the `api` project's `baseU
 
 ## Endpoint index
 
-| Method | Path                                 | Auth                                                                                             | Doc                                                                    |
-| ------ | ------------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| GET    | `/api/health`                        | None                                                                                             | [health/get-health.md](health/get-health.md)                           |
-| POST   | `/api/auth/login`                    | None                                                                                             | [auth/post-login.md](auth/post-login.md)                               |
-| POST   | `/api/auth/logout`                   | None                                                                                             | [auth/post-logout.md](auth/post-logout.md)                             |
-| GET    | `/api/auth/me`                       | Logged in                                                                                        | [auth/get-me.md](auth/get-me.md)                                       |
-| GET    | `/api/projects`                      | Logged in                                                                                        | [projects/get-projects.md](projects/get-projects.md)                   |
-| POST   | `/api/projects`                      | Logged in                                                                                        | [projects/post-project.md](projects/post-project.md)                   |
-| GET    | `/api/projects/:key`                 | Role: any member, or Admin                                                                       | [projects/get-project.md](projects/get-project.md)                     |
-| PATCH  | `/api/projects/:key`                 | Role: Owner, Project manager, QA lead (or Admin)                                                 | [projects/patch-project.md](projects/patch-project.md)                 |
-| POST   | `/api/projects/:key/archive`         | Role: Owner (or Admin)                                                                           | [projects/post-project-archive.md](projects/post-project-archive.md)   |
-| POST   | `/api/projects/:key/restore`         | Role: Owner (or Admin)                                                                           | [projects/post-project-restore.md](projects/post-project-restore.md)   |
-| DELETE | `/api/projects/:key`                 | Role: Owner (or Admin)                                                                           | [projects/delete-project.md](projects/delete-project.md)               |
-| GET    | `/api/projects/:key/members`         | Role: any member, or Admin                                                                       | [projects/get-project-members.md](projects/get-project-members.md)     |
-| POST   | `/api/projects/:key/members`         | Role: Owner, Project manager, QA lead (or Admin); Owner role only by an Owner                    | [projects/post-project-member.md](projects/post-project-member.md)     |
-| PATCH  | `/api/projects/:key/members/:userId` | Role: Owner, Project manager, QA lead (or Admin); Owner rules in BR-PROJECT-23 and BR-PROJECT-24 | [projects/patch-project-member.md](projects/patch-project-member.md)   |
-| DELETE | `/api/projects/:key/members/:userId` | Role: Owner, Project manager, QA lead (or Admin) to remove others; any member to leave           | [projects/delete-project-member.md](projects/delete-project-member.md) |
-| GET    | `/api/projects/:key/activity`        | Role: any member, or Admin                                                                       | [projects/get-project-activity.md](projects/get-project-activity.md)   |
-| GET    | `/api/projects/:key/releases`        | Role: any member, or Admin                                                                       | [releases/get-releases.md](releases/get-releases.md)                   |
-| POST   | `/api/projects/:key/releases`        | Role: Owner, Project manager, QA lead (or Admin)                                                 | [releases/post-release.md](releases/post-release.md)                   |
-| PATCH  | `/api/projects/:key/releases/:id`    | Role: Owner, Project manager, QA lead (or Admin)                                                 | [releases/patch-release.md](releases/patch-release.md)                 |
-| DELETE | `/api/projects/:key/releases/:id`    | Role: Owner, Project manager, QA lead (or Admin)                                                 | [releases/delete-release.md](releases/delete-release.md)               |
-| GET    | `/api/projects/:key/milestones`      | Role: any member, or Admin                                                                       | [milestones/get-milestones.md](milestones/get-milestones.md)           |
-| POST   | `/api/projects/:key/milestones`      | Role: Owner, Project manager, QA lead, Team lead (or Admin)                                      | [milestones/post-milestone.md](milestones/post-milestone.md)           |
-| PATCH  | `/api/projects/:key/milestones/:id`  | Role: Owner, Project manager, QA lead, Team lead (or Admin)                                      | [milestones/patch-milestone.md](milestones/patch-milestone.md)         |
-| DELETE | `/api/projects/:key/milestones/:id`  | Role: Owner, Project manager, QA lead, Team lead (or Admin)                                      | [milestones/delete-milestone.md](milestones/delete-milestone.md)       |
-| GET    | `/api/users`                         | Logged in                                                                                        | [users/get-users.md](users/get-users.md)                               |
+| Method | Path                                 | Auth                                                                    | Doc                                                                    |
+| ------ | ------------------------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| GET    | `/api/health`                        | None                                                                    | [health/get-health.md](health/get-health.md)                           |
+| POST   | `/api/auth/login`                    | None                                                                    | [auth/post-login.md](auth/post-login.md)                               |
+| POST   | `/api/auth/logout`                   | None                                                                    | [auth/post-logout.md](auth/post-logout.md)                             |
+| GET    | `/api/auth/me`                       | Logged in                                                               | [auth/get-me.md](auth/get-me.md)                                       |
+| GET    | `/api/projects`                      | Logged in                                                               | [projects/get-projects.md](projects/get-projects.md)                   |
+| POST   | `/api/projects`                      | System admin only                                                       | [projects/post-project.md](projects/post-project.md)                   |
+| GET    | `/api/projects/:key`                 | Any member, or System admin                                             | [projects/get-project.md](projects/get-project.md)                     |
+| PATCH  | `/api/projects/:key`                 | Project admin (or System admin)                                         | [projects/patch-project.md](projects/patch-project.md)                 |
+| POST   | `/api/projects/:key/archive`         | Project admin (or System admin)                                         | [projects/post-project-archive.md](projects/post-project-archive.md)   |
+| POST   | `/api/projects/:key/restore`         | Project admin (or System admin)                                         | [projects/post-project-restore.md](projects/post-project-restore.md)   |
+| DELETE | `/api/projects/:key`                 | Project admin (or System admin)                                         | [projects/delete-project.md](projects/delete-project.md)               |
+| GET    | `/api/projects/:key/members`         | Any member, or System admin                                             | [projects/get-project-members.md](projects/get-project-members.md)     |
+| POST   | `/api/projects/:key/members`         | Project admin (or System admin)                                         | [projects/post-project-member.md](projects/post-project-member.md)     |
+| PATCH  | `/api/projects/:key/members/:userId` | Project admin (or System admin); own access level rule in BR-PROJECT-24 | [projects/patch-project-member.md](projects/patch-project-member.md)   |
+| DELETE | `/api/projects/:key/members/:userId` | Project admin (or System admin) to remove others; any member to leave   | [projects/delete-project-member.md](projects/delete-project-member.md) |
+| GET    | `/api/projects/:key/activity`        | Any member, or System admin                                             | [projects/get-project-activity.md](projects/get-project-activity.md)   |
+| GET    | `/api/projects/:key/releases`        | Any member, or System admin                                             | [releases/get-releases.md](releases/get-releases.md)                   |
+| POST   | `/api/projects/:key/releases`        | Project admin (or System admin)                                         | [releases/post-release.md](releases/post-release.md)                   |
+| PATCH  | `/api/projects/:key/releases/:id`    | Project admin (or System admin)                                         | [releases/patch-release.md](releases/patch-release.md)                 |
+| DELETE | `/api/projects/:key/releases/:id`    | Project admin (or System admin)                                         | [releases/delete-release.md](releases/delete-release.md)               |
+| GET    | `/api/projects/:key/milestones`      | Any member, or System admin                                             | [milestones/get-milestones.md](milestones/get-milestones.md)           |
+| POST   | `/api/projects/:key/milestones`      | Project admin (or System admin)                                         | [milestones/post-milestone.md](milestones/post-milestone.md)           |
+| PATCH  | `/api/projects/:key/milestones/:id`  | Project admin (or System admin)                                         | [milestones/patch-milestone.md](milestones/patch-milestone.md)         |
+| DELETE | `/api/projects/:key/milestones/:id`  | Project admin (or System admin)                                         | [milestones/delete-milestone.md](milestones/delete-milestone.md)       |
+| GET    | `/api/users`                         | Logged in                                                               | [users/get-users.md](users/get-users.md)                               |
 
 Planned endpoints: [phases/phase-0-architecture.md §11](../phases/phase-0-architecture.md#11-api-architecture).
 Each phase adds its endpoint files and rows here. Phase 3 rows are designed; they are built in the Phase 3 code PR.
@@ -97,8 +97,8 @@ docs by `npm run docs:build`; `npm run docs:check` fails when it is out of date.
 | 409  | `MILESTONE_NAME_TAKEN`      | Milestone name used in the project (BR-PROJECT-27)               |
 | 422  | `PROJECT_ARCHIVED`          | Change to an archived project (BR-PROJECT-08)                    |
 | 422  | `DELETE_NOT_ALLOWED`        | Project, release or milestone can't be deleted in its state      |
-| 422  | `LAST_OWNER`                | Change would leave no Owner (BR-PROJECT-12)                      |
-| 422  | `OWN_ROLE`                  | Caller changes their own role (BR-PROJECT-24)                    |
+| 422  | `LAST_PROJECT_ADMIN`        | Change would leave no Project admin (BR-PROJECT-12)              |
+| 422  | `OWN_ACCESS`                | Caller changes their own access level (BR-PROJECT-24)            |
 | 422  | `ACTIVE_RELEASE_EXISTS`     | Another release is active (BR-PROJECT-17)                        |
 | 422  | `OPEN_MILESTONES`           | Release has milestones not completed (BR-PROJECT-25)             |
 | 422  | `CANNOT_ACTIVATE_MILESTONE` | Release not active or another milestone active (BR-PROJECT-32)   |

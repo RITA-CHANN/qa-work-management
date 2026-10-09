@@ -13,12 +13,12 @@ traces:
   acceptance:
     [AC-PROJECT-09, AC-PROJECT-10, AC-PROJECT-11, AC-PROJECT-12, AC-PROJECT-13, AC-PROJECT-14]
   design: [SCR-PROJECT-01]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # GET /api/projects
 
-Lists the projects the caller is a member of (every project for an Admin), for the project list (SCR-PROJECT-01). Status codes follow RFC 9110; errors are RFC 9457 problem details
+Lists the projects the caller is a member of (every project for a System admin), for the project list (SCR-PROJECT-01). Status codes follow RFC 9110; errors are RFC 9457 problem details
 ([README.md](../README.md#error-format), [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 
 |                 |                                                                                      |
@@ -47,7 +47,7 @@ Lists the projects the caller is a member of (every project for an Admin), for t
       "key": "SHOP",
       "name": "ShopEase Web",
       "archivedAt": null,
-      "myRole": "QA_ENGINEER",
+      "myAccess": "MEMBER",
       "memberCount": 8,
       "activeRelease": {
         "id": "cm…",
@@ -59,15 +59,15 @@ Lists the projects the caller is a member of (every project for an Admin), for t
 }
 ```
 
-| Field           | Type                      | Description                                            |
-| --------------- | ------------------------- | ------------------------------------------------------ |
-| `key`           | string                    | Project key, upper-case (BR-PROJECT-02)                |
-| `name`          | string                    | Display name                                           |
-| `archivedAt`    | string (ISO 8601) \| null | When it was archived; `null` = active                  |
-| `myRole`        | ProjectRole \| null       | Caller's role; `null` for an Admin who is not a member |
-| `memberCount`   | integer                   | Number of members                                      |
-| `activeRelease` | { id, name } \| null      | The `ACTIVE` release                                   |
-| `updatedAt`     | string (ISO 8601)         | Last change                                            |
+| Field           | Type                      | Description                                                                                      |
+| --------------- | ------------------------- | ------------------------------------------------------------------------------------------------ |
+| `key`           | string                    | Project key, upper-case (BR-PROJECT-02)                                                          |
+| `name`          | string                    | Display name                                                                                     |
+| `archivedAt`    | string (ISO 8601) \| null | When it was archived; `null` = active                                                            |
+| `myAccess`      | ProjectAccess \| null     | Caller's access level (`PROJECT_ADMIN`, `MEMBER`); `null` for a System admin who is not a member |
+| `memberCount`   | integer                   | Number of members                                                                                |
+| `activeRelease` | { id, name } \| null      | The `ACTIVE` release                                                                             |
+| `updatedAt`     | string (ISO 8601)         | Last change                                                                                      |
 
 Sorted by name. No pagination in Phase 3: a user is in at most a few hundred projects (assumption in the requirements).
 
@@ -84,13 +84,13 @@ Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-
 
 Checked against the OWASP API Security Top 10 (2023):
 
-| Risk                                                                             | How this endpoint handles it                                                        |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| API1 Broken object level authorization                                           | Filters by the caller's memberships in the query; an Admin sees all (BR-PROJECT-36) |
-| API2 Broken authentication                                                       | Session cookie required (Phase 2); 401 otherwise                                    |
-| API3 Broken object property level authorization (data exposure, mass assignment) | Summary fields only; no member emails                                               |
-| API4 Unrestricted resource consumption                                           | `search` at most 100 characters; result bounded by membership                       |
-| API5 Broken function level authorization                                         | Any logged-in user                                                                  |
+| Risk                                                                             | How this endpoint handles it                                                              |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| API1 Broken object level authorization                                           | Filters by the caller's memberships in the query; a System admin sees all (BR-PROJECT-36) |
+| API2 Broken authentication                                                       | Session cookie required (Phase 2); 401 otherwise                                          |
+| API3 Broken object property level authorization (data exposure, mass assignment) | Summary fields only; no member emails                                                     |
+| API4 Unrestricted resource consumption                                           | `search` at most 100 characters; result bounded by membership                             |
+| API5 Broken function level authorization                                         | Any logged-in user                                                                        |
 
 ## Side effects
 
@@ -109,10 +109,11 @@ curl -b cookies.txt 'http://localhost:3000/api/projects?search=shop&archived=tru
 | Happy path | Linh QA lists projects             | SHOP and MOBI only (OLD archived, SECRET not a member) |
 | Negative   | No cookie                          | 401                                                    |
 | Boundary   | `search` of 100 and 101 characters | 200, then 400                                          |
-| Permission | Ada Admin lists projects           | All four, `myRole` null where not a member             |
+| Permission | Ada Admin lists projects           | All four, `myAccess` null where not a member           |
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

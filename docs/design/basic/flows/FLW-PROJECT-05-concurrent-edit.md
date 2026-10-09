@@ -12,7 +12,7 @@ traces:
   requirements: [BR-PROJECT-07]
   acceptance: [AC-PROJECT-21]
   design: [SCR-PROJECT-02, DD-PROJECT-03, ADR-0009]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # FLW-PROJECT-05 Two people edit the same project
@@ -22,7 +22,7 @@ silently overwriting the first.
 
 ## Actors
 
-Editor A and Editor B (Owner, Project manager or QA lead, or the same person in two tabs). System.
+Editor A and Editor B (Project admins or System admins, or the same person in two tabs). System.
 
 ## Preconditions
 
@@ -70,6 +70,7 @@ sequenceDiagram
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-08 | First version | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version                                                                           | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

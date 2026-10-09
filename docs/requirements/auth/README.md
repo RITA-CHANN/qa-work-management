@@ -6,7 +6,7 @@ status: review
 owner: Claude
 reviewers: [Linh]
 phase: 2
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # Authentication
@@ -76,7 +76,7 @@ Accounts are created by the seed data only. There is no sign-up in this phase.
 - Admin screen to create, disable or delete users.
 - "Remember me" option (every session lasts 7 days).
 - Logging out of all devices.
-- Project roles (OWNER, QA_LEAD, …): Phase 3, when projects exist.
+- Project access levels (Project admin, Member) and job titles: Phase 3, when projects exist.
 - Two-factor login, social login (Google, GitHub).
 
 ## Business risks
@@ -106,3 +106,4 @@ All seed users share the password `Password123!` (dev and test only). The seed u
 | 2026-10-07 | First version (was `phase-2-authentication.md`, IDs renamed `AC-11` → `AC-AUTH-11`)                 | Phase 2; new docs layout                    |
 | 2026-10-07 | Added BR-AUTH-14, BR-AUTH-15, AC-AUTH-29 to AC-AUTH-32; linked the API, flow and detail design docs | Full login feature design                   |
 | 2026-10-08 | Added stakeholders, assumptions, dependencies, business risks and nfr.md                            | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects             | Linh's decision 2026-10-09                  |

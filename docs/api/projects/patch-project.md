@@ -30,7 +30,7 @@ traces:
       AC-PROJECT-67,
     ]
   design: [SCR-PROJECT-02, DD-PROJECT-03, FLW-PROJECT-05]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # PATCH /api/projects/:key
@@ -40,7 +40,7 @@ Edits a project's name and description, with optimistic locking. Status codes fo
 
 |                 |                                                           |
 | --------------- | --------------------------------------------------------- |
-| **Auth**        | Project role: Owner, Project manager, QA lead (or Admin)  |
+| **Auth**        | Project admin (or System admin)                           |
 | **Since phase** | 3                                                         |
 | **Schema**      | `packages/shared/src/projects.ts` (`projectUpdateSchema`) |
 
@@ -82,7 +82,7 @@ Edits a project's name and description, with optimistic locking. Status codes fo
     "description": "Customer web shop",
     "archivedAt": null,
     "version": 4,
-    "myRole": "QA_ENGINEER",
+    "myAccess": "MEMBER",
     "memberCount": 8,
     "activeRelease": {
       "id": "cm…",
@@ -103,19 +103,19 @@ Edits a project's name and description, with optimistic locking. Status codes fo
 }
 ```
 
-| Field                   | Type                          | Description                                            |
-| ----------------------- | ----------------------------- | ------------------------------------------------------ |
-| `key`                   | string                        | Project key, upper-case (BR-PROJECT-02)                |
-| `name`                  | string                        | Display name                                           |
-| `description`           | string \| null                | Description                                            |
-| `archivedAt`            | string (ISO 8601) \| null     | When it was archived; `null` = active                  |
-| `version`               | integer                       | Send back on `PATCH` (DD-PROJECT-03)                   |
-| `myRole`                | ProjectRole \| null           | Caller's role; `null` for an Admin who is not a member |
-| `memberCount`           | integer                       | Number of members                                      |
-| `activeRelease`         | { id, name } \| null          | The `ACTIVE` release                                   |
-| `activeMilestone`       | { id, name, endDate } \| null | The `ACTIVE` milestone (header "days left")            |
-| `createdBy`             | { id, name }                  | Creator                                                |
-| `createdAt / updatedAt` | string (ISO 8601)             | Timestamps (UTC)                                       |
+| Field                   | Type                          | Description                                                                                      |
+| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| `key`                   | string                        | Project key, upper-case (BR-PROJECT-02)                                                          |
+| `name`                  | string                        | Display name                                                                                     |
+| `description`           | string \| null                | Description                                                                                      |
+| `archivedAt`            | string (ISO 8601) \| null     | When it was archived; `null` = active                                                            |
+| `version`               | integer                       | Send back on `PATCH` (DD-PROJECT-03)                                                             |
+| `myAccess`              | ProjectAccess \| null         | Caller's access level (`PROJECT_ADMIN`, `MEMBER`); `null` for a System admin who is not a member |
+| `memberCount`           | integer                       | Number of members                                                                                |
+| `activeRelease`         | { id, name } \| null          | The `ACTIVE` release                                                                             |
+| `activeMilestone`       | { id, name, endDate } \| null | The `ACTIVE` milestone (header "days left")                                                      |
+| `createdBy`             | { id, name }                  | Creator                                                                                          |
+| `createdAt / updatedAt` | string (ISO 8601)             | Timestamps (UTC)                                                                                 |
 
 `key` is not accepted (400): it can never change (BR-PROJECT-03). A body that changes nothing returns 200 with the same `version`.
 
@@ -123,15 +123,15 @@ Edits a project's name and description, with optimistic locking. Status codes fo
 
 Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-01).
 
-| Status | `code`                   | `messageId`    | When                                                                                       |
-| ------ | ------------------------ | -------------- | ------------------------------------------------------------------------------------------ |
-| 415    | `UNSUPPORTED_MEDIA_TYPE` | MSG-COMMON-09  | Body is not `application/json`                                                             |
-| 400    | `VALIDATION_ERROR`       | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`         |
-| 401    | `UNAUTHENTICATED`        | MSG-COMMON-05  | Not logged in                                                                              |
-| 404    | `NOT_FOUND`              | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not an Admin (same body for both, ADR-0008) |
-| 403    | `FORBIDDEN`              | MSG-COMMON-06  | The caller's project role does not allow this action (BR-PROJECT-35)                       |
-| 422    | `PROJECT_ARCHIVED`       | MSG-PROJECT-08 | The project is archived (BR-PROJECT-08)                                                    |
-| 409    | `VERSION_CONFLICT`       | MSG-PROJECT-07 | `version` is not the current one (BR-PROJECT-07, DD-PROJECT-03)                            |
+| Status | `code`                   | `messageId`    | When                                                                                             |
+| ------ | ------------------------ | -------------- | ------------------------------------------------------------------------------------------------ |
+| 415    | `UNSUPPORTED_MEDIA_TYPE` | MSG-COMMON-09  | Body is not `application/json`                                                                   |
+| 400    | `VALIDATION_ERROR`       | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`               |
+| 401    | `UNAUTHENTICATED`        | MSG-COMMON-05  | Not logged in                                                                                    |
+| 404    | `NOT_FOUND`              | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
+| 403    | `FORBIDDEN`              | MSG-COMMON-06  | The caller's access level does not allow this action (BR-PROJECT-35)                             |
+| 422    | `PROJECT_ARCHIVED`       | MSG-PROJECT-08 | The project is archived (BR-PROJECT-08)                                                          |
+| 409    | `VERSION_CONFLICT`       | MSG-PROJECT-07 | `version` is not the current one (BR-PROJECT-07, DD-PROJECT-03)                                  |
 
 ## Security
 
@@ -143,7 +143,7 @@ Checked against the OWASP API Security Top 10 (2023):
 | API2 Broken authentication                                                       | Session cookie required (Phase 2); 401 otherwise                                                       |
 | API3 Broken object property level authorization (data exposure, mass assignment) | Only `name`, `description`, `version`; `key`, `archivedAt` and unknown fields → 400                    |
 | API4 Unrestricted resource consumption                                           | Body limited to 1 MB                                                                                   |
-| API5 Broken function level authorization                                         | `assertCan(role, "project:edit")`                                                                      |
+| API5 Broken function level authorization                                         | `assertCan(access, "project:edit")`                                                                    |
 
 ## Side effects
 
@@ -157,15 +157,16 @@ curl -i -b cookies.txt -X PATCH http://localhost:3000/api/projects/SHOP -H 'Cont
 
 ## Test ideas
 
-| Type       | Case                                  | Expected                                                              |
-| ---------- | ------------------------------------- | --------------------------------------------------------------------- |
-| Happy path | QA lead renames                       | 200, `version` + 1, activity entry with from/to                       |
-| Negative   | Same body twice with the same version | 200, then 409                                                         |
-| Boundary   | Name 3 and 101 characters             | 200, 400                                                              |
-| Permission | Each of the 8 roles                   | 200 for Owner, PM, QA lead; 403 for the other 5; 404 for a non-member |
+| Type       | Case                                            | Expected                                        |
+| ---------- | ----------------------------------------------- | ----------------------------------------------- |
+| Happy path | Project admin renames                           | 200, `version` + 1, activity entry with from/to |
+| Negative   | Same body twice with the same version           | 200, then 409                                   |
+| Boundary   | Name 3 and 101 characters                       | 200, 400                                        |
+| Permission | System admin, Project admin, Member, non-member | 200, 200, 403, 404                              |
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

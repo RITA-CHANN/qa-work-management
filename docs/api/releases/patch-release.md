@@ -22,7 +22,7 @@ traces:
     ]
   acceptance: [AC-PROJECT-41, AC-PROJECT-42, AC-PROJECT-52]
   design: [FLW-PROJECT-04, DD-PROJECT-04, DD-PROJECT-03]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # PATCH /api/projects/:key/releases/:id
@@ -32,7 +32,7 @@ Edits a release's name and dates, or moves its status one step forward. Status c
 
 |                 |                                                           |
 | --------------- | --------------------------------------------------------- |
-| **Auth**        | Project role: Owner, Project manager, QA lead (or Admin)  |
+| **Auth**        | Project admin (or System admin)                           |
 | **Since phase** | 3                                                         |
 | **Schema**      | `packages/shared/src/releases.ts` (`releaseUpdateSchema`) |
 
@@ -97,21 +97,21 @@ Edits a release's name and dates, or moves its status one step forward. Status c
 
 Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-01).
 
-| Status | `code`                      | `messageId`    | When                                                                                       |
-| ------ | --------------------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| 415    | `UNSUPPORTED_MEDIA_TYPE`    | MSG-COMMON-09  | Body is not `application/json`                                                             |
-| 400    | `VALIDATION_ERROR`          | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`         |
-| 401    | `UNAUTHENTICATED`           | MSG-COMMON-05  | Not logged in                                                                              |
-| 404    | `NOT_FOUND`                 | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not an Admin (same body for both, ADR-0008) |
-| 404    | `NOT_FOUND`                 | MSG-COMMON-07  | `id` is not a release of this project                                                      |
-| 403    | `FORBIDDEN`                 | MSG-COMMON-06  | The caller's project role does not allow this action (BR-PROJECT-35)                       |
-| 422    | `PROJECT_ARCHIVED`          | MSG-PROJECT-08 | The project is archived (BR-PROJECT-08)                                                    |
-| 409    | `VERSION_CONFLICT`          | MSG-PROJECT-07 | `version` is not the current one (BR-PROJECT-07, DD-PROJECT-03)                            |
-| 409    | `RELEASE_NAME_TAKEN`        | MSG-PROJECT-14 | New name already used                                                                      |
-| 409    | `INVALID_TRANSITION`        | MSG-PROJECT-16 | Status backwards or skipping a step (BR-PROJECT-16)                                        |
-| 422    | `ACTIVE_RELEASE_EXISTS`     | MSG-PROJECT-17 | Another release is `ACTIVE` (BR-PROJECT-17)                                                |
-| 422    | `OPEN_MILESTONES`           | MSG-PROJECT-27 | `RELEASED` while a milestone is not `COMPLETED` (BR-PROJECT-25)                            |
-| 422    | `MILESTONE_OUTSIDE_RELEASE` | MSG-PROJECT-25 | New dates would leave a milestone outside (BR-PROJECT-29)                                  |
+| Status | `code`                      | `messageId`    | When                                                                                             |
+| ------ | --------------------------- | -------------- | ------------------------------------------------------------------------------------------------ |
+| 415    | `UNSUPPORTED_MEDIA_TYPE`    | MSG-COMMON-09  | Body is not `application/json`                                                                   |
+| 400    | `VALIDATION_ERROR`          | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`               |
+| 401    | `UNAUTHENTICATED`           | MSG-COMMON-05  | Not logged in                                                                                    |
+| 404    | `NOT_FOUND`                 | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
+| 404    | `NOT_FOUND`                 | MSG-COMMON-07  | `id` is not a release of this project                                                            |
+| 403    | `FORBIDDEN`                 | MSG-COMMON-06  | The caller's access level does not allow this action (BR-PROJECT-35)                             |
+| 422    | `PROJECT_ARCHIVED`          | MSG-PROJECT-08 | The project is archived (BR-PROJECT-08)                                                          |
+| 409    | `VERSION_CONFLICT`          | MSG-PROJECT-07 | `version` is not the current one (BR-PROJECT-07, DD-PROJECT-03)                                  |
+| 409    | `RELEASE_NAME_TAKEN`        | MSG-PROJECT-14 | New name already used                                                                            |
+| 409    | `INVALID_TRANSITION`        | MSG-PROJECT-16 | Status backwards or skipping a step (BR-PROJECT-16)                                              |
+| 422    | `ACTIVE_RELEASE_EXISTS`     | MSG-PROJECT-17 | Another release is `ACTIVE` (BR-PROJECT-17)                                                      |
+| 422    | `OPEN_MILESTONES`           | MSG-PROJECT-27 | `RELEASED` while a milestone is not `COMPLETED` (BR-PROJECT-25)                                  |
+| 422    | `MILESTONE_OUTSIDE_RELEASE` | MSG-PROJECT-25 | New dates would leave a milestone outside (BR-PROJECT-29)                                        |
 
 ## Security
 
@@ -146,6 +146,7 @@ curl -i -b cookies.txt -X PATCH http://localhost:3000/api/projects/SHOP/releases
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

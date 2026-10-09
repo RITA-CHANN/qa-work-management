@@ -8,7 +8,7 @@ owner: Claude
 reviewers: [Linh]
 deciders: [Linh, Claude]
 approved:
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # ADR-0008 Answer 404 for projects the caller is not a member of
@@ -25,14 +25,14 @@ and lets someone guess keys.
 ## Decision drivers
 
 - Don't reveal which projects exist (OWASP API1, broken object level authorization).
-- Members still need a clear answer when their **role** doesn't allow an action.
+- Members still need a clear answer when their **access level** doesn't allow an action.
 - One rule that every later project-scoped endpoint (requirements, bugs, runs) can reuse.
 
 ## Considered options
 
-1. 404 for non-members and unknown keys, 403 for members whose role doesn't allow the action.
+1. 404 for non-members and unknown keys, 403 for members whose access level doesn't allow the action.
 2. 403 for every refusal, 404 only for unknown keys.
-3. 404 for every refusal, including members without the right role.
+3. 404 for every refusal, including members without the right access level.
 
 ## Decision outcome
 
@@ -43,10 +43,10 @@ reuses (driver 3). Phase 0 already proposed it; Linh confirmed it (Q-PROJECT-04)
 ### Consequences
 
 - Good, because a key that exists and a key that doesn't give byte-for-byte the same answer to an outsider.
-- Good, because the permission tests split cleanly: "not a member" cases expect 404, "wrong role" cases expect 403.
+- Good, because the permission tests split cleanly: "not a member" cases expect 404, "wrong access level" cases expect 403.
 - Bad, because a user who was just removed sees "Project not found" instead of "you were removed"; support has to
   know this.
-- Neutral: Admins are treated as members of every project (BR-PROJECT-36).
+- Neutral: System admins are treated as Project admins of every project (BR-PROJECT-36).
 
 ### Confirmation
 
@@ -72,4 +72,4 @@ only place that resolves a key.
 
 ## More information
 
-[DD-PROJECT-01 Permissions](../design/detail/logic/DD-PROJECT-01-permissions.md), BR-PROJECT-06, BR-PROJECT-35.
+[DD-PROJECT-01 Permissions](../design/detail/logic/DD-PROJECT-01-permissions.md), BR-PROJECT-06, BR-PROJECT-35. Access levels: [ADR-0011](ADR-0011-project-access-levels-and-job-titles.md).

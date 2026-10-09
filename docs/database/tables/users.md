@@ -6,7 +6,7 @@ owner: Claude
 reviewers: [Linh]
 phase: 1
 model: User
-updated: 2026-10-07
+updated: 2026-10-09
 ---
 
 # users
@@ -60,21 +60,21 @@ phase) also deletes their sessions.
 
 ## Seed data
 
-Every seed user gets the password `Password123!` from Phase 2 (dev and test only). Their project roles are in
+Every seed user gets the password `Password123!` from Phase 2 (dev and test only). Their project access levels and job titles are in
 [requirements/project](../../requirements/project/README.md#test-data).
 
-| Email                 | Name            | Global role | Persona                             |
-| --------------------- | --------------- | ----------- | ----------------------------------- |
-| admin@qawm.test       | Ada Admin       | ADMIN       | Admin                               |
-| lead@qawm.test        | Minh Lead       | USER        | QA Lead                             |
-| linh@qawm.test        | Linh QA         | USER        | QA Engineer                         |
-| dev@qawm.test         | Dev Nguyen      | USER        | Developer                           |
-| viewer@qawm.test      | Pat Viewer      | USER        | Viewer                              |
-| ratelimit@qawm.test   | Rate Limit      | USER        | Only for rate-limit tests (Phase 2) |
-| owner@qawm.test       | Oanh Owner      | USER        | Project owner (Phase 3)             |
-| pm@qawm.test          | Mai PM          | USER        | Project manager (Phase 3)           |
-| teamlead@qawm.test    | Tuan TeamLead   | USER        | Leader of another team (Phase 3)    |
-| stakeholder@qawm.test | Sam Stakeholder | USER        | Business stakeholder (Phase 3)      |
+| Email                 | Name            | Global role | Persona                                                  |
+| --------------------- | --------------- | ----------- | -------------------------------------------------------- |
+| admin@qawm.test       | Ada Admin       | ADMIN       | System admin: creates every seed project, member of none |
+| lead@qawm.test        | Minh Lead       | USER        | QA lead                                                  |
+| linh@qawm.test        | Linh QA         | USER        | QA engineer                                              |
+| dev@qawm.test         | Dev Nguyen      | USER        | Developer                                                |
+| viewer@qawm.test      | Pat Viewer      | USER        | Read-only member (job title Other)                       |
+| ratelimit@qawm.test   | Rate Limit      | USER        | Only for rate-limit tests (Phase 2)                      |
+| owner@qawm.test       | Oanh Owner      | USER        | Project admin and product owner (Phase 3)                |
+| pm@qawm.test          | Mai PM          | USER        | Project admin and project manager (Phase 3)              |
+| teamlead@qawm.test    | Tuan TeamLead   | USER        | Leader of another team (Phase 3)                         |
+| stakeholder@qawm.test | Sam Stakeholder | USER        | Business stakeholder (Phase 3)                           |
 
 ## Used by
 
@@ -83,9 +83,10 @@ Every seed user gets the password `Password123!` from Phase 2 (dev and test only
 
 ## Change log
 
-| Date       | Change                                                                  | Migration  | Why                                         |
-| ---------- | ----------------------------------------------------------------------- | ---------- | ------------------------------------------- |
-| 2026-10-07 | Created                                                                 | `init`     | Phase 1                                     |
-| 2026-10-07 | `password_hash` and `ratelimit@` seed user added                        | `add_auth` | Phase 2                                     |
-| 2026-10-08 | Definition and Classification columns; Retention and Data quality rules | —          | Documentation standards (docs/STANDARDS.md) |
-| 2026-10-08 | Four seed users for Phase 3 project roles                               | —          | Phase 3A                                    |
+| Date       | Change                                                                                  | Migration  | Why                                         |
+| ---------- | --------------------------------------------------------------------------------------- | ---------- | ------------------------------------------- |
+| 2026-10-07 | Created                                                                                 | `init`     | Phase 1                                     |
+| 2026-10-07 | `password_hash` and `ratelimit@` seed user added                                        | `add_auth` | Phase 2                                     |
+| 2026-10-08 | Definition and Classification columns; Retention and Data quality rules                 | —          | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-08 | Four seed users for Phase 3 project roles                                               | —          | Phase 3A                                    |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | —          | Linh's decision 2026-10-09                  |

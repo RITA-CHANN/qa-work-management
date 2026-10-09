@@ -7,23 +7,24 @@ owner: Claude
 reviewers: [Linh]
 approved:
 model: ProjectMember
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # project_members
 
-One row per person in a project, with their one project role. Read on every project-scoped request to decide what
+One row per person in a project, with their one access level and an optional job title. Read on every project-scoped request to decide what
 the caller may do ([DD-PROJECT-01](../../design/detail/logic/DD-PROJECT-01-permissions.md)).
 
 ## Columns
 
-| Column       | Type          | Null | Default             | Key    | Definition                                                                                                                                   | Classification | Rule                         | Since phase |
-| ------------ | ------------- | ---- | ------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------- | ----------- |
-| `project_id` | text          | no   |                     | PK, FK | Project the person belongs to                                                                                                                | internal       |                              | 3           |
-| `user_id`    | text          | no   |                     | PK, FK | Person who is a member                                                                                                                       | internal       | BR-PROJECT-11                | 3           |
-| `role`       | `ProjectRole` | no   |                     |        | The member's role in this project: `OWNER`, `PROJECT_MANAGER`, `QA_LEAD`, `QA_ENGINEER`, `TEAM_LEAD`, `DEVELOPER`, `STAKEHOLDER` or `VIEWER` | internal       | BR-PROJECT-10, BR-PROJECT-35 | 3           |
-| `created_at` | timestamp(3)  | no   | `now()`             |        | Time the person was added (UTC)                                                                                                              | internal       |                              | 3           |
-| `updated_at` | timestamp(3)  | no   | Prisma `@updatedAt` |        | Time the role last changed (UTC)                                                                                                             | internal       |                              | 3           |
+| Column       | Type            | Null | Default             | Key    | Definition                                                                                                                                               | Classification | Rule                         | Since phase |
+| ------------ | --------------- | ---- | ------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------- | ----------- |
+| `project_id` | text            | no   |                     | PK, FK | Project the person belongs to                                                                                                                            | internal       |                              | 3           |
+| `user_id`    | text            | no   |                     | PK, FK | Person who is a member                                                                                                                                   | internal       | BR-PROJECT-11                | 3           |
+| `access`     | `ProjectAccess` | no   |                     |        | What the member may do in this project: `PROJECT_ADMIN` or `MEMBER`                                                                                      | internal       | BR-PROJECT-10, BR-PROJECT-35 | 3           |
+| `job_title`  | `JobTitle`      | yes  |                     |        | What the member does, as a short key: `QAE`, `QAL`, `QAA`, `PM`, `PO`, `BA`, `DEV`, `TL`, `DES`, `STK` or `OTH`; `NULL` = none. No effect on permissions | internal       | BR-PROJECT-37                | 3           |
+| `created_at` | timestamp(3)    | no   | `now()`             |        | Time the person was added (UTC)                                                                                                                          | internal       |                              | 3           |
+| `updated_at` | timestamp(3)    | no   | Prisma `@updatedAt` |        | Time the access level or job title last changed (UTC)                                                                                                    | internal       |                              | 3           |
 
 `Classification`: public, internal, personal (identifies a person), secret (must never leave the API).
 
@@ -43,13 +44,13 @@ the caller may do ([DD-PROJECT-01](../../design/detail/logic/DD-PROJECT-01-permi
 
 ## Lifecycle
 
-| Event                    | Effect on rows                                | Rule                                        |
-| ------------------------ | --------------------------------------------- | ------------------------------------------- |
-| Project created          | Creator inserted as `OWNER`                   | BR-PROJECT-01                               |
-| Member added             | Insert; 409 if the pair exists                | BR-PROJECT-10, BR-PROJECT-23                |
-| Role changed             | Update `role`                                 | BR-PROJECT-13, BR-PROJECT-23, BR-PROJECT-24 |
-| Member removed or leaves | Delete the row, unless it is the last `OWNER` | BR-PROJECT-12                               |
-| Project deleted          | All rows cascade                              | BR-PROJECT-09                               |
+| Event                             | Effect on rows                                                                             | Rule                                                       |
+| --------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| Project created                   | First Project admin (picked by the System admin) inserted as `PROJECT_ADMIN`, no job title | BR-PROJECT-01                                              |
+| Member added                      | Insert; 409 if the pair exists                                                             | BR-PROJECT-10, BR-PROJECT-23                               |
+| Access level or job title changed | Update `access` and/or `job_title`                                                         | BR-PROJECT-13, BR-PROJECT-23, BR-PROJECT-24, BR-PROJECT-37 |
+| Member removed or leaves          | Delete the row, unless it is the last `PROJECT_ADMIN`                                      | BR-PROJECT-12                                              |
+| Project deleted                   | All rows cascade                                                                           | BR-PROJECT-09                                              |
 
 ## Retention
 
@@ -58,15 +59,15 @@ record that they were added and removed.
 
 ## Data quality rules
 
-| Rule                                                                                     | Checked by                                                                |
-| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| At least one `OWNER` per project at all times                                            | Member service, inside the same transaction as the change (BR-PROJECT-12) |
-| Only an `OWNER` (or Admin) writes a row whose old or new role is `OWNER`                 | Member service (BR-PROJECT-23)                                            |
-| Nobody changes their own role, except an Owner stepping down while another Owner remains | Member service (BR-PROJECT-24)                                            |
+| Rule                                                                              | Checked by                                                                |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| At least one `PROJECT_ADMIN` per project at all times                             | Member service, inside the same transaction as the change (BR-PROJECT-12) |
+| `job_title` is one of the 11 keys or `NULL`                                       | Postgres enum `JobTitle` (BR-PROJECT-37)                                  |
+| Nobody changes their own `access`, except a Project admin stepping down to Member | Member service (BR-PROJECT-24)                                            |
 
 ## Seed data
 
-`SHOP` has one member per role; full list in [requirements/project/README.md](../../requirements/project/README.md#test-data).
+`SHOP` has two Project admins and six Members, each with a different job title; full list in [requirements/project/README.md](../../requirements/project/README.md#test-data).
 
 ## Used by
 
@@ -75,6 +76,7 @@ endpoint.
 
 ## Change log
 
-| Date       | Change        | Migration                                    | Why      |
-| ---------- | ------------- | -------------------------------------------- | -------- |
-| 2026-10-08 | First version | `<ts>_add_projects` (in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Migration                                                                                                                                                                                                                                                                                                                 | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version                                                                           | `<ts>_add_projects` (in the Phase 3 code PR)                                                                                                                                                                                                                                                                              | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | `20261009080000_project_access_job_title` (role → access + job title: `OWNER`, `PROJECT_MANAGER`, `QA_LEAD` → `PROJECT_ADMIN`, others → `MEMBER`; job title `OWNER`/`PROJECT_MANAGER` → `PM`, `QA_LEAD` → `QAL`, `QA_ENGINEER` → `QAE`, `TEAM_LEAD` → `TL`, `DEVELOPER` → `DEV`, `STAKEHOLDER` → `STK`, `VIEWER` → `OTH`) | Linh's decision 2026-10-09 |

@@ -129,7 +129,7 @@ const OPERATIONS: Operation[] = [
   { id: 'API-PROJECT-07', method: 'delete', path: '/api/projects/{key}', summary: 'Delete an archived project', tag: 'Projects', ok: { status: 204 } },
   { id: 'API-PROJECT-08', method: 'get', path: '/api/projects/{key}/members', summary: 'Members of a project', tag: 'Members', ok: { status: 200, schema: 'Member', shape: 'list' } },
   { id: 'API-PROJECT-09', method: 'post', path: '/api/projects/{key}/members', summary: 'Add a member', tag: 'Members', body: 'MemberAdd', ok: { status: 201, schema: 'Member', shape: 'item' } },
-  { id: 'API-PROJECT-10', method: 'patch', path: '/api/projects/{key}/members/{userId}', summary: "Change a member's role", tag: 'Members', body: 'MemberUpdate', ok: { status: 200, schema: 'Member', shape: 'item' } },
+  { id: 'API-PROJECT-10', method: 'patch', path: '/api/projects/{key}/members/{userId}', summary: "Change a member's access level or job title", tag: 'Members', body: 'MemberUpdate', ok: { status: 200, schema: 'Member', shape: 'item' } },
   { id: 'API-PROJECT-11', method: 'delete', path: '/api/projects/{key}/members/{userId}', summary: 'Remove a member, or leave', tag: 'Members', ok: { status: 204 } },
   { id: 'API-PROJECT-12', method: 'get', path: '/api/projects/{key}/activity', summary: 'Activity log, newest first', tag: 'Activity', query: activityQuerySchema, ok: { status: 200, schema: 'ActivityEntry', shape: 'page' } },
   { id: 'API-RELEASE-01', method: 'get', path: '/api/projects/{key}/releases', summary: 'Releases of a project', tag: 'Releases', ok: { status: 200, schema: 'Release', shape: 'list' } },
