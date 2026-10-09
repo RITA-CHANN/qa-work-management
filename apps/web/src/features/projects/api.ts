@@ -16,7 +16,7 @@ import type {
   MilestoneUpdate,
   Project,
   ProjectCreate,
-  ProjectRole,
+  MemberUpdate,
   ProjectSummary,
   ProjectUpdate,
   Release,
@@ -153,10 +153,10 @@ export function useAddMember(key: string) {
   );
 }
 
-export function useChangeRole(key: string) {
+export function useUpdateMember(key: string) {
   return useWrite(
-    ({ userId, role }: { userId: string; role: ProjectRole }) =>
-      apiSend<ApiSuccess<Member>>('PATCH', `${base(key)}/members/${userId}`, { role }).then(data),
+    ({ userId, ...body }: { userId: string } & MemberUpdate) =>
+      apiSend<ApiSuccess<Member>>('PATCH', `${base(key)}/members/${userId}`, body).then(data),
     [projectKeys.one(key)],
   );
 }

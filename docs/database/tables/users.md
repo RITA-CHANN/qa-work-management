@@ -76,23 +76,23 @@ sessions, and fails while they have audit entries.
 
 ## Seed data
 
-Every seed user gets the password `Password123!` from Phase 2 (dev and test only), `must_change_password = false`
-and no `last_project_id`. Their project roles are in
+Every seed user gets the password `Password123!` from Phase 2 (dev and test only), `must_change_password = false`,
+`status = ACTIVE` (except Hoa Inactive) and no `last_project_id`. Their project access levels and job titles are in
 [requirements/project](../../requirements/project/README.md#test-data).
 
-| Email                 | Name            | Global role | Status      | Persona                                                    |
-| --------------------- | --------------- | ----------- | ----------- | ---------------------------------------------------------- |
-| admin@qawm.test       | Ada Admin       | ADMIN       | ACTIVE      | Admin                                                      |
-| lead@qawm.test        | Minh Lead       | USER        | ACTIVE      | QA Lead                                                    |
-| linh@qawm.test        | Linh QA         | USER        | ACTIVE      | QA Engineer                                                |
-| dev@qawm.test         | Dev Nguyen      | USER        | ACTIVE      | Developer                                                  |
-| viewer@qawm.test      | Pat Viewer      | USER        | ACTIVE      | Viewer                                                     |
-| ratelimit@qawm.test   | Rate Limit      | USER        | ACTIVE      | Only for rate-limit tests (Phase 2)                        |
-| owner@qawm.test       | Oanh Owner      | USER        | ACTIVE      | Project owner (Phase 3)                                    |
-| pm@qawm.test          | Mai PM          | USER        | ACTIVE      | Project manager (Phase 3)                                  |
-| teamlead@qawm.test    | Tuan TeamLead   | USER        | ACTIVE      | Leader of another team (Phase 3)                           |
-| stakeholder@qawm.test | Sam Stakeholder | USER        | ACTIVE      | Business stakeholder (Phase 3)                             |
-| inactive@qawm.test    | Hoa Inactive    | USER        | DEACTIVATED | Deactivated account, can't sign in (Phase 3C, BR-ADMIN-10) |
+| Email                 | Name            | Global role | Persona                                                  |
+| --------------------- | --------------- | ----------- | -------------------------------------------------------- |
+| admin@qawm.test       | Ada Admin       | ADMIN       | System admin: creates every seed project, member of none |
+| lead@qawm.test        | Minh Lead       | USER        | QA lead                                                  |
+| linh@qawm.test        | Linh QA         | USER        | QA engineer                                              |
+| dev@qawm.test         | Dev Nguyen      | USER        | Developer                                                |
+| viewer@qawm.test      | Pat Viewer      | USER        | Read-only member (job title Other)                       |
+| ratelimit@qawm.test   | Rate Limit      | USER        | Only for rate-limit tests (Phase 2)                      |
+| owner@qawm.test       | Oanh Owner      | USER        | Project admin and product owner (Phase 3)                |
+| pm@qawm.test          | Mai PM          | USER        | Project admin and project manager (Phase 3)              |
+| teamlead@qawm.test    | Tuan TeamLead   | USER        | Leader of another team (Phase 3)                         |
+| stakeholder@qawm.test | Sam Stakeholder | USER        | Business stakeholder (Phase 3)                           |
+| inactive@qawm.test    | Hoa Inactive    | USER        | DEACTIVATED                                              | Deactivated account, can't sign in (Phase 3C, BR-ADMIN-10) |
 
 ## Used by
 
@@ -109,4 +109,5 @@ and no `last_project_id`. Their project roles are in
 | 2026-10-07 | `password_hash` and `ratelimit@` seed user added                                                            | `add_auth`                               | Phase 2                                     |
 | 2026-10-08 | Definition and Classification columns; Retention and Data quality rules                                     | —                                        | Documentation standards (docs/STANDARDS.md) |
 | 2026-10-08 | Four seed users for Phase 3 project roles                                                                   | —                                        | Phase 3A                                    |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects                     | —                                        | Linh's decision 2026-10-09                  |
 | 2026-10-09 | `status`, `must_change_password`, `last_sign_in_at`, `last_project_id`; seed user `inactive@` (Deactivated) | `20261009081118_admin_console_and_audit` | Phase 3C                                    |

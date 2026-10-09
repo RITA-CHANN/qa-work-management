@@ -4,6 +4,7 @@ import {
   daysBetween,
   msg,
   todayIso,
+  type Member,
   type Milestone,
   type Project,
   type Release,
@@ -21,7 +22,7 @@ import {
   useProject,
   useReleases,
 } from '@/features/projects/api';
-import { roleLabel } from '@/features/projects/labels';
+import { ACCESS_LABELS, JOB_TITLE_NAMES } from '@/features/projects/labels';
 import { timeLeft } from '@/features/projects/milestone-time';
 import { errorText } from '@/features/projects/server-error';
 
@@ -97,7 +98,7 @@ export function ProjectDashboard({ projectKey }: { projectKey: string }) {
       project={project.data}
       releases={releases.data ?? []}
       milestones={milestones.data ?? []}
-      memberRoles={(members.data ?? []).map((m) => m.role)}
+      members={members.data ?? []}
       activity={activity.data?.pages.flatMap((page) => page.data).slice(0, 10) ?? []}
     />
   );
@@ -107,13 +108,13 @@ function DashboardBody({
   project,
   releases,
   milestones,
-  memberRoles,
+  members,
   activity,
 }: {
   project: Project;
   releases: Release[];
   milestones: Milestone[];
-  memberRoles: string[];
+  members: Member[];
   activity: Parameters<typeof ActivityList>[0]['entries'];
 }) {
   const base = `/projects/${project.key}`;
@@ -122,12 +123,14 @@ function DashboardBody({
   const doneSprints = releaseSprints.filter((m) => m.status === 'COMPLETED').length;
   const sprint = milestones.find((m) => m.status === 'ACTIVE');
   const upcoming = deadlines(releases, milestones);
-  const roleCounts = Object.entries(
-    memberRoles.reduce<Record<string, number>>((acc, role) => {
-      acc[role] = (acc[role] ?? 0) + 1;
+  const admins = members.filter((m) => m.access === 'PROJECT_ADMIN').length;
+  const titleCounts = Object.entries(
+    members.reduce<Record<string, number>>((acc, m) => {
+      const title = m.jobTitle ? JOB_TITLE_NAMES[m.jobTitle] : 'No job title';
+      acc[title] = (acc[title] ?? 0) + 1;
       return acc;
     }, {}),
-  );
+  ).sort(([a], [b]) => a.localeCompare(b));
 
   return (
     <>
@@ -166,8 +169,8 @@ function DashboardBody({
         <KpiCard
           mono
           label="Members"
-          value={memberRoles.length}
-          hint={`${roleCounts.length} roles`}
+          value={members.length}
+          hint={`${admins} ${admins === 1 ? 'project admin' : 'project admins'}`}
         />
       </div>
 
@@ -248,10 +251,18 @@ function DashboardBody({
 
         <Card title="Team" actions={<CardLink to={`${base}/members`}>Members</CardLink>}>
           <ul className="flex flex-col gap-2">
-            {roleCounts.map(([role, count]) => (
-              <li key={role} className="flex justify-between">
-                <span>{roleLabel(role as never)}</span>
-                <span className="font-mono font-semibold">{count}</span>
+            <li className="flex justify-between">
+              <span>{ACCESS_LABELS.PROJECT_ADMIN}</span>
+              <span className="font-mono font-semibold">{admins}</span>
+            </li>
+            <li className="flex justify-between border-b pb-2">
+              <span>{ACCESS_LABELS.MEMBER}</span>
+              <span className="font-mono font-semibold">{members.length - admins}</span>
+            </li>
+            {titleCounts.map(([title, count]) => (
+              <li key={title} className="flex justify-between text-muted-foreground">
+                <span>{title}</span>
+                <span className="font-mono">{count}</span>
               </li>
             ))}
           </ul>

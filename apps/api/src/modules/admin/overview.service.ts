@@ -3,7 +3,6 @@ import type { adminProjectListQuerySchema } from '@qawm/shared';
 import type { z } from 'zod';
 import { fromDbDate } from '../../lib/dates';
 import { prisma } from '../../lib/prisma';
-import { PROJECT_ADMIN_ROLES } from './project-admins';
 
 /** BR-ADMIN-02, BR-ADMIN-03: every project, archived included, with its admins and current plan. */
 export async function listAdminProjects(
@@ -26,7 +25,7 @@ export async function listAdminProjects(
     include: {
       _count: { select: { members: true } },
       members: {
-        where: { role: { in: PROJECT_ADMIN_ROLES } },
+        where: { access: 'PROJECT_ADMIN' },
         select: { user: { select: { id: true, name: true } } },
       },
       releases: { where: { status: 'ACTIVE' }, select: { name: true, targetDate: true } },

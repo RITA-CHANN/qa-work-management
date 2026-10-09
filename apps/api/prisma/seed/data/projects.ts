@@ -1,6 +1,7 @@
 import type {
+  JobTitle,
   MilestoneStatus,
-  ProjectRole,
+  ProjectAccess,
   ReleaseStatus,
 } from '../../../src/generated/prisma/client';
 
@@ -8,6 +9,7 @@ import type {
  * Seed projects, documented in docs/requirements/project/README.md#test-data.
  * Dates are days relative to the day the seed runs, so "days left" and "overdue" stay meaningful.
  * Tests only read these projects; a test that changes data creates its own project.
+ * Every project is created by the System admin (BR-PROJECT-01), who is not a member.
  */
 
 type SeedMilestone = {
@@ -30,7 +32,7 @@ export type SeedProject = {
   description: string;
   archived: boolean;
   createdBy: string;
-  members: [email: string, role: ProjectRole][];
+  members: [email: string, access: ProjectAccess, jobTitle: JobTitle][];
   releases: SeedRelease[];
 };
 
@@ -40,16 +42,16 @@ export const projects: SeedProject[] = [
     name: 'ShopEase Web',
     description: 'Customer web shop: catalogue, cart and checkout.',
     archived: false,
-    createdBy: 'owner@qawm.test',
+    createdBy: 'admin@qawm.test',
     members: [
-      ['owner@qawm.test', 'OWNER'],
-      ['pm@qawm.test', 'PROJECT_MANAGER'],
-      ['lead@qawm.test', 'QA_LEAD'],
-      ['linh@qawm.test', 'QA_ENGINEER'],
-      ['teamlead@qawm.test', 'TEAM_LEAD'],
-      ['dev@qawm.test', 'DEVELOPER'],
-      ['stakeholder@qawm.test', 'STAKEHOLDER'],
-      ['viewer@qawm.test', 'VIEWER'],
+      ['owner@qawm.test', 'PROJECT_ADMIN', 'PO'],
+      ['pm@qawm.test', 'PROJECT_ADMIN', 'PM'],
+      ['lead@qawm.test', 'MEMBER', 'QAL'],
+      ['linh@qawm.test', 'MEMBER', 'QAE'],
+      ['teamlead@qawm.test', 'MEMBER', 'TL'],
+      ['dev@qawm.test', 'MEMBER', 'DEV'],
+      ['stakeholder@qawm.test', 'MEMBER', 'STK'],
+      ['viewer@qawm.test', 'MEMBER', 'OTH'],
     ],
     releases: [
       {
@@ -86,10 +88,10 @@ export const projects: SeedProject[] = [
     name: 'ShopEase Mobile',
     description: 'Mobile app for the shop.',
     archived: false,
-    createdBy: 'linh@qawm.test',
+    createdBy: 'admin@qawm.test',
     members: [
-      ['linh@qawm.test', 'OWNER'],
-      ['lead@qawm.test', 'QA_LEAD'],
+      ['linh@qawm.test', 'PROJECT_ADMIN', 'QAE'],
+      ['lead@qawm.test', 'MEMBER', 'QAL'],
     ],
     releases: [{ name: '1.0', status: 'PLANNED', start: 7, target: 60, milestones: [] }],
   },
@@ -98,10 +100,10 @@ export const projects: SeedProject[] = [
     name: 'Legacy Portal',
     description: 'The old portal, kept for reference.',
     archived: true,
-    createdBy: 'lead@qawm.test',
+    createdBy: 'admin@qawm.test',
     members: [
-      ['lead@qawm.test', 'OWNER'],
-      ['linh@qawm.test', 'VIEWER'],
+      ['lead@qawm.test', 'PROJECT_ADMIN', 'QAL'],
+      ['linh@qawm.test', 'MEMBER', 'QAE'],
     ],
     releases: [
       {
@@ -119,7 +121,7 @@ export const projects: SeedProject[] = [
     description: 'Only the admin can see this one.',
     archived: false,
     createdBy: 'admin@qawm.test',
-    members: [['admin@qawm.test', 'OWNER']],
+    members: [['owner@qawm.test', 'PROJECT_ADMIN', 'PM']],
     releases: [],
   },
 ];

@@ -15,7 +15,6 @@ import { ConflictError, NotFoundError, UnprocessableError } from '../../lib/erro
 import { prisma } from '../../lib/prisma';
 import { recordAudit } from '../audit/record-audit';
 import { hashPassword } from '../auth/password';
-import { PROJECT_ADMIN_ROLES } from './project-admins';
 
 const userInclude = {
   _count: { select: { memberships: true } },
@@ -85,7 +84,8 @@ export async function getUser(id: string): Promise<AdminUserDetail> {
     projects: row.memberships.map((m) => ({
       key: m.project.key,
       name: m.project.name,
-      role: m.role,
+      access: m.access,
+      jobTitle: m.jobTitle,
       archived: !!m.project.archivedAt,
     })),
     activeSessions: row._count.sessions,
@@ -103,8 +103,12 @@ function assertNotSelf(admin: AuthUser, targetId: string) {
   if (admin.id === targetId) throw new UnprocessableError('OWN_ACCOUNT', 'MSG-ADMIN-04');
 }
 
-/** BR-ADMIN-09: at least one active Admin stays. Run inside the transaction, before the change. */
+/**
+ * BR-ADMIN-09: at least one active Admin stays. Run inside the transaction, before the change. The Admin
+ * rows are locked first, so two Admins demoting each other at the same time can't both pass (AC-ADMIN-21).
+ */
 async function assertAnotherActiveAdmin(tx: Tx, targetId: string) {
+  await tx.$queryRaw`SELECT id FROM users WHERE global_role = 'ADMIN' ORDER BY id FOR UPDATE`;
   const others = await tx.user.count({
     where: { globalRole: 'ADMIN', status: 'ACTIVE', id: { not: targetId } },
   });
@@ -188,12 +192,12 @@ export async function deactivateUser(
     const sole = await tx.project.findMany({
       where: {
         archivedAt: null,
-        members: { some: { userId: id, role: { in: PROJECT_ADMIN_ROLES } } },
+        members: { some: { userId: id, access: 'PROJECT_ADMIN' } },
         NOT: {
           members: {
             some: {
               userId: { not: id },
-              role: { in: PROJECT_ADMIN_ROLES },
+              access: 'PROJECT_ADMIN',
               user: { status: 'ACTIVE' },
             },
           },
@@ -263,6 +267,8 @@ export async function resetPassword(
   id: string,
   ip: string | null,
 ): Promise<OneTimePassword> {
+  // An Admin changes their own password the normal way, not with a one-time password.
+  assertNotSelf(admin, id);
   const oneTimePassword = generateOneTimePassword();
   const passwordHash = await hashPassword(oneTimePassword);
   const user = await prisma.$transaction(async (tx) => {
@@ -292,6 +298,7 @@ export async function signOutEverywhere(
   id: string,
   ip: string | null,
 ): Promise<{ endedSessions: number }> {
+  assertNotSelf(admin, id);
   return prisma.$transaction(async (tx) => {
     const row = await findOrThrow(tx, id);
     const { count } = await tx.session.deleteMany({ where: { userId: id } });

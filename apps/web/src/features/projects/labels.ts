@@ -1,13 +1,14 @@
 import {
+  ACCESS_LABELS,
+  JOB_TITLE_NAMES,
   MILESTONE_STATUS_LABELS,
   RELEASE_STATUS_LABELS,
-  ROLE_LABELS,
-  type ProjectRole,
+  type ProjectAccess,
 } from '@qawm/shared';
 
-export { MILESTONE_STATUS_LABELS, RELEASE_STATUS_LABELS, ROLE_LABELS };
+export { ACCESS_LABELS, JOB_TITLE_NAMES, MILESTONE_STATUS_LABELS, RELEASE_STATUS_LABELS };
 
-export const roleLabel = (role: ProjectRole | null) => (role ? ROLE_LABELS[role] : '—');
+export const accessLabel = (access: ProjectAccess | null) => (access ? ACCESS_LABELS[access] : '—');
 
 /** "2026-10-08 14:02" in the browser's time zone. */
 export function formatDateTime(iso: string): string {

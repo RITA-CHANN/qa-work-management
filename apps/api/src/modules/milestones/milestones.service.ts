@@ -95,7 +95,7 @@ async function assertNameFree(tx: Tx, projectId: string, name: string, excludeId
 /** API-MILESTONE-02: always PLANNED; the project comes from the release, never from the body. */
 export async function createMilestone(ctx: ProjectContext, body: CreateBody): Promise<Milestone> {
   const { project, user } = ctx;
-  assertCan(ctx.role, 'milestone:write');
+  assertCan(ctx.access, 'milestone:write');
   assertNotArchived(project);
   try {
     return await prisma.$transaction(async (tx) => {
@@ -140,7 +140,7 @@ export async function updateMilestone(
   body: UpdateBody,
 ): Promise<Milestone> {
   const { project, user } = ctx;
-  assertCan(ctx.role, 'milestone:write');
+  assertCan(ctx.access, 'milestone:write');
   assertNotArchived(project);
 
   try {
@@ -253,7 +253,7 @@ async function assertCanMoveTo(
 /** API-MILESTONE-04: only while PLANNED (BR-PROJECT-33). */
 export async function deleteMilestone(ctx: ProjectContext, id: string): Promise<void> {
   const { project, user } = ctx;
-  assertCan(ctx.role, 'milestone:write');
+  assertCan(ctx.access, 'milestone:write');
   assertNotArchived(project);
   await prisma.$transaction(async (tx) => {
     await lockActiveProject(tx, project.id);

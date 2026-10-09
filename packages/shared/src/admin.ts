@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { msg } from './messages';
+import { jobTitleSchema, projectAccessSchema } from './projects';
 
 /**
  * Admin console (Phase 3C): users, all projects, audit log. Only System admins reach these endpoints;
@@ -37,7 +38,8 @@ export type AdminUser = z.infer<typeof adminUserSchema>;
 export const adminUserProjectSchema = z.object({
   key: z.string(),
   name: z.string(),
-  role: z.string(),
+  access: projectAccessSchema,
+  jobTitle: jobTitleSchema.nullable(),
   archived: z.boolean(),
 });
 export type AdminUserProject = z.infer<typeof adminUserProjectSchema>;

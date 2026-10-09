@@ -30,8 +30,8 @@ const TITLES: Record<ErrorCode, string> = {
   MILESTONE_NAME_TAKEN: 'Milestone name already in use',
   PROJECT_ARCHIVED: 'Project is archived',
   DELETE_NOT_ALLOWED: 'Delete not allowed',
-  LAST_OWNER: 'Last owner',
-  OWN_ROLE: 'Own role',
+  LAST_PROJECT_ADMIN: 'Last project admin',
+  OWN_ACCESS: 'Own access level',
   ACTIVE_RELEASE_EXISTS: 'Another release is active',
   OPEN_MILESTONES: 'Release has open milestones',
   CANNOT_ACTIVATE_MILESTONE: 'Milestone cannot be activated',
@@ -41,7 +41,6 @@ const TITLES: Record<ErrorCode, string> = {
   EMAIL_TAKEN: 'Email already in use',
   LAST_ADMIN: 'Last active admin',
   OWN_ACCOUNT: 'Own account',
-  LAST_PROJECT_ADMIN: 'Last project admin',
   ACCOUNT_DEACTIVATED: 'Account deactivated',
   PASSWORD_CHANGE_REQUIRED: 'Password change required',
 };

@@ -20,11 +20,11 @@ updated: YYYY-MM-DD
 One sentence: what this endpoint does and who uses it. Status codes follow RFC 9110; the error body format is in
 [README.md](README.md#error-codes).
 
-|                 |                                                  |
-| --------------- | ------------------------------------------------ |
-| **Auth**        | None / Logged in / Project role: …               |
-| **Since phase** | N                                                |
-| **Schema**      | `packages/shared/src/<file>.ts` (`<schemaName>`) |
+|                 |                                                              |
+| --------------- | ------------------------------------------------------------ |
+| **Auth**        | None / Logged in / System admin / Project admin / Any member |
+| **Since phase** | N                                                            |
+| **Schema**      | `packages/shared/src/<file>.ts` (`<schemaName>`)             |
 
 ## Request
 

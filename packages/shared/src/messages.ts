@@ -43,7 +43,7 @@ export const MESSAGES = {
   'MSG-PROJECT-09': 'Only an archived project with no releases can be deleted.',
   'MSG-PROJECT-10': 'Type {key} to confirm',
   'MSG-PROJECT-11': '{name} is already a member of this project',
-  'MSG-PROJECT-12': 'A project must have at least one owner',
+  'MSG-PROJECT-12': 'A project must have at least one project admin',
   'MSG-PROJECT-13': 'Release name must be 1–50 characters',
   'MSG-PROJECT-14': 'A release with this name already exists in this project',
   'MSG-PROJECT-15': 'Target date must be on or after the start date',
@@ -52,8 +52,8 @@ export const MESSAGES = {
   'MSG-PROJECT-18': 'Only a planned release with no milestones can be deleted',
   'MSG-PROJECT-19': 'Changes saved',
   'MSG-PROJECT-20': 'No projects match your search',
-  'MSG-PROJECT-21': 'You are not a member of any project yet. Create one to get started.',
-  'MSG-PROJECT-22': 'You cannot change your own role',
+  'MSG-PROJECT-21': 'You are not a member of any project yet. Ask an administrator to add you.',
+  'MSG-PROJECT-22': 'You cannot change your own access level',
   'MSG-PROJECT-23': 'Milestone name must be 1–50 characters',
   'MSG-PROJECT-24': 'A milestone needs a start and end date, 1–{maxDays} days long',
   'MSG-PROJECT-25': 'Milestone dates must be within release {name} ({start} – {end})',
@@ -65,6 +65,7 @@ export const MESSAGES = {
   'MSG-PROJECT-31': 'Only a planned milestone can be deleted',
   'MSG-PROJECT-32':
     'Release {name} is already released. Add milestones to a planned or active release.',
+  'MSG-PROJECT-33': 'Choose an existing user as the first project admin',
 
   // Admin console: docs/requirements/admin/messages.md
   'MSG-ADMIN-01': 'An account with this email already exists',

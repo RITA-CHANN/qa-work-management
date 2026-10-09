@@ -12,7 +12,7 @@ traces:
   requirements: [US-PROJECT-12, BR-PROJECT-26]
   acceptance: [AC-PROJECT-54, AC-PROJECT-64]
   design: [SCR-PROJECT-04]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # GET /api/projects/:key/milestones
@@ -22,7 +22,7 @@ Lists the milestones (sprints) of a project, optionally of one release. Status c
 
 |                 |                                                         |
 | --------------- | ------------------------------------------------------- |
-| **Auth**        | Project role: any member, or Admin                      |
+| **Auth**        | Any member, or System admin                             |
 | **Since phase** | 3                                                       |
 | **Schema**      | `packages/shared/src/milestones.ts` (`milestoneSchema`) |
 
@@ -81,11 +81,11 @@ Sorted by start date.
 
 Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-01).
 
-| Status | `code`             | `messageId`    | When                                                                                       |
-| ------ | ------------------ | -------------- | ------------------------------------------------------------------------------------------ |
-| 400    | `VALIDATION_ERROR` | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`         |
-| 401    | `UNAUTHENTICATED`  | MSG-COMMON-05  | Not logged in                                                                              |
-| 404    | `NOT_FOUND`        | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not an Admin (same body for both, ADR-0008) |
+| Status | `code`             | `messageId`    | When                                                                                             |
+| ------ | ------------------ | -------------- | ------------------------------------------------------------------------------------------------ |
+| 400    | `VALIDATION_ERROR` | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`               |
+| 401    | `UNAUTHENTICATED`  | MSG-COMMON-05  | Not logged in                                                                                    |
+| 404    | `NOT_FOUND`        | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
 
 ## Security
 
@@ -118,6 +118,7 @@ curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/milestones?releaseI
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

@@ -1,43 +1,50 @@
 import { useId, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
-import { msg, PROJECT_ROLES, type Member, type ProjectRole } from '@qawm/shared';
+import {
+  JOB_TITLES,
+  msg,
+  PROJECT_ACCESS,
+  type JobTitle,
+  type Member,
+  type MemberUpdate,
+  type ProjectAccess,
+} from '@qawm/shared';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogActions } from '@/components/ui/dialog';
 import { inputClass, SelectField } from '@/components/ui/field';
 import { useToast } from '@/components/ui/use-toast';
-import { useAddMember, useChangeRole, useMembers, useRemoveMember, useUsers } from './api';
+import { useAddMember, useMembers, useRemoveMember, useUpdateMember, useUsers } from './api';
 import { useProjectAccess } from './access';
-import { ROLE_LABELS } from './labels';
+import { ACCESS_LABELS, JOB_TITLE_NAMES } from './labels';
 import { useProjectOutlet } from './project-outlet';
 import { errorText } from './server-error';
 
-/** SCR-PROJECT-03: who is in the project; Owner, PM and QA lead manage members here. */
+/** "QA engineer (QAE)": the name, with the key people see in tables later. */
+const jobTitleOption = (title: JobTitle) => `${JOB_TITLE_NAMES[title]} (${title})`;
+
+/** SCR-PROJECT-03: who is in the project; Project admins manage members here. */
 export function MembersTab() {
   const { project } = useProjectOutlet();
   const access = useProjectAccess(project);
   const members = useMembers(project.key);
-  const changeRole = useChangeRole(project.key);
+  const updateMember = useUpdateMember(project.key);
   const toast = useToast();
   const [alert, setAlert] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<Member | null>(null);
-  const ownerHintId = useId();
   const selfHintId = useId();
 
   const canManage = access.can('member:manage');
-  const canManageOwners = access.can('member:manage-owner');
-  // Roles this user may give: "Owner" only for Owners and Admins (BR-PROJECT-23).
-  const offeredRoles = PROJECT_ROLES.filter((role) => role !== 'OWNER' || canManageOwners);
   const myId = access.me?.id;
 
-  async function onRoleChange(member: Member, role: ProjectRole) {
+  async function onChange(member: Member, body: MemberUpdate) {
     setAlert(null);
     try {
-      await changeRole.mutateAsync({ userId: member.userId, role });
+      await updateMember.mutateAsync({ userId: member.userId, ...body });
       toast(msg('MSG-PROJECT-19'));
     } catch (error) {
-      // The select shows the saved role again, because it reads from the server data.
+      // The select shows the saved value again, because it reads from the server data.
       setAlert(errorText(error));
     }
   }
@@ -63,11 +70,8 @@ export function MembersTab() {
         {canManage && <Button onClick={() => setAdding(true)}>Add member</Button>}
       </div>
       {alert && <Alert className="mb-4">{alert}</Alert>}
-      <p id={ownerHintId} className="sr-only">
-        Only an Owner can change an Owner&apos;s role
-      </p>
       <p id={selfHintId} className="sr-only">
-        You can&apos;t change your own role
+        {msg('MSG-PROJECT-22')}
       </p>
       <table className="w-full text-sm" aria-busy={members.isPending}>
         <caption className="sr-only">Project members</caption>
@@ -80,7 +84,10 @@ export function MembersTab() {
               Email
             </th>
             <th scope="col" className="py-2 pr-4 font-medium">
-              Role
+              Access
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Job title
             </th>
             <th scope="col" className="py-2 font-medium">
               <span className="sr-only">Actions</span>
@@ -90,8 +97,6 @@ export function MembersTab() {
         <tbody>
           {rows.map((member) => {
             const isMe = member.userId === myId;
-            const ownerLocked = member.role === 'OWNER' && !canManageOwners;
-            const editable = canManage && !isMe && !ownerLocked;
             return (
               <tr key={member.userId} className="border-b last:border-0">
                 <td className="py-2 pr-4">
@@ -102,25 +107,50 @@ export function MembersTab() {
                 <td className="py-2 pr-4">
                   {canManage && !isMe ? (
                     <select
-                      aria-label={`Role of ${member.name}`}
-                      value={member.role}
-                      disabled={!editable || changeRole.isPending}
-                      aria-describedby={ownerLocked ? ownerHintId : undefined}
+                      aria-label={`Access of ${member.name}`}
+                      value={member.access}
+                      disabled={updateMember.isPending}
                       onChange={(event) =>
-                        void onRoleChange(member, event.target.value as ProjectRole)
+                        void onChange(member, { access: event.target.value as ProjectAccess })
                       }
-                      className={`${inputClass} w-44`}
+                      className={`${inputClass} w-40`}
                     >
-                      {(editable ? offeredRoles : PROJECT_ROLES).map((role) => (
-                        <option key={role} value={role}>
-                          {ROLE_LABELS[role]}
+                      {PROJECT_ACCESS.map((level) => (
+                        <option key={level} value={level}>
+                          {ACCESS_LABELS[level]}
                         </option>
                       ))}
                     </select>
                   ) : (
                     <span aria-describedby={isMe && canManage ? selfHintId : undefined}>
-                      {ROLE_LABELS[member.role]}
+                      {ACCESS_LABELS[member.access]}
                     </span>
+                  )}
+                </td>
+                <td className="py-2 pr-4">
+                  {canManage ? (
+                    <select
+                      aria-label={`Job title of ${member.name}`}
+                      value={member.jobTitle ?? ''}
+                      disabled={updateMember.isPending}
+                      onChange={(event) =>
+                        void onChange(member, {
+                          jobTitle: (event.target.value || null) as JobTitle | null,
+                        })
+                      }
+                      className={`${inputClass} w-52`}
+                    >
+                      <option value="">—</option>
+                      {JOB_TITLES.map((title) => (
+                        <option key={title} value={title}>
+                          {jobTitleOption(title)}
+                        </option>
+                      ))}
+                    </select>
+                  ) : member.jobTitle ? (
+                    `${JOB_TITLE_NAMES[member.jobTitle]} · ${member.jobTitle}`
+                  ) : (
+                    '—'
                   )}
                 </td>
                 <td className="py-2 text-right">
@@ -129,7 +159,7 @@ export function MembersTab() {
                       Leave
                     </Button>
                   )}
-                  {editable && (
+                  {canManage && !isMe && (
                     <Button
                       size="sm"
                       variant="outline"
@@ -151,7 +181,6 @@ export function MembersTab() {
         onClose={() => setAdding(false)}
         projectKey={project.key}
         members={rows}
-        roles={offeredRoles}
       />
       <RemoveMemberDialog
         projectKey={project.key}
@@ -168,13 +197,11 @@ function AddMemberDialog({
   onClose,
   projectKey,
   members,
-  roles,
 }: {
   open: boolean;
   onClose: () => void;
   projectKey: string;
   members: Member[];
-  roles: readonly ProjectRole[];
 }) {
   const users = useUsers(open);
   const add = useAddMember(projectKey);
@@ -196,7 +223,8 @@ function AddMemberDialog({
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const userId = String(form.get('userId') ?? '');
-    const role = String(form.get('role')) as ProjectRole;
+    const access = String(form.get('access')) as ProjectAccess;
+    const jobTitle = (String(form.get('jobTitle') ?? '') || null) as JobTitle | null;
     setError(null);
     if (!userId) {
       setUserError('Choose a user');
@@ -204,7 +232,7 @@ function AddMemberDialog({
     }
     setUserError(undefined);
     try {
-      await add.mutateAsync({ userId, role });
+      await add.mutateAsync({ userId, access, jobTitle });
       close();
       toast(msg('MSG-PROJECT-19'));
     } catch (failure) {
@@ -226,10 +254,18 @@ function AddMemberDialog({
             </option>
           ))}
         </SelectField>
-        <SelectField label="Role" name="role" defaultValue="VIEWER">
-          {roles.map((role) => (
-            <option key={role} value={role}>
-              {ROLE_LABELS[role]}
+        <SelectField label="Access" name="access" defaultValue="MEMBER">
+          {PROJECT_ACCESS.map((level) => (
+            <option key={level} value={level}>
+              {ACCESS_LABELS[level]}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField label="Job title" name="jobTitle" defaultValue="">
+          <option value="">—</option>
+          {JOB_TITLES.map((title) => (
+            <option key={title} value={title}>
+              {jobTitleOption(title)}
             </option>
           ))}
         </SelectField>

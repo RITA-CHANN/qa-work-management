@@ -8,7 +8,7 @@ owner: Claude
 reviewers: [Linh]
 deciders: [Linh, Claude]
 approved:
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # ADR-0010 API errors use RFC 9457 problem details
@@ -53,17 +53,17 @@ allows extension members so nothing we rely on is lost (driver 2), and one `prob
 }
 ```
 
-| Member      | Meaning                                                                                  |
-| ----------- | ---------------------------------------------------------------------------------------- |
-| `type`      | URI naming the problem type; one per `code`, listed in `docs/api/README.md`              |
-| `title`     | Short, fixed summary of the type                                                         |
-| `status`    | Same as the HTTP status                                                                  |
-| `detail`    | The user-facing text, from the message catalog                                           |
-| `instance`  | The request path                                                                         |
-| `code`      | Our stable machine code (`VALIDATION_ERROR`, `VERSION_CONFLICT`, `LAST_OWNER`, …)        |
-| `messageId` | The `MSG-…` ID of `detail`, so the web app and tests don't compare free text             |
-| `errors`    | Only for 400: `[{ "pointer": "/name", "detail": "…", "messageId": "…" }]` (JSON Pointer) |
-| `requestId` | Same as the `X-Request-Id` header                                                        |
+| Member      | Meaning                                                                                   |
+| ----------- | ----------------------------------------------------------------------------------------- |
+| `type`      | URI naming the problem type; one per `code`, listed in `docs/api/README.md`               |
+| `title`     | Short, fixed summary of the type                                                          |
+| `status`    | Same as the HTTP status                                                                   |
+| `detail`    | The user-facing text, from the message catalog                                            |
+| `instance`  | The request path                                                                          |
+| `code`      | Our stable machine code (`VALIDATION_ERROR`, `VERSION_CONFLICT`, `LAST_PROJECT_ADMIN`, …) |
+| `messageId` | The `MSG-…` ID of `detail`, so the web app and tests don't compare free text              |
+| `errors`    | Only for 400: `[{ "pointer": "/name", "detail": "…", "messageId": "…" }]` (JSON Pointer)  |
+| `requestId` | Same as the `X-Request-Id` header                                                         |
 
 ### Consequences
 

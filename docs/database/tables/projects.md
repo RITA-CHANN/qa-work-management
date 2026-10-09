@@ -7,7 +7,7 @@ owner: Claude
 reviewers: [Linh]
 approved:
 model: Project
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # projects
@@ -26,7 +26,7 @@ Requirements: [requirements/project](../../requirements/project/README.md).
 | `description`   | text         | yes  |                     |        | Free text describing the project, at most 2000 characters                                                       | internal       | BR-PROJECT-05                | 3           |
 | `archived_at`   | timestamp(3) | yes  |                     |        | Time the project was archived (UTC); `null` means active                                                        | internal       | BR-PROJECT-08                | 3           |
 | `version`       | integer      | no   | `1`                 |        | Number of times the row has been edited plus one; used to detect concurrent edits                               | internal       | BR-PROJECT-07                | 3           |
-| `created_by_id` | text         | no   |                     | FK     | User who created the project                                                                                    | internal       | BR-PROJECT-01                | 3           |
+| `created_by_id` | text         | no   |                     | FK     | System admin who created the project (not a member unless they picked themselves as first Project admin)        | internal       | BR-PROJECT-01                | 3           |
 | `created_at`    | timestamp(3) | no   | `now()`             |        | Time the row was created (UTC)                                                                                  | internal       |                              | 3           |
 | `updated_at`    | timestamp(3) | no   | Prisma `@updatedAt` |        | Time the row was last changed (UTC)                                                                             | internal       |                              | 3           |
 
@@ -53,16 +53,16 @@ Times are stored in UTC and shown as ISO 8601.
 
 ## Lifecycle
 
-| Event             | Effect on rows                                                                                               | Rule                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------- |
-| Create            | Insert one row (`version` 1) plus the creator's `OWNER` member row and an activity entry, in one transaction | BR-PROJECT-01, BR-PROJECT-22 |
-| Edit              | `name`, `description` change; `version` + 1, only if the sent version matches                                | BR-PROJECT-07                |
-| Archive / restore | `archived_at` set to now / back to `null`; `version` + 1                                                     | BR-PROJECT-08                |
-| Delete            | Row removed, only when archived and no releases; members and activity cascade                                | BR-PROJECT-09                |
+| Event             | Effect on rows                                                                                                                                                                             | Rule                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------- |
+| Create            | Insert one row (`version` 1) by a System admin, plus the first Project admin's `PROJECT_ADMIN` member row and two activity entries (`project.created`, `member.added`), in one transaction | BR-PROJECT-01, BR-PROJECT-22 |
+| Edit              | `name`, `description` change; `version` + 1, only if the sent version matches                                                                                                              | BR-PROJECT-07                |
+| Archive / restore | `archived_at` set to now / back to `null`; `version` + 1                                                                                                                                   | BR-PROJECT-08                |
+| Delete            | Row removed, only when archived and no releases; members and activity cascade                                                                                                              | BR-PROJECT-09                |
 
 ## Retention
 
-Kept until an Owner deletes the project. Archiving keeps everything. Deleting is permanent and removes its members
+Kept until a Project admin or System admin deletes the project. Archiving keeps everything. Deleting is permanent and removes its members
 and activity entries; there is no undo and no soft delete.
 
 ## Data quality rules
@@ -71,12 +71,12 @@ and activity entries; there is no undo and no soft delete.
 | ------------------------------------------------------ | ------------------------------------------------------ |
 | `key` matches `^[A-Z][A-Z0-9]{1,9}$` and never changes | Zod schema, check constraint, no update path for `key` |
 | `name` is 3–100 characters after trimming              | Zod schema (`projectInputSchema`)                      |
-| Every project has at least one `OWNER` member          | Member service (BR-PROJECT-12), unit tests             |
+| Every project has at least one `PROJECT_ADMIN` member  | Member service (BR-PROJECT-12), unit tests             |
 | `version` only grows                                   | Update helper (DD-PROJECT-03)                          |
 
 ## Seed data
 
-`SHOP` ShopEase Web, `MOBI` ShopEase Mobile, `OLD` Legacy Portal (archived), `SECRET` Internal Tools. Members and
+`SHOP` ShopEase Web, `MOBI` ShopEase Mobile, `OLD` Legacy Portal (archived), `SECRET` Internal Tools. Every seed project is created by Ada Admin (System admin). Members and
 releases: [requirements/project/README.md](../../requirements/project/README.md#test-data).
 
 ## Used by
@@ -86,6 +86,7 @@ API-PROJECT-01 to API-PROJECT-12, and every later project-scoped endpoint throug
 
 ## Change log
 
-| Date       | Change        | Migration                                    | Why      |
-| ---------- | ------------- | -------------------------------------------- | -------- |
-| 2026-10-08 | First version | `<ts>_add_projects` (in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Migration                                    | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version                                                                           | `<ts>_add_projects` (in the Phase 3 code PR) | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | `20261009080000_project_access_job_title`    | Linh's decision 2026-10-09 |

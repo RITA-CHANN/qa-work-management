@@ -2,12 +2,12 @@ import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router';
 import {
   adminUserCreateSchema,
+  ACCESS_LABELS,
   GLOBAL_ROLE_LABELS,
+  JOB_TITLE_NAMES,
   msg,
-  ROLE_LABELS,
   USER_STATUS_LABELS,
   type GlobalRole,
-  type ProjectRole,
   type UserStatus,
 } from '@qawm/shared';
 import { EmptyState } from '@/components/EmptyState';
@@ -227,7 +227,8 @@ function UserPanel({ id }: { id: string }) {
                     )}
                   </span>
                   <span className="text-muted-foreground">
-                    {ROLE_LABELS[p.role as ProjectRole] ?? p.role}
+                    {ACCESS_LABELS[p.access]}
+                    {p.jobTitle && ` · ${JOB_TITLE_NAMES[p.jobTitle]}`}
                   </span>
                 </li>
               ))}

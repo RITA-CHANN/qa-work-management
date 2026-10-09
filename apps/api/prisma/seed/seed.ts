@@ -3,7 +3,7 @@
  * (data/projects.ts) are deleted and created again, so every test run starts from the same state.
  * Projects that tests create with their own keys are left alone.
  */
-import { addDays, ROLE_LABELS, todayIso } from '@qawm/shared';
+import { ACCESS_LABELS, addDays, JOB_TITLE_NAMES, todayIso } from '@qawm/shared';
 import { toDbDate } from '../../src/lib/dates';
 import { hashPassword } from '../../src/modules/auth/password';
 import { prisma } from '../../src/lib/prisma';
@@ -63,9 +63,10 @@ async function seedProject(seed: SeedProject, byEmail: Map<string, { id: string;
         createdById: creator.id,
         createdAt,
         members: {
-          create: seed.members.map(([email, role]) => ({
+          create: seed.members.map(([email, access, jobTitle]) => ({
             userId: user(email).id,
-            role,
+            access,
+            jobTitle,
             createdAt,
           })),
         },
@@ -80,14 +81,12 @@ async function seedProject(seed: SeedProject, byEmail: Map<string, { id: string;
         entityId: project.id,
         summary: `${creator.name} created the project`,
       },
-      ...seed.members
-        .filter(([email]) => email !== seed.createdBy)
-        .map(([email, role]) => ({
-          action: 'member.added',
-          entityType: 'member',
-          entityId: user(email).id,
-          summary: `${creator.name} added ${user(email).name} as ${ROLE_LABELS[role]}`,
-        })),
+      ...seed.members.map(([email, access, jobTitle]) => ({
+        action: 'member.added',
+        entityType: 'member',
+        entityId: user(email).id,
+        summary: `${creator.name} added ${user(email).name} as ${ACCESS_LABELS[access]} (${JOB_TITLE_NAMES[jobTitle]})`,
+      })),
     ];
     await tx.activityLog.createMany({
       data: entries.map((entry, index) => ({

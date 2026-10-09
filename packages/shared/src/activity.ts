@@ -8,7 +8,7 @@ export const ACTIVITY_ACTIONS = [
   'project.archived',
   'project.restored',
   'member.added',
-  'member.role_changed',
+  'member.updated',
   'member.removed',
   'member.left',
   'release.created',

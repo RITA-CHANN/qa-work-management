@@ -2,35 +2,57 @@ import { z } from 'zod';
 import { msg } from './messages';
 
 /**
- * Projects, members and their roles (Phase 3A). The API, the web forms and the tests validate with the
+ * Projects, members and their access (Phase 3A). The API, the web forms and the tests validate with the
  * same schemas. Rules: docs/requirements/project/rules.md.
  */
 
-/** The 8 project roles, in display order (Owner first). README "Project roles". */
-export const PROJECT_ROLES = [
-  'OWNER',
-  'PROJECT_MANAGER',
-  'QA_LEAD',
-  'QA_ENGINEER',
-  'TEAM_LEAD',
-  'DEVELOPER',
-  'STAKEHOLDER',
-  'VIEWER',
+/**
+ * What a member may do in a project (BR-PROJECT-35), Backlog style: a Project admin runs the project, a Member
+ * sees it and does the daily work. A System admin (global ADMIN) acts as Project admin everywhere.
+ */
+export const PROJECT_ACCESS = ['PROJECT_ADMIN', 'MEMBER'] as const;
+
+export const projectAccessSchema = z.enum(PROJECT_ACCESS);
+export type ProjectAccess = z.infer<typeof projectAccessSchema>;
+
+export const ACCESS_LABELS: Record<ProjectAccess, string> = {
+  PROJECT_ADMIN: 'Project admin',
+  MEMBER: 'Member',
+};
+
+/**
+ * What a member does (BR-PROJECT-37): a short key, stored and shown in tables ("Minh · QAL"), and a name.
+ * Describes the person only: it never changes what they may do.
+ */
+export const JOB_TITLES = [
+  'QAE',
+  'QAL',
+  'QAA',
+  'PM',
+  'PO',
+  'BA',
+  'DEV',
+  'TL',
+  'DES',
+  'STK',
+  'OTH',
 ] as const;
 
-export const projectRoleSchema = z.enum(PROJECT_ROLES);
-export type ProjectRole = z.infer<typeof projectRoleSchema>;
+export const jobTitleSchema = z.enum(JOB_TITLES);
+export type JobTitle = z.infer<typeof jobTitleSchema>;
 
-/** Names people see, in the UI and in activity summaries. */
-export const ROLE_LABELS: Record<ProjectRole, string> = {
-  OWNER: 'Owner',
-  PROJECT_MANAGER: 'Project manager',
-  QA_LEAD: 'QA lead',
-  QA_ENGINEER: 'QA engineer',
-  TEAM_LEAD: 'Team lead',
-  DEVELOPER: 'Developer',
-  STAKEHOLDER: 'Stakeholder',
-  VIEWER: 'Viewer',
+export const JOB_TITLE_NAMES: Record<JobTitle, string> = {
+  QAE: 'QA engineer',
+  QAL: 'QA lead',
+  QAA: 'QA automation engineer',
+  PM: 'Project manager',
+  PO: 'Product owner',
+  BA: 'Business analyst',
+  DEV: 'Developer',
+  TL: 'Team lead',
+  DES: 'Designer',
+  STK: 'Stakeholder',
+  OTH: 'Other',
 };
 
 /** BR-PROJECT-02: 2–10 upper-case letters or digits, starting with a letter. Same check in the database. */
@@ -61,9 +83,11 @@ export const projectDescriptionSchema = z
 /** `version` read from the server, sent back on every PATCH (DD-PROJECT-03). */
 export const versionSchema = z.number({ error: 'Version is required' }).int().min(1);
 
-/** Body of POST /api/projects (API-PROJECT-02). Strict: unknown fields are a 400 (NFR-PROJECT-04). */
+/** Body of POST /api/projects (API-PROJECT-02), System admins only. Strict: unknown fields are a 400 (NFR-PROJECT-04). */
 export const projectCreateSchema = z.strictObject({
   key: projectKeySchema,
+  /** BR-PROJECT-01: the first Project admin, an existing user. */
+  firstAdminId: z.string({ error: msg('MSG-PROJECT-33') }).min(1, msg('MSG-PROJECT-33')),
   name: projectNameSchema,
   description: projectDescriptionSchema.optional(),
 });
@@ -98,8 +122,8 @@ export const projectSummarySchema = z.object({
   key: z.string(),
   name: z.string(),
   archivedAt: isoDateTime.nullable(),
-  /** null for an Admin who is not a member (BR-PROJECT-36). */
-  myRole: projectRoleSchema.nullable(),
+  /** The caller's access; null for a System admin who is not a member (BR-PROJECT-36). */
+  myAccess: projectAccessSchema.nullable(),
   memberCount: z.number().int(),
   activeRelease: ref.nullable(),
   updatedAt: isoDateTime,
@@ -121,7 +145,8 @@ export const memberSchema = z.object({
   userId: z.string(),
   name: z.string(),
   email: z.email(),
-  role: projectRoleSchema,
+  access: projectAccessSchema,
+  jobTitle: jobTitleSchema.nullable(),
   addedAt: isoDateTime,
 });
 export type Member = z.infer<typeof memberSchema>;
@@ -129,10 +154,14 @@ export type Member = z.infer<typeof memberSchema>;
 /** Body of POST /api/projects/:key/members (API-PROJECT-09). */
 export const memberAddSchema = z.strictObject({
   userId: z.string({ error: 'User is required' }).min(1, 'User is required'),
-  role: projectRoleSchema,
+  access: projectAccessSchema,
+  jobTitle: jobTitleSchema.nullable().optional(),
 });
 export type MemberAdd = z.infer<typeof memberAddSchema>;
 
-/** Body of PATCH /api/projects/:key/members/:userId (API-PROJECT-10). */
-export const memberUpdateSchema = z.strictObject({ role: projectRoleSchema });
+/** Body of PATCH /api/projects/:key/members/:userId (API-PROJECT-10). Fields left out stay as they are. */
+export const memberUpdateSchema = z.strictObject({
+  access: projectAccessSchema.optional(),
+  jobTitle: jobTitleSchema.nullable().optional(),
+});
 export type MemberUpdate = z.infer<typeof memberUpdateSchema>;

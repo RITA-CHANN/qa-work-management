@@ -6,11 +6,15 @@ import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { inputClass } from '@/components/ui/field';
+import { useMe } from '@/features/auth/use-me';
 import { useProjects } from './api';
-import { relativeDays, roleLabel } from './labels';
+import { accessLabel, relativeDays } from './labels';
 import { NewProjectDialog } from './NewProjectDialog';
 
-/** SCR-PROJECT-01: the projects I am in (all of them for an Admin), search, show archived, create. */
+/**
+ * SCR-PROJECT-01: the projects I am in (all of them for a System admin), search, show archived.
+ * Only a System admin creates projects (BR-PROJECT-01).
+ */
 export function ProjectListPage() {
   const [params, setParams] = useSearchParams();
   const q = params.get('q') ?? '';
@@ -18,6 +22,8 @@ export function ProjectListPage() {
   const [search, setSearch] = useState(q);
   const [creating, setCreating] = useState(false);
   const projects = useProjects(q, archived);
+  const { data: me } = useMe();
+  const isSystemAdmin = me?.globalRole === 'ADMIN';
 
   // Search after 300 ms without typing, or on Enter; the text is kept in the URL (?q=).
   const applySearch = useCallback(
@@ -56,7 +62,7 @@ export function ProjectListPage() {
     <>
       <PageHeader
         title="Projects"
-        actions={<Button onClick={() => setCreating(true)}>New project</Button>}
+        actions={isSystemAdmin && <Button onClick={() => setCreating(true)}>New project</Button>}
       />
       <div className="mb-4 flex flex-wrap items-center gap-6">
         <label className="flex items-center gap-2 text-sm font-medium">
@@ -102,7 +108,7 @@ export function ProjectListPage() {
                 Name
               </th>
               <th scope="col" className="py-2 pr-4 font-medium">
-                My role
+                My access
               </th>
               <th scope="col" className="hidden py-2 pr-4 font-medium md:table-cell">
                 Members
@@ -136,7 +142,7 @@ export function ProjectListPage() {
                   </Link>
                   {project.archivedAt && <Badge className="ml-2">Archived</Badge>}
                 </td>
-                <td className="py-2 pr-4">{roleLabel(project.myRole)}</td>
+                <td className="py-2 pr-4">{accessLabel(project.myAccess)}</td>
                 <td className="hidden py-2 pr-4 md:table-cell">{project.memberCount}</td>
                 <td className="py-2 pr-4">{project.activeRelease?.name ?? '—'}</td>
                 <td className="hidden py-2 md:table-cell">{relativeDays(project.updatedAt)}</td>
@@ -151,7 +157,7 @@ export function ProjectListPage() {
         </p>
       )}
 
-      <NewProjectDialog open={creating} onClose={() => setCreating(false)} />
+      {isSystemAdmin && <NewProjectDialog open={creating} onClose={() => setCreating(false)} />}
     </>
   );
 }

@@ -18,7 +18,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 | [Admin console](admin.md)    | 3     | 22       | 10        | 21                | 0                  | 21              | 1                      | 0   |
 | [Project dashboard](dash.md) | 3     | 7        | 1         | 7                 | 0                  | 7               | 0                      | 0   |
 | [Guest access](guest.md)     | 3     | 6        | 2         | 6                 | 0                  | 6               | 0                      | 0   |
-| [Projects](project.md)       | 3     | 70       | 22        | 70                | 0                  | 70              | 0                      | 8   |
+| [Projects](project.md)       | 3     | 76       | 25        | 76                | 0                  | 76              | 0                      | 8   |
 | [App shell](shell.md)        | 3     | 8        | 1         | 7                 | 0                  | 7               | 1                      | 0   |
 
 ## Gaps to review
@@ -39,27 +39,30 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 - [AC-DASH-03](../requirements/dash/acceptance.md): There is no create, edit or delete control, every card links to its page, and no cost, budget or rate data is shown
 - [AC-GUEST-01](../requirements/guest/acceptance.md): Sam sees the dashboard and Releases only; Members and Activity are in neither the nav, search nor dashboard; both APIs return 404
 - [AC-GUEST-03](../requirements/guest/acceptance.md): Every call returns 403 (MSG-COMMON-06) and nothing changes
-- [AC-PROJECT-01](../requirements/project/acceptance.md): I land on the new project's page, and I am listed as Owner
+- [AC-PROJECT-01](../requirements/project/acceptance.md): I land on the new project's page; Oanh Owner is listed as Project admin, I am not listed as a member, and the badge shows "System admin"
 - [AC-PROJECT-05](../requirements/project/acceptance.md): I see MSG-PROJECT-04 and nothing is created
-- [AC-PROJECT-09](../requirements/project/acceptance.md): The table shows exactly SHOP and MOBI with Key, Name, My role, Members, Active release
+- [AC-PROJECT-09](../requirements/project/acceptance.md): The table shows exactly SHOP and MOBI with Key, Name, My access, Members, Active release
 - [AC-PROJECT-16](../requirements/project/acceptance.md): I see the "Project not found" page / API 404, same as for a key that doesn't exist
 - [AC-PROJECT-17](../requirements/project/acceptance.md): I see no Edit, Archive, Delete, Add member, New release or New milestone buttons
 - [AC-PROJECT-18](../requirements/project/acceptance.md): I get 403 and nothing changes
 - [AC-PROJECT-22](../requirements/project/acceptance.md): There is no Edit button; the API returns 403
-- [AC-PROJECT-23](../requirements/project/acceptance.md): Dev Nguyen appears in the members table with role Developer, and can now open the project
-- [AC-PROJECT-25](../requirements/project/acceptance.md): The table shows QA engineer; Linh's next request uses the new role without logging in again
+- [AC-PROJECT-23](../requirements/project/acceptance.md): Dev Nguyen appears in the members table with access Member and job title "Developer · DEV", and can now open the project
+- [AC-PROJECT-25](../requirements/project/acceptance.md): The table shows Project admin; Linh's next request uses the new access level without logging in again
 - [AC-PROJECT-26](../requirements/project/acceptance.md): Dev Nguyen disappears from the table and now gets 404 on the project
 - [AC-PROJECT-27](../requirements/project/acceptance.md): I see MSG-PROJECT-12 and nothing changes
-- [AC-PROJECT-29](../requirements/project/acceptance.md): I see members but no Add / Change role / Remove controls; the API returns 403
+- [AC-PROJECT-29](../requirements/project/acceptance.md): I see members but no Add member, Access, Job title or Remove controls; the API returns 403
 - [AC-PROJECT-31](../requirements/project/acceptance.md): 422 with MSG-PROJECT-08
 - [AC-PROJECT-35](../requirements/project/acceptance.md): The confirm button stays disabled for the wrong key; with the right key the project is gone and its page is 404
 - [AC-PROJECT-47](../requirements/project/acceptance.md): No entry was added for it
 - [AC-PROJECT-48](../requirements/project/acceptance.md): Each step works and writes an activity entry
-- [AC-PROJECT-49](../requirements/project/acceptance.md): "Owner" is not offered in my role picker; the API returns 403 and nothing changes
-- [AC-PROJECT-50](../requirements/project/acceptance.md): The control is disabled for my own row; the API returns 422 with MSG-PROJECT-22
+- [AC-PROJECT-49](../requirements/project/acceptance.md): ~~"Owner" is not offered in my role picker; the API returns 403 and nothing changes~~ Deprecated 2026-10-09: there is no Owner role (replaced by AC-PROJECT-75)
+- [AC-PROJECT-50](../requirements/project/acceptance.md): My own Access is plain text with MSG-PROJECT-22 as a hint (no select); the API returns 422 with MSG-PROJECT-22
 - [AC-PROJECT-59](../requirements/project/acceptance.md): I see MSG-PROJECT-26; 11-15 → 11-28 is accepted
 - [AC-PROJECT-66](../requirements/project/acceptance.md): I can see them but there is no New / Edit / Delete; the API returns 403
 - [AC-PROJECT-70](../requirements/project/acceptance.md): 404 for the other project's release; 400 without a release; nothing is created
+- [AC-PROJECT-71](../requirements/project/acceptance.md): There is no "New project" button; the API returns 403 and nothing is created
+- [AC-PROJECT-74](../requirements/project/acceptance.md): Each returns 403: a job title gives no rights
+- [AC-PROJECT-75](../requirements/project/acceptance.md): Each step works and writes an activity entry (any Project admin manages other Project admins)
 - [AC-PROJECT-21](../requirements/project/acceptance.md): Tab 2 shows MSG-PROJECT-07, tab 1's values are kept, and tab 2 can reload to see them
 - [AC-SHELL-05](../requirements/shell/acceptance.md): SECRET is in neither the results nor the API response; with no match I see MSG-SHELL-01; Esc closes the search
 

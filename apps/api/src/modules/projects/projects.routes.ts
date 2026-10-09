@@ -21,7 +21,7 @@ import { listActivity } from '../activity/activity.service';
 import { milestonesRouter } from '../milestones/milestones.routes';
 import { releasesRouter } from '../releases/releases.routes';
 import { keyOf, loadProject, readProjectView } from './loader';
-import { addMember, changeMemberRole, listMembers, removeMember } from './members.service';
+import { addMember, listMembers, removeMember, updateMember } from './members.service';
 import {
   archiveProject,
   createProject,
@@ -59,7 +59,7 @@ projectsRouter.post('/', async (req, res) => {
 /** GET /api/projects/:key (API-PROJECT-03) */
 projectsRouter.get('/:key', async (req, res) => {
   const ctx = await loadProject(keyOf(req), req.user!);
-  const project = await readProjectView(prisma, ctx.project.id, ctx.myRole);
+  const project = await readProjectView(prisma, ctx.project.id, ctx.myAccess);
   res.json({ data: project } satisfies ApiSuccess<Project>);
 });
 
@@ -108,7 +108,7 @@ projectsRouter.post('/:key/members', async (req, res) => {
 projectsRouter.patch('/:key/members/:userId', async (req, res) => {
   const body = parseOrThrow(memberUpdateSchema, req.body);
   const ctx = await loadProject(keyOf(req), req.user!);
-  const member = await changeMemberRole(ctx, req.params.userId, body.role);
+  const member = await updateMember(ctx, req.params.userId, body);
   res.json({ data: member } satisfies ApiSuccess<Member>);
 });
 

@@ -345,6 +345,17 @@ paths:
                       code:
                         enum:
                           - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: FORBIDDEN'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - FORBIDDEN
         '409':
           description: 'Conflict: KEY_TAKEN'
           content:
@@ -907,7 +918,7 @@ paths:
   /api/projects/{key}/members/{userId}:
     patch:
       operationId: API-PROJECT-10
-      summary: Change a member's role
+      summary: Change a member's access level or job title
       description: 'Docs: docs/api/projects/patch-project-member.md'
       tags:
         - Members
@@ -998,7 +1009,7 @@ paths:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
         '422':
-          description: 'Unprocessable Content: PROJECT_ARCHIVED, OWN_ROLE, LAST_OWNER'
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, OWN_ACCESS, LAST_PROJECT_ADMIN'
           content:
             application/problem+json:
               schema:
@@ -1008,8 +1019,8 @@ paths:
                       code:
                         enum:
                           - PROJECT_ARCHIVED
-                          - OWN_ROLE
-                          - LAST_OWNER
+                          - OWN_ACCESS
+                          - LAST_PROJECT_ADMIN
     delete:
       operationId: API-PROJECT-11
       summary: Remove a member, or leave
@@ -1066,7 +1077,7 @@ paths:
                         enum:
                           - NOT_FOUND
         '422':
-          description: 'Unprocessable Content: PROJECT_ARCHIVED, LAST_OWNER'
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, LAST_PROJECT_ADMIN'
           content:
             application/problem+json:
               schema:
@@ -1076,7 +1087,7 @@ paths:
                       code:
                         enum:
                           - PROJECT_ARCHIVED
-                          - LAST_OWNER
+                          - LAST_PROJECT_ADMIN
   /api/projects/{key}/activity:
     get:
       operationId: API-PROJECT-12
@@ -3128,8 +3139,8 @@ components:
             - MILESTONE_NAME_TAKEN
             - PROJECT_ARCHIVED
             - DELETE_NOT_ALLOWED
-            - LAST_OWNER
-            - OWN_ROLE
+            - LAST_PROJECT_ADMIN
+            - OWN_ACCESS
             - ACTIVE_RELEASE_EXISTS
             - OPEN_MILESTONES
             - CANNOT_ACTIVATE_MILESTONE
@@ -3139,7 +3150,6 @@ components:
             - EMAIL_TAKEN
             - LAST_ADMIN
             - OWN_ACCOUNT
-            - LAST_PROJECT_ADMIN
             - ACCOUNT_DEACTIVATED
             - PASSWORD_CHANGE_REQUIRED
         messageId:
@@ -3238,18 +3248,12 @@ components:
               format: date-time
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
             - type: 'null'
-        myRole:
+        myAccess:
           anyOf:
             - type: string
               enum:
-                - OWNER
-                - PROJECT_MANAGER
-                - QA_LEAD
-                - QA_ENGINEER
-                - TEAM_LEAD
-                - DEVELOPER
-                - STAKEHOLDER
-                - VIEWER
+                - PROJECT_ADMIN
+                - MEMBER
             - type: 'null'
         memberCount:
           type: integer
@@ -3276,7 +3280,7 @@ components:
         - key
         - name
         - archivedAt
-        - myRole
+        - myAccess
         - memberCount
         - activeRelease
         - updatedAt
@@ -3294,18 +3298,12 @@ components:
               format: date-time
               pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
             - type: 'null'
-        myRole:
+        myAccess:
           anyOf:
             - type: string
               enum:
-                - OWNER
-                - PROJECT_MANAGER
-                - QA_LEAD
-                - QA_ENGINEER
-                - TEAM_LEAD
-                - DEVELOPER
-                - STAKEHOLDER
-                - VIEWER
+                - PROJECT_ADMIN
+                - MEMBER
             - type: 'null'
         memberCount:
           type: integer
@@ -3373,7 +3371,7 @@ components:
         - key
         - name
         - archivedAt
-        - myRole
+        - myAccess
         - memberCount
         - activeRelease
         - updatedAt
@@ -3394,17 +3392,27 @@ components:
           type: string
           format: email
           pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
-        role:
+        access:
           type: string
           enum:
-            - OWNER
-            - PROJECT_MANAGER
-            - QA_LEAD
-            - QA_ENGINEER
-            - TEAM_LEAD
-            - DEVELOPER
-            - STAKEHOLDER
-            - VIEWER
+            - PROJECT_ADMIN
+            - MEMBER
+        jobTitle:
+          anyOf:
+            - type: string
+              enum:
+                - QAE
+                - QAL
+                - QAA
+                - PM
+                - PO
+                - BA
+                - DEV
+                - TL
+                - DES
+                - STK
+                - OTH
+            - type: 'null'
         addedAt:
           type: string
           format: date-time
@@ -3413,7 +3421,8 @@ components:
         - userId
         - name
         - email
-        - role
+        - access
+        - jobTitle
         - addedAt
       additionalProperties: false
     Release:
@@ -3537,7 +3546,7 @@ components:
             - project.archived
             - project.restored
             - member.added
-            - member.role_changed
+            - member.updated
             - member.removed
             - member.left
             - release.created
@@ -4098,6 +4107,9 @@ components:
         key:
           type: string
           minLength: 1
+        firstAdminId:
+          type: string
+          minLength: 1
         name:
           type: string
           minLength: 3
@@ -4109,6 +4121,7 @@ components:
             - type: 'null'
       required:
         - key
+        - firstAdminId
         - name
       additionalProperties: false
     ProjectUpdate:
@@ -4140,37 +4153,55 @@ components:
         userId:
           type: string
           minLength: 1
-        role:
+        access:
           type: string
           enum:
-            - OWNER
-            - PROJECT_MANAGER
-            - QA_LEAD
-            - QA_ENGINEER
-            - TEAM_LEAD
-            - DEVELOPER
-            - STAKEHOLDER
-            - VIEWER
+            - PROJECT_ADMIN
+            - MEMBER
+        jobTitle:
+          anyOf:
+            - type: string
+              enum:
+                - QAE
+                - QAL
+                - QAA
+                - PM
+                - PO
+                - BA
+                - DEV
+                - TL
+                - DES
+                - STK
+                - OTH
+            - type: 'null'
       required:
         - userId
-        - role
+        - access
       additionalProperties: false
     MemberUpdate:
       type: object
       properties:
-        role:
+        access:
           type: string
           enum:
-            - OWNER
-            - PROJECT_MANAGER
-            - QA_LEAD
-            - QA_ENGINEER
-            - TEAM_LEAD
-            - DEVELOPER
-            - STAKEHOLDER
-            - VIEWER
-      required:
-        - role
+            - PROJECT_ADMIN
+            - MEMBER
+        jobTitle:
+          anyOf:
+            - type: string
+              enum:
+                - QAE
+                - QAL
+                - QAA
+                - PM
+                - PO
+                - BA
+                - DEV
+                - TL
+                - DES
+                - STK
+                - OTH
+            - type: 'null'
       additionalProperties: false
     ReleaseCreate:
       type: object

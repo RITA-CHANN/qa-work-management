@@ -34,9 +34,10 @@ export async function login(
   const ok = await verifyPassword(found?.passwordHash ?? null, password);
   if (!found || !ok) {
     loginRateLimiter.recordFailure(email);
-    // The email tried is kept, never the password (BR-ADMIN-14).
+    // The email tried is kept, never the password (BR-ADMIN-14). Nobody is signed in yet, so the
+    // actor is unknown (BR-ADMIN-15), even when the email belongs to an account.
     await recordAudit(prisma, {
-      actorId: found?.id ?? null,
+      actorId: null,
       action: 'auth.sign_in_failed',
       targetType: 'session',
       targetName: email,
@@ -47,7 +48,7 @@ export async function login(
   // Checked after the password, so the message doesn't reveal which emails exist (BR-ADMIN-10).
   if (found.status === 'DEACTIVATED') {
     await recordAudit(prisma, {
-      actorId: found.id,
+      actorId: null,
       action: 'auth.sign_in_failed',
       targetType: 'session',
       targetName: email,

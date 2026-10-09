@@ -1,5 +1,5 @@
 import type { Request } from 'express';
-import type { AuthUser, Project as ProjectDto, ProjectRole } from '@qawm/shared';
+import type { AuthUser, Project as ProjectDto, ProjectAccess } from '@qawm/shared';
 import type { Project } from '../../generated/prisma/client';
 import { fromDbDate } from '../../lib/dates';
 import { NotFoundError } from '../../lib/errors';
@@ -7,10 +7,10 @@ import { prisma } from '../../lib/prisma';
 
 export type ProjectContext = {
   project: Project;
-  /** The role permissions are checked with. An Admin always acts as OWNER (BR-PROJECT-36). */
-  role: ProjectRole;
-  /** The caller's own member role; null for an Admin who is not a member. */
-  myRole: ProjectRole | null;
+  /** The access permissions are checked with. A System admin always acts as PROJECT_ADMIN (BR-PROJECT-36). */
+  access: ProjectAccess;
+  /** The caller's own member access; null for a System admin who is not a member. */
+  myAccess: ProjectAccess | null;
   user: AuthUser;
 };
 
@@ -25,14 +25,14 @@ export const keyOf = (req: Request) => (req.params as { key: string }).key;
 export async function loadProject(key: string, user: AuthUser): Promise<ProjectContext> {
   const found = await prisma.project.findUnique({
     where: { key: key.toUpperCase() },
-    include: { members: { where: { userId: user.id }, select: { role: true } } },
+    include: { members: { where: { userId: user.id }, select: { access: true } } },
   });
-  const myRole = found?.members[0]?.role ?? null;
+  const myAccess = found?.members[0]?.access ?? null;
   const isAdmin = user.globalRole === 'ADMIN';
-  if (!found || (!myRole && !isAdmin)) throw new NotFoundError('MSG-PROJECT-06');
+  if (!found || (!myAccess && !isAdmin)) throw new NotFoundError('MSG-PROJECT-06');
 
   const { members: _members, ...project } = found;
-  return { project, myRole, role: isAdmin ? 'OWNER' : myRole!, user };
+  return { project, myAccess, access: isAdmin ? 'PROJECT_ADMIN' : myAccess!, user };
 }
 
 /**
@@ -42,7 +42,7 @@ export async function loadProject(key: string, user: AuthUser): Promise<ProjectC
 export async function readProjectView(
   db: Pick<typeof prisma, 'project'>,
   projectId: string,
-  myRole: ProjectRole | null,
+  myAccess: ProjectAccess | null,
 ): Promise<ProjectDto> {
   const row = await db.project.findUniqueOrThrow({
     where: { id: projectId },
@@ -60,7 +60,7 @@ export async function readProjectView(
     description: row.description,
     archivedAt: row.archivedAt?.toISOString() ?? null,
     version: row.version,
-    myRole,
+    myAccess,
     memberCount: row._count.members,
     activeRelease: row.releases[0] ?? null,
     activeMilestone: milestone
