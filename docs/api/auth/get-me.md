@@ -11,7 +11,7 @@ traces:
   requirements: [US-AUTH-02, US-AUTH-05, BR-AUTH-05, BR-AUTH-06, BR-AUTH-11]
   acceptance: [AC-AUTH-14, AC-AUTH-15, AC-AUTH-16, AC-AUTH-17, AC-AUTH-20, AC-AUTH-25, AC-AUTH-27]
   design: [SCR-AUTH-02, FLW-AUTH-01, DD-AUTH-02, DD-AUTH-03]
-updated: 2026-10-07
+updated: 2026-10-09
 ---
 
 # GET /api/auth/me
@@ -38,7 +38,7 @@ lasts 7 days from login (BR-AUTH-05).
 
 ### Errors
 
-| Status | `code`            | `message`                 | When                                                    |
+| Status | `code`            | `detail`                  | When                                                    |
 | ------ | ----------------- | ------------------------- | ------------------------------------------------------- |
 | 401    | `UNAUTHENTICATED` | `Authentication required` | No cookie, unknown token, logged-out or expired session |
 
@@ -76,7 +76,8 @@ curl -i -b cookies.txt http://localhost:3000/api/auth/me
 
 ## Change log
 
-| Date       | Change                                             | Why                                         |
-| ---------- | -------------------------------------------------- | ------------------------------------------- |
-| 2026-10-07 | First version                                      | Phase 2                                     |
-| 2026-10-08 | Added Security (OWASP API Top 10) and Side effects | Documentation standards (docs/STANDARDS.md) |
+| Date       | Change                                                               | Why                                         |
+| ---------- | -------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                                        | Phase 2                                     |
+| 2026-10-08 | Added Security (OWASP API Top 10) and Side effects                   | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-09 | Errors use the RFC 9457 error body (`detail`, `errors`, `messageId`) | ADR-0010, Phase 3 code PR                   |

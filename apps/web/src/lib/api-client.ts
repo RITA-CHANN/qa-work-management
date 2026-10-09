@@ -1,15 +1,25 @@
-import type { ApiError, ErrorCode } from '@qawm/shared';
+import type { ErrorCode, FieldError, MessageCode, Problem } from '@qawm/shared';
 
-/** Thrown for any non-2xx API response. Carries the server's error code and requestId. */
+/**
+ * Thrown for any non-2xx API response. Carries the RFC 9457 problem details the API sends
+ * (ADR-0010): the machine `code`, the `messageId` of the text, field errors and the requestId.
+ */
 export class ApiRequestError extends Error {
   constructor(
     readonly status: number,
     readonly code: ErrorCode | 'NETWORK_ERROR',
     message: string,
     readonly requestId?: string,
+    readonly messageId?: MessageCode,
+    readonly errors: FieldError[] = [],
   ) {
     super(message);
     this.name = 'ApiRequestError';
+  }
+
+  /** The message of one field, e.g. fieldError('/key'), for showing under that input. */
+  fieldError(pointer: string): string | undefined {
+    return this.errors.find((error) => error.pointer === pointer)?.detail;
   }
 }
 
@@ -33,7 +43,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
       ...init,
       credentials: 'same-origin',
       headers: {
-        Accept: 'application/json',
+        Accept: 'application/json, application/problem+json',
         ...(init.body ? { 'Content-Type': 'application/json' } : {}),
         ...init.headers,
       },
@@ -46,13 +56,23 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
 
   if (!response.ok) {
     if (response.status === 401 && !AUTH_PATHS.has(path)) onUnauthenticated?.();
-    const error = (body as ApiError | null)?.error;
+    const problem = body as Partial<Problem> | null;
     throw new ApiRequestError(
       response.status,
-      error?.code ?? 'INTERNAL_ERROR',
-      error?.message ?? `Request failed with status ${response.status}`,
-      error?.requestId,
+      problem?.code ?? 'INTERNAL_ERROR',
+      problem?.detail ?? `Request failed with status ${response.status}`,
+      problem?.requestId,
+      problem?.messageId,
+      problem?.errors ?? [],
     );
   }
   return body as T;
+}
+
+/** apiFetch with a JSON body. */
+export function apiSend<T>(method: 'POST' | 'PATCH' | 'DELETE', path: string, body?: unknown) {
+  return apiFetch<T>(path, {
+    method,
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  });
 }

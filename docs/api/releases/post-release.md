@@ -12,7 +12,7 @@ traces:
   requirements: [US-PROJECT-08, BR-PROJECT-14, BR-PROJECT-15]
   acceptance: [AC-PROJECT-36, AC-PROJECT-37, AC-PROJECT-38, AC-PROJECT-39, AC-PROJECT-40]
   design: [FLW-PROJECT-04, SCR-PROJECT-04, DD-PROJECT-04]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # POST /api/projects/:key/releases
@@ -22,7 +22,7 @@ Creates a release in status Planned. Status codes follow RFC 9110; errors are RF
 
 |                 |                                                           |
 | --------------- | --------------------------------------------------------- |
-| **Auth**        | Project role: Owner, Project manager, QA lead (or Admin)  |
+| **Auth**        | Project admin (or System admin)                           |
 | **Since phase** | 3                                                         |
 | **Schema**      | `packages/shared/src/releases.ts` (`releaseCreateSchema`) |
 
@@ -87,15 +87,15 @@ Creates a release in status Planned. Status codes follow RFC 9110; errors are RF
 
 Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-01).
 
-| Status | `code`                   | `messageId`    | When                                                                                       |
-| ------ | ------------------------ | -------------- | ------------------------------------------------------------------------------------------ |
-| 415    | `UNSUPPORTED_MEDIA_TYPE` | MSG-COMMON-09  | Body is not `application/json`                                                             |
-| 400    | `VALIDATION_ERROR`       | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`         |
-| 401    | `UNAUTHENTICATED`        | MSG-COMMON-05  | Not logged in                                                                              |
-| 404    | `NOT_FOUND`              | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not an Admin (same body for both, ADR-0008) |
-| 403    | `FORBIDDEN`              | MSG-COMMON-06  | The caller's project role does not allow this action (BR-PROJECT-35)                       |
-| 422    | `PROJECT_ARCHIVED`       | MSG-PROJECT-08 | The project is archived (BR-PROJECT-08)                                                    |
-| 409    | `RELEASE_NAME_TAKEN`     | MSG-PROJECT-14 | Same name in this project, ignoring case and spaces (BR-PROJECT-14)                        |
+| Status | `code`                   | `messageId`    | When                                                                                             |
+| ------ | ------------------------ | -------------- | ------------------------------------------------------------------------------------------------ |
+| 415    | `UNSUPPORTED_MEDIA_TYPE` | MSG-COMMON-09  | Body is not `application/json`                                                                   |
+| 400    | `VALIDATION_ERROR`       | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`               |
+| 401    | `UNAUTHENTICATED`        | MSG-COMMON-05  | Not logged in                                                                                    |
+| 404    | `NOT_FOUND`              | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
+| 403    | `FORBIDDEN`              | MSG-COMMON-06  | The caller's access level does not allow this action (BR-PROJECT-35)                             |
+| 422    | `PROJECT_ARCHIVED`       | MSG-PROJECT-08 | The project is archived (BR-PROJECT-08)                                                          |
+| 409    | `RELEASE_NAME_TAKEN`     | MSG-PROJECT-14 | Same name in this project, ignoring case and spaces (BR-PROJECT-14)                              |
 
 ## Security
 
@@ -121,15 +121,16 @@ curl -i -b cookies.txt http://localhost:3000/api/projects/MOBI/releases -H 'Cont
 
 ## Test ideas
 
-| Type       | Case                                   | Expected     |
-| ---------- | -------------------------------------- | ------------ |
-| Happy path | QA lead creates "2.6"                  | 201, PLANNED |
-| Negative   | " 2.4 " in SHOP; "2.4" in MOBI         | 409; 201     |
-| Boundary   | Target = start; target = start − 1 day | 201; 400     |
-| Permission | Team lead creates a release            | 403          |
+| Type       | Case                                                                | Expected     |
+| ---------- | ------------------------------------------------------------------- | ------------ |
+| Happy path | Project admin creates "2.6"                                         | 201, PLANNED |
+| Negative   | " 2.4 " in SHOP; "2.4" in MOBI                                      | 409; 201     |
+| Boundary   | Target = start; target = start − 1 day                              | 201; 400     |
+| Permission | Member with job title QA lead (Minh Lead in SHOP) creates a release | 403          |
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

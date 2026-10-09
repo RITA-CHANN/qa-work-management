@@ -69,7 +69,7 @@ traces:
       API-MILESTONE-04,
     ]
   design: [FLW-PROJECT-04, DD-PROJECT-04]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # SCR-PROJECT-04 Releases and milestones tab
@@ -128,24 +128,22 @@ There is no button that moves a status backwards; the API refuses it too (AC-PRO
 
 ## States
 
-| State            | What the user sees                                     | Criteria          |
-| ---------------- | ------------------------------------------------------ | ----------------- |
-| Loading          | Skeleton                                               |                   |
-| Empty            | "No releases yet." and, for planners, "New release"    |                   |
-| Error            | MSG-COMMON-01 with "Try again"                         |                   |
-| No permission    | Lists only; no New, Edit, status or Delete buttons     | AC-PROJECT-66     |
-| Team lead        | Milestone buttons only; no release buttons             | Permission matrix |
-| Active milestone | "Active · N days left" or "Active · Overdue by N days" | AC-PROJECT-64     |
-| Archived project | Read-only for everyone                                 | BR-PROJECT-08     |
-| Success          | Toast MSG-PROJECT-19                                   |                   |
+| State            | What the user sees                                        | Criteria      |
+| ---------------- | --------------------------------------------------------- | ------------- |
+| Loading          | Skeleton                                                  |               |
+| Empty            | "No releases yet." and, for Project admins, "New release" |               |
+| Error            | MSG-COMMON-01 with "Try again"                            |               |
+| No permission    | Lists only; no New, Edit, status or Delete buttons        | AC-PROJECT-66 |
+| Active milestone | "Active · N days left" or "Active · Overdue by N days"    | AC-PROJECT-64 |
+| Archived project | Read-only for everyone                                    | BR-PROJECT-08 |
+| Success          | Toast MSG-PROJECT-19                                      |               |
 
 ## Permissions
 
-| Role                                        | Can see    | Can do                            |
-| ------------------------------------------- | ---------- | --------------------------------- |
-| Owner, Project manager, QA lead, Admin      | Everything | All release and milestone actions |
-| Team lead                                   | Everything | Milestone actions only            |
-| QA engineer, Developer, Stakeholder, Viewer | Everything | Nothing                           |
+| Access level                               | Can see    | Can do                            |
+| ------------------------------------------ | ---------- | --------------------------------- |
+| Project admin, System admin                | Everything | All release and milestone actions |
+| Member (any job title, Team lead included) | Everything | Nothing                           |
 
 ## Accessibility
 
@@ -168,6 +166,7 @@ Below 768 px the milestone table becomes cards; release action buttons move into
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-08 | First version | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version                                                                           | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

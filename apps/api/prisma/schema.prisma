@@ -18,16 +18,19 @@ enum GlobalRole {
 
 /// A person who can sign in. See docs/database/tables/users.md.
 model User {
-  id           String     @id @default(cuid())
+  id              String          @id @default(cuid())
   /// Always stored lower-case (BR-AUTH-01).
-  email        String     @unique
-  name         String
-  globalRole   GlobalRole @default(USER) @map("global_role")
+  email           String          @unique
+  name            String
+  globalRole      GlobalRole      @default(USER) @map("global_role")
   /// argon2id hash; null means the user can't log in (BR-AUTH-12).
-  passwordHash String?    @map("password_hash")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-  sessions     Session[]
+  passwordHash    String?         @map("password_hash")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  sessions        Session[]
+  memberships     ProjectMember[]
+  projectsCreated Project[]       @relation("ProjectCreatedBy")
+  activities      ActivityLog[]
 
   @@map("users")
 }
@@ -43,4 +46,141 @@ model Session {
 
   @@index([userId])
   @@map("sessions")
+}
+
+/// What a member may do in a project (BR-PROJECT-35). See docs/requirements/project/README.md#permission-matrix.
+enum ProjectAccess {
+  PROJECT_ADMIN
+  MEMBER
+}
+
+/// What a member does (BR-PROJECT-37), stored as its short key. No effect on permissions.
+enum JobTitle {
+  QAE
+  QAL
+  QAA
+  PM
+  PO
+  BA
+  DEV
+  TL
+  DES
+  STK
+  OTH
+}
+
+enum ReleaseStatus {
+  PLANNED
+  ACTIVE
+  RELEASED
+}
+
+enum MilestoneStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+}
+
+/// A project. See docs/database/tables/projects.md.
+model Project {
+  id          String          @id @default(cuid())
+  /// Upper-case, never changes (BR-PROJECT-02, BR-PROJECT-03). Check constraint in the migration.
+  key         String          @unique
+  name        String
+  description String?
+  /// null means active (BR-PROJECT-08).
+  archivedAt  DateTime?       @map("archived_at")
+  /// Optimistic locking (DD-PROJECT-03).
+  version     Int             @default(1)
+  createdById String          @map("created_by_id")
+  createdBy   User            @relation("ProjectCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  members     ProjectMember[]
+  releases    Release[]
+  milestones  Milestone[]
+  activities  ActivityLog[]
+
+  @@map("projects")
+}
+
+/// A person's access and job title in a project. See docs/database/tables/project_members.md.
+model ProjectMember {
+  projectId String        @map("project_id")
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String        @map("user_id")
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  access    ProjectAccess
+  jobTitle  JobTitle?     @map("job_title")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  @@id([projectId, userId])
+  @@index([userId])
+  @@map("project_members")
+}
+
+/// A release of a project. See docs/database/tables/releases.md.
+/// One ACTIVE release per project: partial unique index in the migration (BR-PROJECT-17).
+model Release {
+  id             String        @id @default(cuid())
+  projectId      String        @map("project_id")
+  project        Project       @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  name           String
+  /// lower(trim(name)), for uniqueness (BR-PROJECT-14).
+  nameNormalized String        @map("name_normalized")
+  status         ReleaseStatus @default(PLANNED)
+  startDate      DateTime?     @map("start_date") @db.Date
+  targetDate     DateTime?     @map("target_date") @db.Date
+  version        Int           @default(1)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  milestones     Milestone[]
+
+  @@unique([projectId, nameNormalized])
+  @@map("releases")
+}
+
+/// A milestone (sprint) inside a release. See docs/database/tables/milestones.md.
+/// One ACTIVE milestone per project: partial unique index in the migration (BR-PROJECT-32).
+model Milestone {
+  id             String          @id @default(cuid())
+  projectId      String          @map("project_id")
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  releaseId      String          @map("release_id")
+  release        Release         @relation(fields: [releaseId], references: [id], onDelete: Restrict)
+  name           String
+  nameNormalized String          @map("name_normalized")
+  goal           String?
+  startDate      DateTime        @map("start_date") @db.Date
+  endDate        DateTime        @map("end_date") @db.Date
+  status         MilestoneStatus @default(PLANNED)
+  version        Int             @default(1)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  @@unique([projectId, nameNormalized])
+  @@index([releaseId])
+  @@map("milestones")
+}
+
+/// One change in a project, written in the same transaction as the change (BR-PROJECT-22).
+/// See docs/database/tables/activity_logs.md.
+model ActivityLog {
+  id         String   @id @default(cuid())
+  projectId  String   @map("project_id")
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  actorId    String   @map("actor_id")
+  actor      User     @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  /// `<entity>.<verb>`, e.g. member.role_changed (DD-PROJECT-02).
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  /// Sentence frozen at write time (BR-PROJECT-20).
+  summary    String
+  changes    Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([projectId, createdAt(sort: Desc), id(sort: Desc)])
+  @@map("activity_logs")
 }

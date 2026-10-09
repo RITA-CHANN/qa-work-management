@@ -43,7 +43,7 @@ export const MESSAGES = {
   'MSG-PROJECT-09': 'Only an archived project with no releases can be deleted.',
   'MSG-PROJECT-10': 'Type {key} to confirm',
   'MSG-PROJECT-11': '{name} is already a member of this project',
-  'MSG-PROJECT-12': 'A project must have at least one owner',
+  'MSG-PROJECT-12': 'A project must have at least one project admin',
   'MSG-PROJECT-13': 'Release name must be 1–50 characters',
   'MSG-PROJECT-14': 'A release with this name already exists in this project',
   'MSG-PROJECT-15': 'Target date must be on or after the start date',
@@ -52,8 +52,8 @@ export const MESSAGES = {
   'MSG-PROJECT-18': 'Only a planned release with no milestones can be deleted',
   'MSG-PROJECT-19': 'Changes saved',
   'MSG-PROJECT-20': 'No projects match your search',
-  'MSG-PROJECT-21': 'You are not a member of any project yet. Create one to get started.',
-  'MSG-PROJECT-22': 'You cannot change your own role',
+  'MSG-PROJECT-21': 'You are not a member of any project yet. Ask an administrator to add you.',
+  'MSG-PROJECT-22': 'You cannot change your own access level',
   'MSG-PROJECT-23': 'Milestone name must be 1–50 characters',
   'MSG-PROJECT-24': 'A milestone needs a start and end date, 1–{maxDays} days long',
   'MSG-PROJECT-25': 'Milestone dates must be within release {name} ({start} – {end})',
@@ -63,6 +63,9 @@ export const MESSAGES = {
   'MSG-PROJECT-29': 'Only one milestone can be active, and its release must be active',
   'MSG-PROJECT-30': 'A milestone with this name already exists in this project',
   'MSG-PROJECT-31': 'Only a planned milestone can be deleted',
+  'MSG-PROJECT-32':
+    'Release {name} is already released. Add milestones to a planned or active release.',
+  'MSG-PROJECT-33': 'Choose an existing user as the first project admin',
 } as const;
 
 export type MessageCode = keyof typeof MESSAGES;
@@ -75,4 +78,20 @@ export function msg(code: MessageCode, values?: MessageValues): string {
   return text.replace(/\{(\w+)\}/g, (match, key: string) =>
     key in values ? String(values[key]) : match,
   );
+}
+
+const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Each text as a pattern, with `{name}` placeholders matching any value.
+const PATTERNS = (Object.entries(MESSAGES) as [MessageCode, string][]).map(
+  ([code, text]) =>
+    [code, new RegExp(`^${escapeRegExp(text).replace(/\\\{\w+\\\}/g, '.+?')}$`)] as const,
+);
+
+/**
+ * The code of a text built with msg(), e.g. a Zod issue message. Used by the API to add `messageId` to
+ * each field error. Returns undefined for texts that are not in the catalog.
+ */
+export function messageIdOf(text: string): MessageCode | undefined {
+  return PATTERNS.find(([, pattern]) => pattern.test(text))?.[0];
 }

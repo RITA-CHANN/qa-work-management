@@ -30,8 +30,10 @@
     "e2e": "npm run test -w @qawm/e2e",
     "e2e:ui": "npm run test:ui -w @qawm/e2e",
     "e2e:report": "npm run report -w @qawm/e2e",
-    "docs:check": "node scripts/docs/check.mjs",
-    "docs:build": "node scripts/docs/check.mjs --write"
+    "docs:check": "node scripts/docs/check.mjs && npm run openapi:check",
+    "docs:build": "node scripts/docs/check.mjs --write && npm run openapi:build",
+    "openapi:build": "tsx scripts/openapi/generate.ts",
+    "openapi:check": "tsx scripts/openapi/generate.ts --check"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -43,8 +45,10 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
     "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.71.1"
+    "typescript-eslint": "^8.71.1",
+    "yaml": "^2.9.1"
   },
   "overrides": {
     "shell-quote": "^1.12.0"

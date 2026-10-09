@@ -475,14 +475,73 @@ for (const app of ['api', 'web']) {
   for (const path of await walk(join(ROOT, 'apps', app, 'src'), '')) {
     if (!/\.tsx?$/.test(path) || /\.test\.tsx?$/.test(path)) continue;
     const rel = posix(relative(ROOT, path));
+    if (rel.includes('/generated/')) continue;
     const text = await readFile(path, 'utf8');
     for (const [id, code] of codeMessages) {
-      const literal = code.text.split('{')[0];
+      // The longest fixed part between {placeholders}: "Release " alone is too common to flag.
+      const literal = code.text
+        .split(/\{\w+\}/)
+        .reduce((a, b) => (b.length > a.length ? b : a), '');
       if (literal.length >= 8 && text.includes(literal)) {
         errors.push(`${rel}: copies the text of ${id}; use msg('${id}') instead`);
       }
     }
   }
+}
+
+// 6b. Permissions: the matrix in docs/requirements/project/README.md (BR-PROJECT-35) and the PERMISSIONS map of
+//     packages/shared/src/permissions.ts list the same actions in the same order and allow the same access levels.
+//     The matrix columns are System admin | Project admin | Member | Not a member; only the two access levels are
+//     in the map (a System admin acts as PROJECT_ADMIN, BR-PROJECT-36), so `null` skips the System admin column.
+const PERMISSIONS_REL = 'packages/shared/src/permissions.ts';
+const MATRIX_REL = 'requirements/project/README.md';
+const MATRIX_COLUMNS = [null, 'PROJECT_ADMIN', 'MEMBER'];
+const codePermissions = [
+  ...(await readFile(join(ROOT, PERMISSIONS_REL), 'utf8')).matchAll(
+    /^\s*'([a-z-]+:[a-z-]+)':\s*\[([^\]]*)\]/gm,
+  ),
+].map(([, action, list]) => ({
+  action,
+  roles: [...list.matchAll(/'([A-Z_]+)'/g)].map((m) => m[1]),
+}));
+const matrixText =
+  (await readFile(join(DOCS, MATRIX_REL), 'utf8')).split(/^### Permission matrix$/m)[1] ?? '';
+const matrixRows = matrixText
+  .split('\n')
+  .filter((line) => /^\|.*(✅|❌)/.test(line))
+  .map((line) => {
+    const cells = line
+      .split('|')
+      .slice(1, -1)
+      .map((c) => c.trim());
+    return { label: cells[0], cells: cells.slice(1, 1 + MATRIX_COLUMNS.length) };
+  })
+  // A row with a footnote (✅², "Leave the project", "Create a project") is a rule the services check by hand,
+  // not a map entry.
+  .filter((row) => row.cells.every((cell) => cell === '✅' || cell === '❌'))
+  .map((row) => ({
+    label: row.label,
+    systemAdmin: row.cells[0],
+    roles: MATRIX_COLUMNS.filter((access, i) => access && row.cells[i] === '✅'),
+  }));
+// A System admin can do everything a Project admin can (BR-PROJECT-36).
+for (const row of matrixRows.filter((r) => r.systemAdmin !== '✅')) {
+  errors.push(
+    `docs/${MATRIX_REL}: matrix row "${row.label}" must allow the System admin (BR-PROJECT-36)`,
+  );
+}
+if (matrixRows.length !== codePermissions.length) {
+  errors.push(
+    `docs/${MATRIX_REL}: the permission matrix has ${matrixRows.length} rows, ${PERMISSIONS_REL} has ${codePermissions.length} actions`,
+  );
+} else {
+  codePermissions.forEach(({ action, roles }, i) => {
+    const row = matrixRows[i];
+    if (row.roles.join() !== roles.join())
+      errors.push(
+        `docs/${MATRIX_REL}: matrix row "${row.label}" allows ${row.roles.join(', ')}; ${PERMISSIONS_REL} '${action}' allows ${roles.join(', ')}`,
+      );
+  });
 }
 
 // 7. Generated files

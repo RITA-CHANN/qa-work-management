@@ -12,17 +12,17 @@ traces:
   requirements: [US-PROJECT-03, US-PROJECT-12, BR-PROJECT-06, BR-PROJECT-34, BR-PROJECT-36]
   acceptance: [AC-PROJECT-15, AC-PROJECT-16, AC-PROJECT-64]
   design: [SCR-PROJECT-02, DD-PROJECT-01]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # GET /api/projects/:key
 
-Returns one project with the caller's role, for the project page header and Overview (SCR-PROJECT-02). Status codes follow RFC 9110; errors are RFC 9457 problem details
+Returns one project with the caller's access level, for the project page header and Overview (SCR-PROJECT-02). Status codes follow RFC 9110; errors are RFC 9457 problem details
 ([README.md](../README.md#error-format), [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 
 |                 |                                                     |
 | --------------- | --------------------------------------------------- |
-| **Auth**        | Project role: any member, or Admin                  |
+| **Auth**        | Any member, or System admin                         |
 | **Since phase** | 3                                                   |
 | **Schema**      | `packages/shared/src/projects.ts` (`projectSchema`) |
 
@@ -46,7 +46,7 @@ Returns one project with the caller's role, for the project page header and Over
     "description": "Customer web shop",
     "archivedAt": null,
     "version": 3,
-    "myRole": "QA_ENGINEER",
+    "myAccess": "MEMBER",
     "memberCount": 8,
     "activeRelease": {
       "id": "cm…",
@@ -67,19 +67,19 @@ Returns one project with the caller's role, for the project page header and Over
 }
 ```
 
-| Field                   | Type                          | Description                                            |
-| ----------------------- | ----------------------------- | ------------------------------------------------------ |
-| `key`                   | string                        | Project key, upper-case (BR-PROJECT-02)                |
-| `name`                  | string                        | Display name                                           |
-| `description`           | string \| null                | Description                                            |
-| `archivedAt`            | string (ISO 8601) \| null     | When it was archived; `null` = active                  |
-| `version`               | integer                       | Send back on `PATCH` (DD-PROJECT-03)                   |
-| `myRole`                | ProjectRole \| null           | Caller's role; `null` for an Admin who is not a member |
-| `memberCount`           | integer                       | Number of members                                      |
-| `activeRelease`         | { id, name } \| null          | The `ACTIVE` release                                   |
-| `activeMilestone`       | { id, name, endDate } \| null | The `ACTIVE` milestone (header "days left")            |
-| `createdBy`             | { id, name }                  | Creator                                                |
-| `createdAt / updatedAt` | string (ISO 8601)             | Timestamps (UTC)                                       |
+| Field                   | Type                          | Description                                                                                      |
+| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| `key`                   | string                        | Project key, upper-case (BR-PROJECT-02)                                                          |
+| `name`                  | string                        | Display name                                                                                     |
+| `description`           | string \| null                | Description                                                                                      |
+| `archivedAt`            | string (ISO 8601) \| null     | When it was archived; `null` = active                                                            |
+| `version`               | integer                       | Send back on `PATCH` (DD-PROJECT-03)                                                             |
+| `myAccess`              | ProjectAccess \| null         | Caller's access level (`PROJECT_ADMIN`, `MEMBER`); `null` for a System admin who is not a member |
+| `memberCount`           | integer                       | Number of members                                                                                |
+| `activeRelease`         | { id, name } \| null          | The `ACTIVE` release                                                                             |
+| `activeMilestone`       | { id, name, endDate } \| null | The `ACTIVE` milestone (header "days left")                                                      |
+| `createdBy`             | { id, name }                  | Creator                                                                                          |
+| `createdAt / updatedAt` | string (ISO 8601)             | Timestamps (UTC)                                                                                 |
 
 Archived projects are returned too (with `archivedAt`), so the page can show the banner.
 
@@ -87,10 +87,10 @@ Archived projects are returned too (with `archivedAt`), so the page can show the
 
 Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-01).
 
-| Status | `code`            | `messageId`    | When                                                                                       |
-| ------ | ----------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| 401    | `UNAUTHENTICATED` | MSG-COMMON-05  | Not logged in                                                                              |
-| 404    | `NOT_FOUND`       | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not an Admin (same body for both, ADR-0008) |
+| Status | `code`            | `messageId`    | When                                                                                             |
+| ------ | ----------------- | -------------- | ------------------------------------------------------------------------------------------------ |
+| 401    | `UNAUTHENTICATED` | MSG-COMMON-05  | Not logged in                                                                                    |
+| 404    | `NOT_FOUND`       | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
 
 ## Security
 
@@ -118,13 +118,14 @@ curl -b cookies.txt http://localhost:3000/api/projects/SHOP
 
 | Type       | Case                           | Expected                                                         |
 | ---------- | ------------------------------ | ---------------------------------------------------------------- |
-| Happy path | Linh QA gets SHOP              | 200, `myRole` QA_ENGINEER                                        |
+| Happy path | Linh QA gets SHOP              | 200, `myAccess` MEMBER                                           |
 | Negative   | Linh QA gets SECRET; gets NOPE | Both 404 with identical bodies except `requestId` and `instance` |
 | Boundary   | Key in lower case `shop`       | 200 (same project)                                               |
-| Permission | Ada Admin gets SHOP            | 200, `myRole` null                                               |
+| Permission | Ada Admin gets SHOP            | 200, `myAccess` null                                             |
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

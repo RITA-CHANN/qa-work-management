@@ -13,7 +13,7 @@ traces:
   acceptance: [AC-AUTH-17, AC-AUTH-20, AC-AUTH-26, AC-AUTH-31]
   api: [API-AUTH-01, API-AUTH-02, API-AUTH-03]
   design: [DD-AUTH-01]
-updated: 2026-10-07
+updated: 2026-10-09
 ---
 
 # DD-AUTH-02 API guards (requireAuth, requireJson, cookie)
@@ -67,10 +67,10 @@ sequenceDiagram
 
 `apps/api/src/middleware/require-json.ts`
 
-| Method                   | Rule                                                                         |
-| ------------------------ | ---------------------------------------------------------------------------- |
-| GET, HEAD, OPTIONS       | No check                                                                     |
-| POST, PUT, PATCH, DELETE | `Content-Type` must be `application/json`, else 415 `UNSUPPORTED_MEDIA_TYPE` |
+| Method                   | Rule                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| GET, HEAD, OPTIONS       | No check                                                                                                     |
+| POST, PUT, PATCH, DELETE | `Content-Type` must be `application/json`, else 415 `UNSUPPORTED_MEDIA_TYPE`. A DELETE without a body passes |
 
 Why: an HTML form on another site can only send `text/plain`, `multipart/form-data` or
 `application/x-www-form-urlencoded`. Requiring JSON blocks those cross-site requests, together with
@@ -97,13 +97,13 @@ The request logger redacts the `cookie` and `set-cookie` headers and the `passwo
 
 ## Errors
 
-| Situation                                 | What the code does             | Status / message                             |
-| ----------------------------------------- | ------------------------------ | -------------------------------------------- |
-| Protected route, no cookie                | Stops before the handler       | 401 `UNAUTHENTICATED` (MSG-COMMON-05)        |
-| Cookie with an unknown or expired session | Deletes the row, clears cookie | 401 `UNAUTHENTICATED` (MSG-COMMON-05)        |
-| POST/PUT/PATCH/DELETE without JSON        | Stops before the handler       | 415 `UNSUPPORTED_MEDIA_TYPE` (MSG-COMMON-09) |
-| Body is not valid JSON                    | `express.json` error, mapped   | 400 (MSG-COMMON-03)                          |
-| No router matches                         | Falls through                  | 404 `NOT_FOUND` (MSG-COMMON-08)              |
+| Situation                                           | What the code does             | Status / message                             |
+| --------------------------------------------------- | ------------------------------ | -------------------------------------------- |
+| Protected route, no cookie                          | Stops before the handler       | 401 `UNAUTHENTICATED` (MSG-COMMON-05)        |
+| Cookie with an unknown or expired session           | Deletes the row, clears cookie | 401 `UNAUTHENTICATED` (MSG-COMMON-05)        |
+| POST/PUT/PATCH, or DELETE with a body, without JSON | Stops before the handler       | 415 `UNSUPPORTED_MEDIA_TYPE` (MSG-COMMON-09) |
+| Body is not valid JSON                              | `express.json` error, mapped   | 400 (MSG-COMMON-03)                          |
+| No router matches                                   | Falls through                  | 404 `NOT_FOUND` (MSG-COMMON-08)              |
 
 ## Security
 
@@ -112,7 +112,7 @@ The request logger redacts the `cookie` and `set-cookie` headers and the `passwo
 - CSRF: `SameSite=Lax` plus the JSON-only rule above.
 - No secrets in logs: cookies and passwords are redacted.
 - Object- and role-level checks (OWASP API1, API5) are not needed in Phase 2: every logged-in user may call every
-  protected route. Phase 3 adds project roles here.
+  protected route. Phase 3 adds project access levels (Project admin, Member; DD-PROJECT-01).
 
 ## Testability
 
@@ -123,8 +123,10 @@ The request logger redacts the `cookie` and `set-cookie` headers and the `passwo
 
 ## Change log
 
-| Date       | Change                                                             | Why                                         |
-| ---------- | ------------------------------------------------------------------ | ------------------------------------------- |
-| 2026-10-07 | First version                                                      | Phase 2                                     |
-| 2026-10-07 | Protected routers start with `requireAuth`; unknown paths stay 404 | Keep the Phase 1 404 behaviour              |
-| 2026-10-08 | Added viewpoint, Errors, Security and Testability                  | Documentation standards (docs/STANDARDS.md) |
+| Date       | Change                                                                                  | Why                                         |
+| ---------- | --------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                                                                           | Phase 2                                     |
+| 2026-10-07 | Protected routers start with `requireAuth`; unknown paths stay 404                      | Keep the Phase 1 404 behaviour              |
+| 2026-10-08 | Added viewpoint, Errors, Security and Testability                                       | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-09 | A DELETE without a body passes the JSON check                                           | Phase 3 delete endpoints take no body       |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09                  |

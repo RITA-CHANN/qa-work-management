@@ -12,7 +12,7 @@ traces:
   requirements: [US-PROJECT-08, US-PROJECT-12]
   acceptance: [AC-PROJECT-36]
   design: [SCR-PROJECT-04]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # GET /api/projects/:key/releases
@@ -22,7 +22,7 @@ Lists the releases of a project with their milestone counts (SCR-PROJECT-04). St
 
 |                 |                                                     |
 | --------------- | --------------------------------------------------- |
-| **Auth**        | Project role: any member, or Admin                  |
+| **Auth**        | Any member, or System admin                         |
 | **Since phase** | 3                                                   |
 | **Schema**      | `packages/shared/src/releases.ts` (`releaseSchema`) |
 
@@ -71,10 +71,10 @@ Ordered Active, Planned (by start date), Released (newest first).
 
 Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-01).
 
-| Status | `code`            | `messageId`    | When                                                                                       |
-| ------ | ----------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| 401    | `UNAUTHENTICATED` | MSG-COMMON-05  | Not logged in                                                                              |
-| 404    | `NOT_FOUND`       | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not an Admin (same body for both, ADR-0008) |
+| Status | `code`            | `messageId`    | When                                                                                             |
+| ------ | ----------------- | -------------- | ------------------------------------------------------------------------------------------------ |
+| 401    | `UNAUTHENTICATED` | MSG-COMMON-05  | Not logged in                                                                                    |
+| 404    | `NOT_FOUND`       | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
 
 ## Security
 
@@ -107,6 +107,7 @@ curl -b cookies.txt http://localhost:3000/api/projects/SHOP/releases
 
 ## Change log
 
-| Date       | Change                                               | Why      |
-| ---------- | ---------------------------------------------------- | -------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

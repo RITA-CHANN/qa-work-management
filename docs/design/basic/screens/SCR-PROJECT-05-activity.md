@@ -14,7 +14,7 @@ traces:
   acceptance: [AC-PROJECT-08, AC-PROJECT-44, AC-PROJECT-45, AC-PROJECT-46]
   api: [API-PROJECT-12]
   design: [DD-PROJECT-02]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # SCR-PROJECT-05 Activity tab
@@ -26,7 +26,7 @@ Who changed what and when in this project, newest first.
 ```
  Activity
  ┌──────────────────────────────────────────────────────────────────────────┐
- │ Minh Lead changed Linh QA's role from Viewer to QA Engineer              │
+ │ Oanh Owner changed Linh QA's access from Member to Project admin         │
  │ 2026-10-08 14:02                                         ▸ Show changes  │
  ├──────────────────────────────────────────────────────────────────────────┤
  │ Mai PM edited the project                                                │
@@ -61,10 +61,10 @@ None: the tab is read-only.
 
 ## Permissions
 
-| Role                      | Can see             | Can do          |
-| ------------------------- | ------------------- | --------------- |
-| Every project role, Admin | All entries         | Read, load more |
-| Not a member              | "Project not found" | —               |
+| Access level                        | Can see             | Can do          |
+| ----------------------------------- | ------------------- | --------------- |
+| Project admin, Member, System admin | All entries         | Read, load more |
+| Not a member                        | "Project not found" | —               |
 
 ## Accessibility
 
@@ -84,6 +84,7 @@ Same layout; long summaries wrap.
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-08 | First version | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version                                                                           | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

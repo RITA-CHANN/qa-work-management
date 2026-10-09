@@ -7,7 +7,7 @@ owner: Claude
 reviewers: [Linh]
 approved:
 model: ActivityLog
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # activity_logs
@@ -17,17 +17,17 @@ the code has no update or delete path (BR-PROJECT-21). Later phases write to the
 
 ## Columns
 
-| Column        | Type         | Null | Default  | Key | Definition                                                                                                                             | Classification | Rule          | Since phase |
-| ------------- | ------------ | ---- | -------- | --- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------- | ----------- |
-| `id`          | text         | no   | `cuid()` | PK  | Unique identifier of the entry; also the pagination cursor                                                                             | internal       |               | 3           |
-| `project_id`  | text         | no   |          | FK  | Project the change belongs to                                                                                                          | internal       |               | 3           |
-| `actor_id`    | text         | no   |          | FK  | User who made the change                                                                                                               | internal       | BR-PROJECT-20 | 3           |
-| `action`      | text         | no   |          |     | Machine name of what happened, `<entity>.<verb>`, for example `member.role_changed`                                                    | internal       | BR-PROJECT-19 | 3           |
-| `entity_type` | text         | no   |          |     | Kind of record changed: `project`, `member`, `release`, `milestone`                                                                    | internal       |               | 3           |
-| `entity_id`   | text         | no   |          |     | Id of the record changed (a user id for `member`)                                                                                      | internal       |               | 3           |
-| `summary`     | text         | no   |          |     | Sentence shown to people, written at the time of the change, for example "Minh Lead changed Linh QA's role from Viewer to QA Engineer" | personal       | BR-PROJECT-20 | 3           |
-| `changes`     | jsonb        | yes  |          |     | Changed fields with old and new value: `{ "name": { "from": "A", "to": "B" } }`; `null` for create and delete                          | internal       | BR-PROJECT-20 | 3           |
-| `created_at`  | timestamp(3) | no   | `now()`  |     | Time of the change (UTC)                                                                                                               | internal       |               | 3           |
+| Column        | Type         | Null | Default  | Key | Definition                                                                                                                                                       | Classification | Rule          | Since phase |
+| ------------- | ------------ | ---- | -------- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------- | ----------- |
+| `id`          | text         | no   | `cuid()` | PK  | Unique identifier of the entry; also the pagination cursor                                                                                                       | internal       |               | 3           |
+| `project_id`  | text         | no   |          | FK  | Project the change belongs to                                                                                                                                    | internal       |               | 3           |
+| `actor_id`    | text         | no   |          | FK  | User who made the change                                                                                                                                         | internal       | BR-PROJECT-20 | 3           |
+| `action`      | text         | no   |          |     | Machine name of what happened, `<entity>.<verb>`, for example `member.updated`                                                                                   | internal       | BR-PROJECT-19 | 3           |
+| `entity_type` | text         | no   |          |     | Kind of record changed: `project`, `member`, `release`, `milestone`                                                                                              | internal       |               | 3           |
+| `entity_id`   | text         | no   |          |     | Id of the record changed (a user id for `member`)                                                                                                                | internal       |               | 3           |
+| `summary`     | text         | no   |          |     | Sentence shown to people, written at the time of the change, for example "Oanh Owner changed Linh QA's access from Member to Project admin"                      | personal       | BR-PROJECT-20 | 3           |
+| `changes`     | jsonb        | yes  |          |     | Changed fields with old and new value: `{ "name": { "from": "A", "to": "B" } }` (for `member.updated`: `access` and/or `jobTitle`); `null` for create and delete | internal       | BR-PROJECT-20 | 3           |
+| `created_at`  | timestamp(3) | no   | `now()`  |     | Time of the change (UTC)                                                                                                                                         | internal       |               | 3           |
 
 `Classification`: public, internal, personal (identifies a person), secret (must never leave the API). `summary`
 is personal because it contains names.
@@ -69,7 +69,7 @@ example 2 years) can be added later if the table grows; not needed in Phase 3.
 
 ## Seed data
 
-A few entries per seed project ("created the project", "added … as …") so the Activity tab is not empty.
+A few entries per seed project ("Ada Admin created the project", "Ada Admin added Oanh Owner as Project admin (Product owner)") so the Activity tab is not empty.
 
 ## Used by
 
@@ -78,6 +78,7 @@ API-PROJECT-12 (read); every write endpoint of projects, members, releases and m
 
 ## Change log
 
-| Date       | Change        | Migration                                    | Why      |
-| ---------- | ------------- | -------------------------------------------- | -------- |
-| 2026-10-08 | First version | `<ts>_add_projects` (in the Phase 3 code PR) | Phase 3A |
+| Date       | Change                                                                                                                                   | Migration                                    | Why                        |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version                                                                                                                            | `<ts>_add_projects` (in the Phase 3 code PR) | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects (`member.role_changed` renamed `member.updated`) | —                                            | Linh's decision 2026-10-09 |

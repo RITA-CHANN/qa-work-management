@@ -44,7 +44,7 @@ traces:
     ]
   api: [API-PROJECT-03, API-PROJECT-04, API-PROJECT-05, API-PROJECT-06, API-PROJECT-07]
   design: [FLW-PROJECT-03, FLW-PROJECT-05, DD-PROJECT-01, DD-PROJECT-03]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # SCR-PROJECT-02 Project page (header, overview, project dialogs)
@@ -57,7 +57,7 @@ Members, SCR-PROJECT-04 Releases and milestones, SCR-PROJECT-05 Activity.
 
 ```
 ┌──────────┬────────────────────────────────────────────────────────────────────┐
-│ nav      │  ShopEase Web  SHOP  [QA Lead]          [ Edit ] [ ⋯ More ▾ ]       │ <h1> name, key, my-role badge
+│ nav      │  ShopEase Web  SHOP  [Project admin]    [ Edit ] [ ⋯ More ▾ ]       │ <h1> name, key, my-access badge
 │          │  ⚠ This project is archived. Restore it to make changes. [Restore] │ banner only when archived
 │          │  Current: Sprint 4 · release 2.4 · 3 days left                     │ or "Overdue by 2 days"
 │          │  [ Overview ] [ Members ] [ Releases & milestones ] [ Activity ]   │ tabs (links, URL per tab)
@@ -66,7 +66,8 @@ Members, SCR-PROJECT-04 Releases and milestones, SCR-PROJECT-05 Activity.
 │          │  Members 8 · Active release 2.4 · Created by Oanh Owner, 2026-09-01 │
 │          │  Recent activity (5 newest) …                      View all →      │
 └──────────┴────────────────────────────────────────────────────────────────────┘
-More ▾ (Owner only): Archive / Restore, Delete (only when archived)
+More ▾ (Project admins and System admins): Archive / Restore, Delete (only when archived)
+Badge: "Project admin" or "Member" (my access); "System admin" for a System admin who is not a member
 
 Dialog "Edit project": Key (read-only text), Name, Description, [Cancel] [Save]
 Dialog "Archive project?": explains read-only effect, [Cancel] [Archive]
@@ -99,29 +100,28 @@ Routes: `/projects/:key` (Overview), `/projects/:key/members`, `/projects/:key/r
 
 ## States
 
-| State                    | What the user sees                                                                                | Criteria                     |
-| ------------------------ | ------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Loading                  | Header skeleton                                                                                   |                              |
-| Not found / not a member | MSG-PROJECT-06 page, same for both                                                                | AC-PROJECT-16                |
-| Error                    | MSG-COMMON-01 with "Try again"                                                                    |                              |
-| Read-only role           | No Edit, no More menu                                                                             | AC-PROJECT-17, AC-PROJECT-22 |
-| Archived                 | Banner MSG-PROJECT-08 style text with Restore (Owner only); every write button hidden on all tabs | AC-PROJECT-30                |
-| Active milestone         | "Current: <milestone> · release <name> · N days left" or "Overdue by N days"                      | AC-PROJECT-64                |
-| No active milestone      | Line hidden                                                                                       |                              |
-| Success                  | Toast MSG-PROJECT-19 after a save                                                                 | AC-PROJECT-19                |
+| State                    | What the user sees                                                                                         | Criteria                     |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| Loading                  | Header skeleton                                                                                            |                              |
+| Not found / not a member | MSG-PROJECT-06 page, same for both                                                                         | AC-PROJECT-16                |
+| Error                    | MSG-COMMON-01 with "Try again"                                                                             |                              |
+| Member (read only)       | No Edit, no More menu                                                                                      | AC-PROJECT-17, AC-PROJECT-22 |
+| Archived                 | Banner MSG-PROJECT-08 style text with Restore (Project admins only); every write button hidden on all tabs | AC-PROJECT-30                |
+| Active milestone         | "Current: <milestone> · release <name> · N days left" or "Overdue by N days"                               | AC-PROJECT-64                |
+| No active milestone      | Line hidden                                                                                                |                              |
+| Success                  | Toast MSG-PROJECT-19 after a save                                                                          | AC-PROJECT-19                |
 
 ## Permissions
 
-| Role                                                   | Can see             | Can do                         |
-| ------------------------------------------------------ | ------------------- | ------------------------------ |
-| Owner, Admin                                           | Everything          | Edit, archive, restore, delete |
-| Project manager, QA lead                               | Everything          | Edit                           |
-| QA engineer, Team lead, Developer, Stakeholder, Viewer | Everything          | Nothing on this tab            |
-| Not a member                                           | "Project not found" | —                              |
+| Access level                | Can see             | Can do                         |
+| --------------------------- | ------------------- | ------------------------------ |
+| Project admin, System admin | Everything          | Edit, archive, restore, delete |
+| Member (any job title)      | Everything          | Nothing on this tab            |
+| Not a member                | "Project not found" | —                              |
 
 ## Accessibility
 
-- Page title "<Name> · Projects · QA Work Management"; `<h1>` is the project name; the key and role badge are text.
+- Page title "<Name> · Projects · QA Work Management"; `<h1>` is the project name; the key and access badge are text.
 - Tabs are links in a `nav` labelled "Project sections" with `aria-current="page"` on the active one (they change
   the URL, so they are links, not an ARIA tab widget).
 - The archived banner is `role="status"` when it appears after archiving.
@@ -145,6 +145,7 @@ scroll horizontally.
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-08 | First version | Phase 3A |
+| Date       | Change                                                                                  | Why                        |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-08 | First version                                                                           | Phase 3A                   |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |

@@ -55,7 +55,7 @@ traces:
       API-MILESTONE-04,
     ]
   design: [FLW-PROJECT-04, SCR-PROJECT-04]
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # DD-PROJECT-04 Release and milestone lifecycle
@@ -106,6 +106,7 @@ Skipping a state (`PLANNED → RELEASED`) is not allowed either: each move is on
 | Transition table      | `RELEASE_NEXT = { PLANNED: 'ACTIVE', ACTIVE: 'RELEASED' }`, `MILESTONE_NEXT = { PLANNED: 'ACTIVE', ACTIVE: 'COMPLETED' }`; any other target → 409 `INVALID_TRANSITION` | BR-PROJECT-16, BR-PROJECT-31 |
 | One active            | Checked in the service, and a partial unique index catches a race                                                                                                      | BR-PROJECT-17, BR-PROJECT-32 |
 | Release → RELEASED    | Refused while any milestone of the release is not `COMPLETED`                                                                                                          | BR-PROJECT-25                |
+| New milestone         | Refused with 422 `RELEASE_CLOSED` (MSG-PROJECT-32) when the release is `RELEASED`                                                                                      | BR-PROJECT-25                |
 | Milestone length      | `days = end − start + 1`; must be 1 to `MILESTONE_MAX_DAYS` (default 28)                                                                                               | BR-PROJECT-28                |
 | Inside release        | If the release has `start_date`, milestone `start ≥ release.start`; if it has `target_date`, milestone `end ≤ release.target`                                          | BR-PROJECT-29                |
 | No overlap            | Two milestones of one release overlap when `a.start ≤ b.end AND b.start ≤ a.end` (inclusive days, so sharing one day overlaps)                                         | BR-PROJECT-30                |
@@ -145,6 +146,7 @@ a `releaseId` from another project gives 404.
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-08 | First version | Phase 3A |
+| Date       | Change                                             | Why                              |
+| ---------- | -------------------------------------------------- | -------------------------------- |
+| 2026-10-08 | First version                                      | Phase 3A                         |
+| 2026-10-09 | Added the `RELEASE_CLOSED` rule for new milestones | Gap found while building the API |
