@@ -12,8 +12,21 @@ import { fileURLToPath } from 'node:url';
 import {
   activityEntrySchema,
   activityQuerySchema,
+  adminOverviewSchema,
+  adminProjectListQuerySchema,
+  adminProjectSchema,
+  adminUserCreateSchema,
+  adminUserDetailSchema,
+  adminUserListQuerySchema,
+  adminUserSchema,
+  adminUserUpdateSchema,
+  auditEventSchema,
+  auditQuerySchema,
   authUserSchema,
+  changePasswordSchema,
+  changeProjectAdminSchema,
   emptyBodySchema,
+  guestVisibilitySchema,
   healthResponseSchema,
   loginRequestSchema,
   memberAddSchema,
@@ -23,8 +36,10 @@ import {
   milestoneListQuerySchema,
   milestoneSchema,
   milestoneUpdateSchema,
+  oneTimePasswordSchema,
   problemSchema,
   projectCreateSchema,
+  projectKeySchema,
   projectListQuerySchema,
   projectSchema,
   projectSummarySchema,
@@ -32,8 +47,11 @@ import {
   releaseCreateSchema,
   releaseSchema,
   releaseUpdateSchema,
+  searchQuerySchema,
+  searchResultSchema,
   userListQuerySchema,
   userOptionSchema,
+  workspaceSettingsSchema,
 } from '@qawm/shared';
 import * as prettier from 'prettier';
 import { stringify } from 'yaml';
@@ -54,6 +72,12 @@ function jsonSchema(schema: z.ZodType, io: 'input' | 'output'): JsonSchema {
   return rest;
 }
 
+// /api/me/current-project (API-ME-01, API-ME-02) validates inline in apps/api/src/modules/me/me.routes.ts;
+// these mirror it. POST /api/admin/users/:id/sign-out (API-ADMIN-10) returns a plain count.
+const currentProjectSchema = z.object({ key: z.string().nullable() });
+const currentProjectUpdateSchema = z.strictObject({ key: projectKeySchema });
+const signOutResultSchema = z.object({ endedSessions: z.number().int() });
+
 // Named schemas under components/schemas. Responses use the output side, bodies the input side
 // (what a client sends, before the API trims or upper-cases it).
 const responseSchemas = {
@@ -67,6 +91,16 @@ const responseSchemas = {
   Milestone: milestoneSchema,
   ActivityEntry: activityEntrySchema,
   UserOption: userOptionSchema,
+  CurrentProject: currentProjectSchema,
+  SearchResult: searchResultSchema,
+  AdminOverview: adminOverviewSchema,
+  AdminProject: adminProjectSchema,
+  AdminUser: adminUserSchema,
+  AdminUserDetail: adminUserDetailSchema,
+  OneTimePassword: oneTimePasswordSchema,
+  SignOutResult: signOutResultSchema,
+  AuditEvent: auditEventSchema,
+  WorkspaceSettings: workspaceSettingsSchema,
 } as const;
 const bodySchemas = {
   LoginRequest: loginRequestSchema,
@@ -79,6 +113,13 @@ const bodySchemas = {
   ReleaseUpdate: releaseUpdateSchema,
   MilestoneCreate: milestoneCreateSchema,
   MilestoneUpdate: milestoneUpdateSchema,
+  ChangePassword: changePasswordSchema,
+  CurrentProjectUpdate: currentProjectUpdateSchema,
+  AdminUserCreate: adminUserCreateSchema,
+  AdminUserUpdate: adminUserUpdateSchema,
+  GuestVisibility: guestVisibilitySchema,
+  ChangeProjectAdmin: changeProjectAdminSchema,
+  WorkspaceSettingsUpdate: workspaceSettingsSchema,
 } as const;
 type ResponseName = keyof typeof responseSchemas;
 type BodyName = keyof typeof bodySchemas;
@@ -87,7 +128,7 @@ const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
 
 type Operation = {
   id: string;
-  method: 'get' | 'post' | 'patch' | 'delete';
+  method: 'get' | 'post' | 'put' | 'patch' | 'delete';
   path: string;
   summary: string;
   tag: string;
@@ -120,6 +161,7 @@ const OPERATIONS: Operation[] = [
   { id: 'API-AUTH-01', method: 'post', path: '/api/auth/login', summary: 'Log in', tag: 'Auth', auth: false, body: 'LoginRequest', ok: { status: 200, schema: 'AuthUser', shape: 'item' } },
   { id: 'API-AUTH-02', method: 'post', path: '/api/auth/logout', summary: 'Log out', tag: 'Auth', auth: false, ok: { status: 204 } },
   { id: 'API-AUTH-03', method: 'get', path: '/api/auth/me', summary: 'The logged-in user', tag: 'Auth', ok: { status: 200, schema: 'AuthUser', shape: 'item' } },
+  { id: 'API-AUTH-04', method: 'post', path: '/api/auth/change-password', summary: 'Replace a one-time password', tag: 'Auth', body: 'ChangePassword', ok: { status: 200, schema: 'AuthUser', shape: 'item' } },
   { id: 'API-PROJECT-01', method: 'get', path: '/api/projects', summary: "The caller's projects", tag: 'Projects', query: projectListQuerySchema, ok: { status: 200, schema: 'ProjectSummary', shape: 'list' } },
   { id: 'API-PROJECT-02', method: 'post', path: '/api/projects', summary: 'Create a project', tag: 'Projects', body: 'ProjectCreate', ok: { status: 201, schema: 'Project', shape: 'item' }, created: true },
   { id: 'API-PROJECT-03', method: 'get', path: '/api/projects/{key}', summary: 'One project', tag: 'Projects', ok: { status: 200, schema: 'Project', shape: 'item' } },
@@ -132,6 +174,7 @@ const OPERATIONS: Operation[] = [
   { id: 'API-PROJECT-10', method: 'patch', path: '/api/projects/{key}/members/{userId}', summary: "Change a member's access level or job title", tag: 'Members', body: 'MemberUpdate', ok: { status: 200, schema: 'Member', shape: 'item' } },
   { id: 'API-PROJECT-11', method: 'delete', path: '/api/projects/{key}/members/{userId}', summary: 'Remove a member, or leave', tag: 'Members', ok: { status: 204 } },
   { id: 'API-PROJECT-12', method: 'get', path: '/api/projects/{key}/activity', summary: 'Activity log, newest first', tag: 'Activity', query: activityQuerySchema, ok: { status: 200, schema: 'ActivityEntry', shape: 'page' } },
+  { id: 'API-PROJECT-13', method: 'put', path: '/api/projects/{key}/guest-visibility', summary: 'Set which areas Guests see', tag: 'Projects', body: 'GuestVisibility', ok: { status: 200, schema: 'Project', shape: 'item' } },
   { id: 'API-RELEASE-01', method: 'get', path: '/api/projects/{key}/releases', summary: 'Releases of a project', tag: 'Releases', ok: { status: 200, schema: 'Release', shape: 'list' } },
   { id: 'API-RELEASE-02', method: 'post', path: '/api/projects/{key}/releases', summary: 'Create a release', tag: 'Releases', body: 'ReleaseCreate', ok: { status: 201, schema: 'Release', shape: 'item' } },
   { id: 'API-RELEASE-03', method: 'patch', path: '/api/projects/{key}/releases/{id}', summary: 'Edit a release or move its status', tag: 'Releases', body: 'ReleaseUpdate', ok: { status: 200, schema: 'Release', shape: 'item' } },
@@ -141,6 +184,23 @@ const OPERATIONS: Operation[] = [
   { id: 'API-MILESTONE-03', method: 'patch', path: '/api/projects/{key}/milestones/{id}', summary: 'Edit a milestone or move its status', tag: 'Milestones', body: 'MilestoneUpdate', ok: { status: 200, schema: 'Milestone', shape: 'item' } },
   { id: 'API-MILESTONE-04', method: 'delete', path: '/api/projects/{key}/milestones/{id}', summary: 'Delete a planned milestone', tag: 'Milestones', ok: { status: 204 } },
   { id: 'API-USER-01', method: 'get', path: '/api/users', summary: 'Users for the member picker', tag: 'Users', query: userListQuerySchema, ok: { status: 200, schema: 'UserOption', shape: 'list' } },
+  { id: 'API-ME-01', method: 'get', path: '/api/me/current-project', summary: 'The project the shell opens on', tag: 'Me', ok: { status: 200, schema: 'CurrentProject', shape: 'item' } },
+  { id: 'API-ME-02', method: 'put', path: '/api/me/current-project', summary: 'Remember the current project', tag: 'Me', body: 'CurrentProjectUpdate', ok: { status: 200, schema: 'CurrentProject', shape: 'item' } },
+  { id: 'API-SEARCH-01', method: 'get', path: '/api/search', summary: 'Search projects, releases, milestones and (Admins) users', tag: 'Search', query: searchQuerySchema, ok: { status: 200, schema: 'SearchResult', shape: 'list' } },
+  { id: 'API-ADMIN-01', method: 'get', path: '/api/admin/overview', summary: 'All-projects dashboard KPIs', tag: 'Admin', ok: { status: 200, schema: 'AdminOverview', shape: 'item' } },
+  { id: 'API-ADMIN-02', method: 'get', path: '/api/admin/projects', summary: 'Every project', tag: 'Admin', query: adminProjectListQuerySchema, ok: { status: 200, schema: 'AdminProject', shape: 'list' } },
+  { id: 'API-ADMIN-03', method: 'get', path: '/api/admin/users', summary: 'Every user account', tag: 'Admin', query: adminUserListQuerySchema, ok: { status: 200, schema: 'AdminUser', shape: 'list' } },
+  { id: 'API-ADMIN-04', method: 'post', path: '/api/admin/users', summary: 'Create a user with a one-time password', tag: 'Admin', body: 'AdminUserCreate', ok: { status: 201, schema: 'OneTimePassword', shape: 'item' } },
+  { id: 'API-ADMIN-05', method: 'get', path: '/api/admin/users/{id}', summary: 'One user with projects and sessions', tag: 'Admin', ok: { status: 200, schema: 'AdminUserDetail', shape: 'item' } },
+  { id: 'API-ADMIN-06', method: 'patch', path: '/api/admin/users/{id}', summary: "Change a user's global role", tag: 'Admin', body: 'AdminUserUpdate', ok: { status: 200, schema: 'AdminUser', shape: 'item' } },
+  { id: 'API-ADMIN-07', method: 'post', path: '/api/admin/users/{id}/deactivate', summary: 'Deactivate a user', tag: 'Admin', body: 'EmptyBody', ok: { status: 200, schema: 'AdminUser', shape: 'item' } },
+  { id: 'API-ADMIN-08', method: 'post', path: '/api/admin/users/{id}/reactivate', summary: 'Reactivate a user', tag: 'Admin', body: 'EmptyBody', ok: { status: 200, schema: 'AdminUser', shape: 'item' } },
+  { id: 'API-ADMIN-09', method: 'post', path: '/api/admin/users/{id}/reset-password', summary: 'Reset a password to a new one-time password', tag: 'Admin', body: 'EmptyBody', ok: { status: 200, schema: 'OneTimePassword', shape: 'item' } },
+  { id: 'API-ADMIN-10', method: 'post', path: '/api/admin/users/{id}/sign-out', summary: 'Sign a user out everywhere', tag: 'Admin', body: 'EmptyBody', ok: { status: 200, schema: 'SignOutResult', shape: 'item' } },
+  { id: 'API-ADMIN-11', method: 'get', path: '/api/admin/audit', summary: 'Audit log, newest first', tag: 'Admin', query: auditQuerySchema, ok: { status: 200, schema: 'AuditEvent', shape: 'page' } },
+  { id: 'API-ADMIN-12', method: 'post', path: '/api/admin/projects/{key}/project-admin', summary: 'Change the project admin of a project', tag: 'Admin', body: 'ChangeProjectAdmin', ok: { status: 200, schema: 'Member', shape: 'list' } },
+  { id: 'API-ADMIN-13', method: 'get', path: '/api/admin/settings', summary: 'Workspace settings', tag: 'Admin', ok: { status: 200, schema: 'WorkspaceSettings', shape: 'item' } },
+  { id: 'API-ADMIN-14', method: 'put', path: '/api/admin/settings', summary: 'Save the workspace settings', tag: 'Admin', body: 'WorkspaceSettingsUpdate', ok: { status: 200, schema: 'WorkspaceSettings', shape: 'item' } },
 ];
 
 // prettier-ignore
@@ -232,7 +292,9 @@ function pathParameters(path: string) {
       ? key
       : name === 'userId'
         ? id('userId', 'User id of the member')
-        : id(name, 'Id of the release or milestone'),
+        : path.startsWith('/api/admin/users/')
+          ? id(name, 'User id')
+          : id(name, 'Id of the release or milestone'),
   );
 }
 
@@ -318,6 +380,9 @@ function buildDocument() {
       'Milestones',
       'Activity',
       'Users',
+      'Me',
+      'Search',
+      'Admin',
     ].map((name) => ({ name })),
     paths,
     components: {

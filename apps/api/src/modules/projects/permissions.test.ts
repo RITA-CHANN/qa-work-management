@@ -6,16 +6,18 @@ import { assertCan, assertNotArchived } from './permissions';
 // The permission matrix of docs/requirements/project/README.md (BR-PROJECT-35), written the same way:
 // one row per action, one column per access level. NFR-PROJECT-02: every access level × every action.
 // A System admin acts as PROJECT_ADMIN (loader.ts); job titles play no part.
-//                                ADMIN MEMBER
+// A Guest may view the project, but only the areas switched on for Guests (assertArea, BR-GUEST-03).
+//                                ADMIN MEMBER GUEST
 // prettier-ignore
 const MATRIX: Record<ProjectAction, string> = {
-  'project:view':    '✅    ✅',
-  'project:edit':    '✅    ❌',
-  'release:write':   '✅    ❌',
-  'milestone:write': '✅    ❌',
-  'member:manage':   '✅    ❌',
-  'project:archive': '✅    ❌',
-  'project:delete':  '✅    ❌',
+  'project:view':    '✅    ✅     ✅',
+  'project:edit':    '✅    ❌     ❌',
+  'project:guests':  '✅    ❌     ❌',
+  'release:write':   '✅    ❌     ❌',
+  'milestone:write': '✅    ❌     ❌',
+  'member:manage':   '✅    ❌     ❌',
+  'project:archive': '✅    ❌     ❌',
+  'project:delete':  '✅    ❌     ❌',
 };
 
 const cases = Object.entries(MATRIX).flatMap(([action, row]) =>
@@ -28,8 +30,8 @@ const cases = Object.entries(MATRIX).flatMap(([action, row]) =>
 );
 
 describe('permission matrix', () => {
-  it('covers 2 access levels × 7 actions', () => {
-    expect(cases).toHaveLength(14);
+  it('covers 3 access levels × 8 actions', () => {
+    expect(cases).toHaveLength(24);
   });
 
   it.each(cases)('%s by %s → allowed: %s', (action, access, allowed) => {

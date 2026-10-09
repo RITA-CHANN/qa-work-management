@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   activityQuerySchema,
   emptyBodySchema,
+  guestVisibilitySchema,
   memberAddSchema,
   memberUpdateSchema,
   projectCreateSchema,
@@ -20,7 +21,7 @@ import { requireAuth } from '../../middleware/require-auth';
 import { listActivity } from '../activity/activity.service';
 import { milestonesRouter } from '../milestones/milestones.routes';
 import { releasesRouter } from '../releases/releases.routes';
-import { keyOf, loadProject, readProjectView } from './loader';
+import { assertArea, keyOf, loadProject, readProjectView } from './loader';
 import { addMember, listMembers, removeMember, updateMember } from './members.service';
 import {
   archiveProject,
@@ -28,6 +29,7 @@ import {
   deleteProject,
   listProjects,
   restoreProject,
+  updateGuestVisibility,
   updateProject,
 } from './projects.service';
 
@@ -94,6 +96,7 @@ projectsRouter.delete('/:key', async (req, res) => {
 /** GET /api/projects/:key/members (API-PROJECT-08) */
 projectsRouter.get('/:key/members', async (req, res) => {
   const ctx = await loadProject(keyOf(req), req.user!);
+  assertArea(ctx, 'members');
   res.json({ data: await listMembers(ctx) } satisfies ApiSuccess<Member[]>);
 });
 
@@ -119,10 +122,18 @@ projectsRouter.delete('/:key/members/:userId', async (req, res) => {
   res.status(204).end();
 });
 
+/** PUT /api/projects/:key/guest-visibility (API-PROJECT-13) */
+projectsRouter.put('/:key/guest-visibility', async (req, res) => {
+  const body = parseOrThrow(guestVisibilitySchema, req.body);
+  const ctx = await loadProject(keyOf(req), req.user!);
+  res.json({ data: await updateGuestVisibility(ctx, body) } satisfies ApiSuccess<Project>);
+});
+
 /** GET /api/projects/:key/activity (API-PROJECT-12). There is no write endpoint for activity. */
 projectsRouter.get('/:key/activity', async (req, res) => {
   const query = parseOrThrow(activityQuerySchema, req.query);
   const ctx = await loadProject(keyOf(req), req.user!);
+  assertArea(ctx, 'activity');
   const page = await listActivity(ctx, query);
   res.json({
     data: page.data,

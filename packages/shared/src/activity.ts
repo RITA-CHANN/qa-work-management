@@ -7,6 +7,7 @@ export const ACTIVITY_ACTIONS = [
   'project.updated',
   'project.archived',
   'project.restored',
+  'project.guest_visibility_changed',
   'member.added',
   'member.updated',
   'member.removed',

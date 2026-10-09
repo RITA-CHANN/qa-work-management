@@ -9,3 +9,6 @@ export * from './releases';
 export * from './milestones';
 export * from './activity';
 export * from './users';
+export * from './admin';
+export * from './search';
+export * from './guest';

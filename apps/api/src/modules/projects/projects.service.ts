@@ -1,11 +1,13 @@
 import type {
   AuthUser,
+  GuestVisibility,
   Project as ProjectDto,
   ProjectSummary,
   projectCreateSchema,
   projectListQuerySchema,
   projectUpdateSchema,
 } from '@qawm/shared';
+import { canSeeArea, GUEST_AREAS } from '@qawm/shared';
 import type { z } from 'zod';
 import { isUniqueViolation } from '../../lib/db-types';
 import {
@@ -17,6 +19,7 @@ import {
 import { prisma } from '../../lib/prisma';
 import { diff, recordActivity } from '../activity/record-activity';
 import { summaries } from '../activity/summaries';
+import { getSettings } from '../admin/settings.service';
 import { readProjectView, type ProjectContext } from './loader';
 import { assertCan, assertNotArchived } from './permissions';
 
@@ -53,7 +56,10 @@ export async function listProjects(
     archivedAt: row.archivedAt?.toISOString() ?? null,
     myAccess: row.members[0]?.access ?? null,
     memberCount: row._count.members,
-    activeRelease: row.releases[0] ?? null,
+    // BR-GUEST-03: a Guest without the releases area doesn't see the active release.
+    activeRelease: canSeeArea(row.members[0]?.access, row.guestAreas, 'releases')
+      ? (row.releases[0] ?? null)
+      : null,
     updatedAt: row.updatedAt.toISOString(),
   }));
 }
@@ -66,17 +72,21 @@ export async function createProject(
   user: AuthUser,
   body: z.output<typeof projectCreateSchema>,
 ): Promise<ProjectDto> {
-  if (user.globalRole !== 'ADMIN') throw new ForbiddenError();
+  if (user.globalRole !== 'ADMIN') throw new ForbiddenError('FORBIDDEN', 'MSG-ADMIN-09');
   const firstAdmin = await prisma.user.findUnique({ where: { id: body.firstAdminId } });
-  if (!firstAdmin) throw ValidationError.field('/firstAdminId', 'MSG-PROJECT-33');
+  if (firstAdmin?.status !== 'ACTIVE')
+    throw ValidationError.field('/firstAdminId', 'MSG-PROJECT-33');
 
   try {
     return await prisma.$transaction(async (tx) => {
+      // A new project starts with the workspace's Guest defaults (BR-GUEST-02).
+      const { defaultGuestAreas } = await getSettings(tx);
       const project = await tx.project.create({
         data: {
           key: body.key,
           name: body.name,
           description: body.description ?? null,
+          guestAreas: defaultGuestAreas,
           createdById: user.id,
           members: { create: { userId: firstAdmin.id, access: 'PROJECT_ADMIN' } },
         },
@@ -136,6 +146,39 @@ export async function updateProject(
       entityId: project.id,
       summary: summaries.projectUpdated(user.name),
       changes,
+    });
+    return readProjectView(tx, project.id, ctx.myAccess);
+  });
+}
+
+/**
+ * API-PROJECT-13: which areas Guests see (BR-GUEST-02). Project admins and System admins only; written to the
+ * activity and audit logs (BR-GUEST-06). Takes effect on the Guests' next request, since loadProject reads
+ * the project fresh each time.
+ */
+export async function updateGuestVisibility(
+  ctx: ProjectContext,
+  body: GuestVisibility,
+): Promise<ProjectDto> {
+  const { project, user } = ctx;
+  assertCan(ctx.access, 'project:guests');
+  assertNotArchived(project);
+  // Stored in the order of GUEST_AREAS, without repeats, so equal sets compare equal.
+  const areas = GUEST_AREAS.filter((area) => body.areas.includes(area));
+  if (areas.join() === project.guestAreas.join()) {
+    return readProjectView(prisma, project.id, ctx.myAccess);
+  }
+  return prisma.$transaction(async (tx) => {
+    await tx.project.update({ where: { id: project.id }, data: { guestAreas: areas } });
+    await recordActivity(tx, {
+      projectId: project.id,
+      actorId: user.id,
+      action: 'project.guest_visibility_changed',
+      entityType: 'project',
+      entityId: project.id,
+      summary: summaries.guestVisibilityChanged(user.name),
+      changes: { guestAreas: { from: project.guestAreas, to: areas } },
+      audit: true,
     });
     return readProjectView(tx, project.id, ctx.myAccess);
   });

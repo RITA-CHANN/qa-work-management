@@ -36,7 +36,7 @@ describe('project-scoped write functions', () => {
     '%s calls assertCan',
     (_label, { name, body }) => {
       if (SYSTEM_ADMIN_ONLY.has(name)) {
-        expect(body).toMatch(/if \(user\.globalRole !== 'ADMIN'\) throw new ForbiddenError\(\)/);
+        expect(body).toMatch(/if \(user\.globalRole !== 'ADMIN'\) throw new ForbiddenError\(/);
         return;
       }
       expect(body).toMatch(/assertCan\(ctx\.access, '[a-z-]+:[a-z-]+'\)/);

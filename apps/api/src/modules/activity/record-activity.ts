@@ -1,6 +1,7 @@
 import type { ActivityAction, ActivityChanges, ActivityEntityType } from '@qawm/shared';
 import type { Prisma } from '../../generated/prisma/client';
 import type { Tx } from '../../lib/db-types';
+import { recordAudit } from '../audit/record-audit';
 
 export type ActivityInput = {
   projectId: string;
@@ -11,6 +12,8 @@ export type ActivityInput = {
   /** The sentence people read, built now so later renames don't change it (BR-PROJECT-20). */
   summary: string;
   changes?: ActivityChanges | null;
+  /** Also write an audit event whoever acts (e.g. Guest visibility, BR-GUEST-06). */
+  audit?: boolean;
 };
 
 /**
@@ -29,6 +32,47 @@ export async function recordActivity(tx: Tx, input: ActivityInput): Promise<void
       // Values are plain JSON (strings, null); the cast only tells Prisma so.
       changes: (input.changes ?? undefined) as Prisma.InputJsonValue | undefined,
     },
+  });
+  await auditAdminWrite(tx, input);
+}
+
+/**
+ * BR-ADMIN-14: a write by an Admin on a project they are not a member of is also an audit event,
+ * marked actedAs = ADMIN, in the same transaction. With `audit: true` every actor's write is.
+ */
+async function auditAdminWrite(tx: Tx, input: ActivityInput): Promise<void> {
+  const actor = await tx.user.findUnique({
+    where: { id: input.actorId },
+    select: {
+      globalRole: true,
+      memberships: { where: { projectId: input.projectId }, select: { userId: true } },
+    },
+  });
+  const actedAsAdmin = actor?.globalRole === 'ADMIN' && actor.memberships.length === 0;
+  if (!actedAsAdmin && !input.audit) return;
+  // The caller already passed loadProject() for this project; only its key is read here.
+  // eslint-disable-next-line no-restricted-syntax
+  const project = await tx.project.findUnique({
+    where: { id: input.projectId },
+    select: { key: true },
+  });
+  const before: Record<string, unknown> = {};
+  const after: Record<string, unknown> = {};
+  for (const [field, change] of Object.entries(input.changes ?? {})) {
+    before[field] = change.from;
+    after[field] = change.to;
+  }
+  const hasChanges = Object.keys(after).length > 0;
+  await recordAudit(tx, {
+    actorId: input.actorId,
+    action: input.action,
+    targetType: input.entityType,
+    targetId: input.entityId,
+    targetName: input.summary,
+    projectKey: project?.key ?? null,
+    before: hasChanges ? before : null,
+    after: hasChanges ? after : null,
+    actedAs: actedAsAdmin ? 'ADMIN' : null,
   });
 }
 

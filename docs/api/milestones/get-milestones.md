@@ -9,8 +9,8 @@ owner: Claude
 reviewers: [Linh]
 approved:
 traces:
-  requirements: [US-PROJECT-12, BR-PROJECT-26]
-  acceptance: [AC-PROJECT-54, AC-PROJECT-64]
+  requirements: [US-PROJECT-12, BR-PROJECT-26, BR-GUEST-03]
+  acceptance: [AC-PROJECT-54, AC-PROJECT-64, AC-GUEST-01]
   design: [SCR-PROJECT-04]
 updated: 2026-10-09
 ---
@@ -20,11 +20,11 @@ updated: 2026-10-09
 Lists the milestones (sprints) of a project, optionally of one release. Status codes follow RFC 9110; errors are RFC 9457 problem details
 ([README.md](../README.md#error-format), [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 
-|                 |                                                         |
-| --------------- | ------------------------------------------------------- |
-| **Auth**        | Any member, or System admin                             |
-| **Since phase** | 3                                                       |
-| **Schema**      | `packages/shared/src/milestones.ts` (`milestoneSchema`) |
+|                 |                                                                           |
+| --------------- | ------------------------------------------------------------------------- |
+| **Auth**        | Any member, or System admin; a Guest only while the `releases` area is on |
+| **Since phase** | 3                                                                         |
+| **Schema**      | `packages/shared/src/milestones.ts` (`milestoneSchema`)                   |
 
 ## Request
 
@@ -86,6 +86,7 @@ Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-
 | 400    | `VALIDATION_ERROR` | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`               |
 | 401    | `UNAUTHENTICATED`  | MSG-COMMON-05  | Not logged in                                                                                    |
 | 404    | `NOT_FOUND`        | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
+| 404    | `NOT_FOUND`        | MSG-COMMON-07  | The caller is a Guest and the `releases` area is off for Guests (BR-GUEST-03)                    |
 
 ## Security
 
@@ -97,7 +98,7 @@ Checked against the OWASP API Security Top 10 (2023):
 | API2 Broken authentication                                                       | Session cookie required (Phase 2); 401 otherwise                                                                                                                         |
 | API3 Broken object property level authorization (data exposure, mass assignment) | Milestone fields only                                                                                                                                                    |
 | API4 Unrestricted resource consumption                                           | Bounded by project size                                                                                                                                                  |
-| API5 Broken function level authorization                                         | Any member                                                                                                                                                               |
+| API5 Broken function level authorization                                         | Any member; `assertArea(ctx, "releases")` for a Guest: sprints belong to the `releases` area (BR-GUEST-03)                                                               |
 
 ## Side effects
 
@@ -111,10 +112,11 @@ curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/milestones?releaseI
 
 ## Test ideas
 
-| Type       | Case              | Expected                           |
-| ---------- | ----------------- | ---------------------------------- |
-| Happy path | SHOP              | Sprint 1 to Sprint 5 by start date |
-| Negative   | SECRET as Linh QA | 404                                |
+| Type       | Case                                            | Expected                           |
+| ---------- | ----------------------------------------------- | ---------------------------------- |
+| Happy path | SHOP                                            | Sprint 1 to Sprint 5 by start date |
+| Negative   | SECRET as Linh QA                               | 404                                |
+| Permission | SHOP as Sam Stakeholder (Guest), `releases` off | 404 MSG-COMMON-07                  |
 
 ## Change log
 
@@ -122,3 +124,4 @@ curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/milestones?releaseI
 | ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
 | 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| 2026-10-09 | Guest: 404 while the `releases` area is off                                             | BR-GUEST-03                |

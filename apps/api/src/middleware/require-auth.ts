@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import { UnauthenticatedError } from '../lib/errors';
+import { ForbiddenError, UnauthenticatedError } from '../lib/errors';
 import { findSessionUser, SESSION_COOKIE, sessionCookieOptions } from '../modules/auth/session';
 
 /**
@@ -18,5 +18,14 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   }
   req.user = session.user;
   req.sessionIdHash = session.idHash;
+  // A one-time password only lets the user read who they are and set a new password (BR-ADMIN-07).
+  if (
+    session.user.mustChangePassword &&
+    !PASSWORD_CHANGE_ROUTES.has(req.originalUrl.split('?')[0]!)
+  ) {
+    throw new ForbiddenError('PASSWORD_CHANGE_REQUIRED', 'MSG-ADMIN-07');
+  }
   next();
 };
+
+const PASSWORD_CHANGE_ROUTES = new Set(['/api/auth/me', '/api/auth/change-password']);

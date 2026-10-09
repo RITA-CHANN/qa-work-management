@@ -9,15 +9,16 @@ owner: Claude
 reviewers: [Linh]
 approved:
 traces:
-  requirements: [BR-PROJECT-11, BR-PROJECT-01]
-  acceptance: [AC-PROJECT-23, AC-PROJECT-24, AC-PROJECT-01]
+  requirements: [BR-PROJECT-11, BR-PROJECT-01, BR-ADMIN-04, BR-ADMIN-10, BR-ADMIN-18]
+  acceptance: [AC-PROJECT-23, AC-PROJECT-24, AC-PROJECT-01, AC-ADMIN-09, AC-ADMIN-12]
   design: [SCR-PROJECT-03, SCR-PROJECT-01]
 updated: 2026-10-09
 ---
 
 # GET /api/users
 
-Lists users for the "Add member" picker (SCR-PROJECT-03) and the "First project admin" picker of "New project" (SCR-PROJECT-01). Status codes follow RFC 9110; errors are RFC 9457 problem details
+Lists active users for the "Add member" picker (SCR-PROJECT-03), and the "First project admin" picker of "New project"
+and the "New project admin" picker of "Change project admin" in Admin console › Projects (SCR-ADMIN-02). Status codes follow RFC 9110; errors are RFC 9457 problem details
 ([README.md](../README.md#error-format), [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 
 |                 |                                                     |
@@ -57,7 +58,8 @@ Lists users for the "Add member" picker (SCR-PROJECT-03) and the "First project 
 | `name`  | string | Display name |
 | `email` | string | Email        |
 
-The web app removes current members from the list itself (it already has them from API-PROJECT-08).
+Only `ACTIVE` accounts are listed: a deactivated user can't be picked (BR-ADMIN-10). The web app removes current
+members from the list itself (it already has them from API-PROJECT-08).
 
 ### Errors
 
@@ -92,11 +94,12 @@ curl -b cookies.txt 'http://localhost:3000/api/users?search=sam'
 
 ## Test ideas
 
-| Type       | Case                | Expected                           |
-| ---------- | ------------------- | ---------------------------------- |
-| Happy path | `search=sam`        | Sam Stakeholder                    |
-| Boundary   | `limit=50` and `51` | 200; 400                           |
-| Security   | Response fields     | No `passwordHash`, no `globalRole` |
+| Type       | Case                                       | Expected                           |
+| ---------- | ------------------------------------------ | ---------------------------------- |
+| Happy path | `search=sam`                               | Sam Stakeholder                    |
+| Boundary   | `limit=50` and `51`                        | 200; 400                           |
+| Security   | Response fields                            | No `passwordHash`, no `globalRole` |
+| Negative   | `search=Hoa` (Hoa Inactive is deactivated) | `[]`                               |
 
 ## Change log
 
@@ -104,3 +107,4 @@ curl -b cookies.txt 'http://localhost:3000/api/users?search=sam'
 | ---------- | --------------------------------------------------------------------------------------- | -------------------------- |
 | 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                   |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09 |
+| 2026-10-09 | Only active users; also used by the Admin console pickers                               | BR-ADMIN-10, BR-ADMIN-18   |

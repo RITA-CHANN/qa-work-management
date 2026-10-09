@@ -6,8 +6,12 @@ What the business needs, one folder per feature: stories (`US`), business rules 
 (`AC`) and messages (`MSG`). How to add a feature: [../\_templates/README.md](../_templates/README.md).
 Coverage per criterion: [../traceability/](../traceability/README.md).
 
-| Feature                          | Phase | Status | Stories | Rules | Criteria | Criteria with a test |
-| -------------------------------- | ----- | ------ | ------- | ----- | -------- | -------------------- |
-| [Common](common/README.md)       | 1     | review | 0       | 0     | 0        | 0                    |
-| [Authentication](auth/README.md) | 2     | review | 6       | 15    | 32       | 15                   |
-| [Projects](project/README.md)    | 3     | review | 14      | 37    | 76       | 0                    |
+| Feature                             | Phase | Status | Stories | Rules | Criteria | Criteria with a test |
+| ----------------------------------- | ----- | ------ | ------- | ----- | -------- | -------------------- |
+| [Common](common/README.md)          | 1     | review | 0       | 0     | 0        | 0                    |
+| [Authentication](auth/README.md)    | 2     | review | 6       | 15    | 32       | 15                   |
+| [Admin console](admin/README.md)    | 3     | review | 5       | 18    | 22       | 0                    |
+| [Project dashboard](dash/README.md) | 3     | review | 2       | 8     | 7        | 0                    |
+| [Guest access](guest/README.md)     | 3     | review | 2       | 6     | 6        | 0                    |
+| [Projects](project/README.md)       | 3     | review | 14      | 37    | 76       | 0                    |
+| [App shell](shell/README.md)        | 3     | review | 3       | 8     | 8        | 0                    |
