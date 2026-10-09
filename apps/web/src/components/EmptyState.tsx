@@ -4,7 +4,10 @@ import { useId, type ReactNode } from 'react';
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   const titleId = useId();
   return (
-    <section aria-labelledby={titleId} className="rounded-lg border border-dashed p-10 text-center">
+    <section
+      aria-labelledby={titleId}
+      className="rounded-[var(--radius)] border border-dashed bg-card p-10 text-center"
+    >
       <h2 id={titleId} className="text-lg font-medium">
         {title}
       </h2>

@@ -37,7 +37,11 @@ describe('summaries', () => {
 describe('recordActivity', () => {
   it('writes through the transaction client it is given (BR-PROJECT-22)', async () => {
     const create = vi.fn().mockResolvedValue({});
-    const tx = { activityLog: { create } } as unknown as Tx;
+    const member = { globalRole: 'USER', memberships: [{ userId: 'u1' }] };
+    const tx = {
+      activityLog: { create },
+      user: { findUnique: vi.fn().mockResolvedValue(member) },
+    } as unknown as Tx;
     await recordActivity(tx, {
       projectId: 'p1',
       actorId: 'u1',
@@ -67,5 +71,33 @@ describe('recordActivity', () => {
         summary: 's',
       }),
     ).rejects.toThrow('disk full');
+  });
+
+  it('also writes an audit event marked ADMIN when an Admin is not a member (BR-ADMIN-14)', async () => {
+    const audit = vi.fn().mockResolvedValue({});
+    const tx = {
+      activityLog: { create: vi.fn().mockResolvedValue({}) },
+      user: { findUnique: vi.fn().mockResolvedValue({ globalRole: 'ADMIN', memberships: [] }) },
+      project: { findUnique: vi.fn().mockResolvedValue({ key: 'SHOP' }) },
+      auditEvent: { create: audit },
+    } as unknown as Tx;
+    await recordActivity(tx, {
+      projectId: 'p1',
+      actorId: 'admin',
+      action: 'project.updated',
+      entityType: 'project',
+      entityId: 'p1',
+      summary: 'Ada Admin edited the project',
+      changes: { name: { from: 'A', to: 'B' } },
+    });
+    expect(audit).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        actorId: 'admin',
+        projectKey: 'SHOP',
+        actedAs: 'ADMIN',
+        before: { name: 'A' },
+        after: { name: 'B' },
+      }),
+    });
   });
 });

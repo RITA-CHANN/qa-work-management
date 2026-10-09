@@ -70,7 +70,11 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
 }
 
 /** apiFetch with a JSON body. */
-export function apiSend<T>(method: 'POST' | 'PATCH' | 'DELETE', path: string, body?: unknown) {
+export function apiSend<T>(
+  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+  path: string,
+  body?: unknown,
+) {
   return apiFetch<T>(path, {
     method,
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),

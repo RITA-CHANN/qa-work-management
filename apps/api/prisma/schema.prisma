@@ -16,21 +16,35 @@ enum GlobalRole {
   USER
 }
 
+/// BR-ADMIN-10: a deactivated account can't sign in; it is never deleted.
+enum UserStatus {
+  ACTIVE
+  DEACTIVATED
+}
+
 /// A person who can sign in. See docs/database/tables/users.md.
 model User {
-  id              String          @id @default(cuid())
+  id                 String          @id @default(cuid())
   /// Always stored lower-case (BR-AUTH-01).
-  email           String          @unique
-  name            String
-  globalRole      GlobalRole      @default(USER) @map("global_role")
+  email              String          @unique
+  name               String
+  globalRole         GlobalRole      @default(USER) @map("global_role")
   /// argon2id hash; null means the user can't log in (BR-AUTH-12).
-  passwordHash    String?         @map("password_hash")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
-  sessions        Session[]
-  memberships     ProjectMember[]
-  projectsCreated Project[]       @relation("ProjectCreatedBy")
-  activities      ActivityLog[]
+  passwordHash       String?         @map("password_hash")
+  status             UserStatus      @default(ACTIVE)
+  /// Set when an Admin creates the account or resets its password (BR-ADMIN-07, BR-ADMIN-12).
+  mustChangePassword Boolean         @default(false) @map("must_change_password")
+  lastSignInAt       DateTime?       @map("last_sign_in_at")
+  /// The project the shell opens on (BR-SHELL-04).
+  lastProjectId      String?         @map("last_project_id")
+  lastProject        Project?        @relation("UserLastProject", fields: [lastProjectId], references: [id], onDelete: SetNull)
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  sessions           Session[]
+  memberships        ProjectMember[]
+  projectsCreated    Project[]       @relation("ProjectCreatedBy")
+  activities         ActivityLog[]
+  auditEvents        AuditEvent[]
 
   @@map("users")
 }
@@ -74,23 +88,24 @@ enum MilestoneStatus {
 
 /// A project. See docs/database/tables/projects.md.
 model Project {
-  id          String          @id @default(cuid())
+  id           String          @id @default(cuid())
   /// Upper-case, never changes (BR-PROJECT-02, BR-PROJECT-03). Check constraint in the migration.
-  key         String          @unique
-  name        String
-  description String?
+  key          String          @unique
+  name         String
+  description  String?
   /// null means active (BR-PROJECT-08).
-  archivedAt  DateTime?       @map("archived_at")
+  archivedAt   DateTime?       @map("archived_at")
   /// Optimistic locking (DD-PROJECT-03).
-  version     Int             @default(1)
-  createdById String          @map("created_by_id")
-  createdBy   User            @relation("ProjectCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
-  members     ProjectMember[]
-  releases    Release[]
-  milestones  Milestone[]
-  activities  ActivityLog[]
+  version      Int             @default(1)
+  createdById  String          @map("created_by_id")
+  createdBy    User            @relation("ProjectCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  members      ProjectMember[]
+  releases     Release[]
+  milestones   Milestone[]
+  activities   ActivityLog[]
+  lastOpenedBy User[]          @relation("UserLastProject")
 
   @@map("projects")
 }
@@ -173,4 +188,32 @@ model ActivityLog {
 
   @@index([projectId, createdAt(sort: Desc), id(sort: Desc)])
   @@map("activity_logs")
+}
+
+/// Security and admin events, workspace-wide (BR-ADMIN-14..17). Never updated or deleted by the app.
+/// See docs/database/tables/audit_events.md.
+model AuditEvent {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now()) @map("created_at")
+  /// null for a failed sign-in with an unknown email.
+  actorId    String?  @map("actor_id")
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  /// `<area>.<verb>`, e.g. auth.sign_in_failed, user.role_changed, project.updated.
+  action     String
+  targetType String   @map("target_type")
+  targetId   String?  @map("target_id")
+  /// Readable name of the target, frozen at write time (an email, a project key).
+  targetName String   @map("target_name")
+  /// Project key, when the event is about a project.
+  projectKey String?  @map("project_key")
+  before     Json?
+  after      Json?
+  /// ADMIN when an Admin acted on a project they are not a member of (BR-ADMIN-14).
+  actedAs    String?  @map("acted_as")
+  ip         String?
+
+  @@index([createdAt(sort: Desc), id(sort: Desc)])
+  @@index([actorId])
+  @@index([action])
+  @@map("audit_events")
 }

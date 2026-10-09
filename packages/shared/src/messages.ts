@@ -65,6 +65,32 @@ export const MESSAGES = {
   'MSG-PROJECT-31': 'Only a planned milestone can be deleted',
   'MSG-PROJECT-32':
     'Release {name} is already released. Add milestones to a planned or active release.',
+
+  // Admin console: docs/requirements/admin/messages.md
+  'MSG-ADMIN-01': 'An account with this email already exists',
+  'MSG-ADMIN-02': 'Copy this password now. It will not be shown again.',
+  'MSG-ADMIN-03': 'There must be at least one active Admin',
+  'MSG-ADMIN-04': 'You cannot change your own role or status',
+  'MSG-ADMIN-05':
+    '{name} is the only project admin of {projects}. Set another project admin first.',
+  'MSG-ADMIN-06': 'This account is deactivated. Contact an administrator.',
+  'MSG-ADMIN-07': 'Set a new password to continue',
+  'MSG-ADMIN-08': 'You are viewing this project as Admin',
+  'MSG-ADMIN-09': 'Only a system administrator can create projects',
+  'MSG-ADMIN-10': 'You are not in any project yet. Ask an administrator to add you.',
+  'MSG-ADMIN-11': 'Name must be 2–100 characters',
+  'MSG-ADMIN-12': 'Password must be 8–200 characters',
+  'MSG-ADMIN-13': 'Passwords do not match',
+  'MSG-ADMIN-14': 'Choose a password different from the one-time password',
+  'MSG-ADMIN-15': 'Password changed',
+  'MSG-ADMIN-16': 'User not found',
+
+  // Shell: docs/requirements/shell/messages.md
+  'MSG-SHELL-01': 'No results for "{query}"',
+
+  // Project dashboard: docs/requirements/dashboard/messages.md
+  'MSG-DASH-01': 'No release planned yet',
+  'MSG-DASH-02': 'No sprint running',
 } as const;
 
 export type MessageCode = keyof typeof MESSAGES;

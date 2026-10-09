@@ -43,6 +43,13 @@ export const ERROR_CODES = [
   'MILESTONE_OUTSIDE_RELEASE',
   'MILESTONE_OVERLAP',
   'RELEASE_CLOSED',
+  // Phase 3C (docs/api/README.md#phase-3c-codes)
+  'EMAIL_TAKEN',
+  'LAST_ADMIN',
+  'OWN_ACCOUNT',
+  'LAST_PROJECT_ADMIN',
+  'ACCOUNT_DEACTIVATED',
+  'PASSWORD_CHANGE_REQUIRED',
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

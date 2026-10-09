@@ -1,5 +1,11 @@
 import { createBrowserRouter } from 'react-router';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { AdminAuditPage } from '@/features/admin/AdminAuditPage';
+import { AdminDashboardPage } from '@/features/admin/AdminDashboardPage';
+import { AdminLayout } from '@/features/admin/AdminLayout';
+import { AdminProjectsPage } from '@/features/admin/AdminProjectsPage';
+import { AdminUsersPage } from '@/features/admin/AdminUsersPage';
+import { ChangePasswordPage } from '@/features/auth/ChangePasswordPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { ActivityTab } from '@/features/projects/ActivityTab';
@@ -17,6 +23,18 @@ export const router = createBrowserRouter([
     // Every other page needs a logged-in user (BR-AUTH-08).
     element: <RequireAuth />,
     children: [
+      { path: 'change-password', element: <ChangePasswordPage /> },
+      {
+        // Admin UI (BR-ADMIN-01): its own layout; non-Admins get the not-found page (MSG-COMMON-13).
+        path: 'admin',
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <AdminDashboardPage /> },
+          { path: 'projects', element: <AdminProjectsPage /> },
+          { path: 'users', element: <AdminUsersPage /> },
+          { path: 'audit', element: <AdminAuditPage /> },
+        ],
+      },
       {
         element: <AppLayout />,
         children: [

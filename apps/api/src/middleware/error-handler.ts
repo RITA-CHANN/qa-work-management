@@ -38,6 +38,12 @@ const TITLES: Record<ErrorCode, string> = {
   MILESTONE_OUTSIDE_RELEASE: 'Milestone outside its release',
   MILESTONE_OVERLAP: 'Milestones overlap',
   RELEASE_CLOSED: 'Release is released',
+  EMAIL_TAKEN: 'Email already in use',
+  LAST_ADMIN: 'Last active admin',
+  OWN_ACCOUNT: 'Own account',
+  LAST_PROJECT_ADMIN: 'Last project admin',
+  ACCOUNT_DEACTIVATED: 'Account deactivated',
+  PASSWORD_CHANGE_REQUIRED: 'Password change required',
 };
 
 function isJsonSyntaxError(err: unknown): boolean {

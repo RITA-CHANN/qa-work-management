@@ -6,9 +6,12 @@ import { errorHandler } from './middleware/error-handler';
 import { notFound } from './middleware/not-found';
 import { requireJson } from './middleware/require-json';
 import { requestId } from './middleware/request-id';
+import { adminRouter } from './modules/admin/admin.routes';
 import { authRouter, publicAuthRouter } from './modules/auth/auth.routes';
 import { healthRouter } from './modules/health/health.routes';
+import { meRouter } from './modules/me/me.routes';
 import { projectsRouter } from './modules/projects/projects.routes';
+import { searchRouter } from './modules/search/search.routes';
 import { usersRouter } from './modules/users/users.routes';
 
 /**
@@ -44,6 +47,9 @@ export function createApp() {
   api.use('/auth', authRouter);
   api.use('/projects', projectsRouter);
   api.use('/users', usersRouter);
+  api.use('/me', meRouter);
+  api.use('/search', searchRouter);
+  api.use('/admin', adminRouter);
   api.use(notFound);
 
   app.use('/api', api);

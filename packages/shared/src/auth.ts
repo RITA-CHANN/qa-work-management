@@ -26,6 +26,23 @@ export const authUserSchema = z.object({
   email: z.email(),
   name: z.string(),
   globalRole: z.enum(['ADMIN', 'USER']),
+  /** True until the user replaces a one-time password set by an Admin (BR-ADMIN-07, BR-ADMIN-12). */
+  mustChangePassword: z.boolean(),
 });
 
 export type AuthUser = z.infer<typeof authUserSchema>;
+
+/** Password rule for passwords people choose (BR-ADMIN-07). */
+export const newPasswordSchema = z
+  .string({ error: msg('MSG-ADMIN-12') })
+  .min(8, msg('MSG-ADMIN-12'))
+  .max(200, msg('MSG-ADMIN-12'));
+
+/** Body of POST /api/auth/change-password (API-AUTH-04), used after signing in with a one-time password. */
+export const changePasswordSchema = z
+  .strictObject({ newPassword: newPasswordSchema, confirmPassword: z.string() })
+  .refine((body) => body.newPassword === body.confirmPassword, {
+    message: msg('MSG-ADMIN-13'),
+    path: ['confirmPassword'],
+  });
+export type ChangePassword = z.infer<typeof changePasswordSchema>;
