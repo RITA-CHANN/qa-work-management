@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { loginRequestSchema, type ApiSuccess, type AuthUser } from '@qawm/shared';
-import { ValidationError } from '../../lib/errors';
+import { parseOrThrow } from '../../lib/errors';
 import { requireAuth } from '../../middleware/require-auth';
 import { login } from './auth.service';
 import { deleteSession, SESSION_COOKIE, sessionCookieOptions } from './session';
@@ -10,13 +10,8 @@ export const publicAuthRouter = Router();
 
 /** POST /api/auth/login (API-AUTH-01) */
 publicAuthRouter.post('/login', async (req, res) => {
-  const parsed = loginRequestSchema.safeParse(req.body ?? {});
-  if (!parsed.success) {
-    throw new ValidationError(
-      parsed.error.issues.map((issue) => ({ path: issue.path.join('.'), message: issue.message })),
-    );
-  }
-  const { user, token } = await login(parsed.data, req.cookies?.[SESSION_COOKIE]);
+  const body = parseOrThrow(loginRequestSchema, req.body);
+  const { user, token } = await login(body, req.cookies?.[SESSION_COOKIE]);
   res.cookie(SESSION_COOKIE, token, sessionCookieOptions());
   res.json({ data: user } satisfies ApiSuccess<AuthUser>);
 });

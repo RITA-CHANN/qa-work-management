@@ -63,6 +63,8 @@ export const MESSAGES = {
   'MSG-PROJECT-29': 'Only one milestone can be active, and its release must be active',
   'MSG-PROJECT-30': 'A milestone with this name already exists in this project',
   'MSG-PROJECT-31': 'Only a planned milestone can be deleted',
+  'MSG-PROJECT-32':
+    'Release {name} is already released. Add milestones to a planned or active release.',
 } as const;
 
 export type MessageCode = keyof typeof MESSAGES;
@@ -75,4 +77,20 @@ export function msg(code: MessageCode, values?: MessageValues): string {
   return text.replace(/\{(\w+)\}/g, (match, key: string) =>
     key in values ? String(values[key]) : match,
   );
+}
+
+const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Each text as a pattern, with `{name}` placeholders matching any value.
+const PATTERNS = (Object.entries(MESSAGES) as [MessageCode, string][]).map(
+  ([code, text]) =>
+    [code, new RegExp(`^${escapeRegExp(text).replace(/\\\{\w+\\\}/g, '.+?')}$`)] as const,
+);
+
+/**
+ * The code of a text built with msg(), e.g. a Zod issue message. Used by the API to add `messageId` to
+ * each field error. Returns undefined for texts that are not in the catalog.
+ */
+export function messageIdOf(text: string): MessageCode | undefined {
+  return PATTERNS.find(([, pattern]) => pattern.test(text))?.[0];
 }

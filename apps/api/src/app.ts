@@ -8,6 +8,8 @@ import { requireJson } from './middleware/require-json';
 import { requestId } from './middleware/request-id';
 import { authRouter, publicAuthRouter } from './modules/auth/auth.routes';
 import { healthRouter } from './modules/health/health.routes';
+import { projectsRouter } from './modules/projects/projects.routes';
+import { usersRouter } from './modules/users/users.routes';
 
 /**
  * Builds the Express app without starting a server, so it can be reused by tests
@@ -40,6 +42,8 @@ export function createApp() {
   api.use('/auth', publicAuthRouter);
   // Protected routes.
   api.use('/auth', authRouter);
+  api.use('/projects', projectsRouter);
+  api.use('/users', usersRouter);
   api.use(notFound);
 
   app.use('/api', api);

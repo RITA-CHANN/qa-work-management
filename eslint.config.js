@@ -37,6 +37,22 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
   {
+    // OWASP API1 (DD-PROJECT-01): a project is read by key or id only through loadProject, which turns
+    // "not a member" into 404. Lists (findMany) filter by membership in their own query.
+    files: ['apps/api/src/**/*.ts'],
+    ignores: ['apps/api/src/modules/projects/loader.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "MemberExpression[object.property.name='project'][property.name=/^find(Unique|First)/]",
+          message: 'Read a project through loadProject() in modules/projects/loader.ts.',
+        },
+      ],
+    },
+  },
+  {
     files: ['apps/api/src/types/**/*.d.ts'],
     rules: { '@typescript-eslint/no-namespace': 'off' },
   },

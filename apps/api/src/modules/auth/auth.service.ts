@@ -1,4 +1,4 @@
-import { msg, type AuthUser, type LoginRequest } from '@qawm/shared';
+import { type AuthUser, type LoginRequest } from '@qawm/shared';
 import { env } from '../../config/env';
 import { RateLimitedError, UnauthenticatedError } from '../../lib/errors';
 import { prisma } from '../../lib/prisma';
@@ -20,14 +20,14 @@ export async function login(
   previousToken: string | undefined,
 ): Promise<{ user: AuthUser; token: string }> {
   if (loginRateLimiter.isBlocked(email)) {
-    throw new RateLimitedError(msg('MSG-AUTH-02'));
+    throw new RateLimitedError('MSG-AUTH-02');
   }
 
   const found = await prisma.user.findUnique({ where: { email } });
   const ok = await verifyPassword(found?.passwordHash ?? null, password);
   if (!found || !ok) {
     loginRateLimiter.recordFailure(email);
-    throw new UnauthenticatedError(msg('MSG-AUTH-01'));
+    throw new UnauthenticatedError('MSG-AUTH-01');
   }
 
   loginRateLimiter.clear(email);

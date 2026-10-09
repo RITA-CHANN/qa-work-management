@@ -3,9 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { UnsupportedMediaTypeError } from '../lib/errors';
 import { requireJson } from './require-json';
 
-function run(method: string, contentType?: string) {
+function run(method: string, contentType?: string, headers: Record<string, string> = {}) {
   const req = {
     method,
+    headers,
     is: (type: string) => (contentType?.startsWith(type) ? type : false),
   } as unknown as Request;
   const next = vi.fn();
@@ -28,4 +29,14 @@ describe('requireJson', () => {
       expect(() => run('POST', type)).toThrow(UnsupportedMediaTypeError);
     },
   );
+
+  it('lets a DELETE without a body through (no form can send DELETE)', () => {
+    expect(run('DELETE')).toHaveBeenCalled();
+  });
+
+  it('rejects a DELETE that sends a non-JSON body', () => {
+    expect(() => run('DELETE', 'text/plain', { 'content-length': '1' })).toThrow(
+      UnsupportedMediaTypeError,
+    );
+  });
 });

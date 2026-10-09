@@ -13,6 +13,8 @@ export const envSchema = z.object({
   SESSION_TTL_HOURS: z.coerce.number().int().min(1).max(8760).default(168),
   LOGIN_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(5),
   LOGIN_RATE_LIMIT_WINDOW_MIN: z.coerce.number().int().min(1).max(1440).default(15),
+  // Projects (BR-PROJECT-28): longest milestone (sprint) in days.
+  MILESTONE_MAX_DAYS: z.coerce.number().int().min(1).max(366).default(28),
 });
 
 export type Env = z.infer<typeof envSchema>;
