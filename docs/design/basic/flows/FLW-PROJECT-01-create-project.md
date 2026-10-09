@@ -71,7 +71,7 @@ flowchart TD
     G -- 201 --> H[Toast, list reloads with the project]
     G -- 409 KEY_TAKEN --> I[MSG-PROJECT-04 under Key] --> C
     G -- 400 --> E
-    G -- 403 not a System admin --> X[MSG-COMMON-06]
+    G -- 403 not a System admin --> X[MSG-ADMIN-09]
 ```
 
 ## Main flow
