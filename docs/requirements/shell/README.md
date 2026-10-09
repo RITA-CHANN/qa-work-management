@@ -28,6 +28,15 @@ Technical plan: [phase-3c-plan.md](../../phases/phase-3c-plan.md). Related 3C fe
 Accessibility (BR-SHELL-07) is written as a business rule because it applies to every page; there is no separate
 `nfr.md` for the shell.
 
+## Design and API
+
+| Layer   | Docs                                                                                                                                                                                                    |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Screens | [SCR-SHELL-01 App shell](../../design/basic/screens/SCR-SHELL-01-app-shell.md) (side nav, project switcher, search, account menu)                                                                       |
+| API     | [API-ME-01 Current project](../../api/me/get-current-project.md), [API-ME-02 Remember the current project](../../api/me/put-current-project.md), [API-SEARCH-01 Search](../../api/search/get-search.md) |
+| Data    | [users](../../database/tables/users.md) (`last_project_id`)                                                                                                                                             |
+| Plan    | [phase-3c-plan.md](../../phases/phase-3c-plan.md#changed-locators-for-existing-tests) (changed locators, BR-SHELL-08)                                                                                   |
+
 ## Goal
 
 Give the app its final look and structure **before** more modules arrive, so Requirements (3B), Test cases (4) and
@@ -92,6 +101,7 @@ None. The Phase 3C questions were answered with their defaults; see
 
 ## Change log
 
-| Date       | Change                                                      | Why      |
-| ---------- | ----------------------------------------------------------- | -------- |
-| 2026-10-09 | First version, from the Phase 3C business requirements v1.3 | Phase 3C |
+| Date       | Change                                                                | Why              |
+| ---------- | --------------------------------------------------------------------- | ---------------- |
+| 2026-10-09 | First version, from the Phase 3C business requirements v1.3           | Phase 3C         |
+| 2026-10-09 | "Design and API" table: screens, API and data of the Phase 3C code PR | Phase 3C code PR |

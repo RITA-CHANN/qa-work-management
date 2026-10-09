@@ -23,6 +23,14 @@ Technical plan: [phase-3c-plan.md](../../phases/phase-3c-plan.md). The folder is
 | [acceptance.md](acceptance.md) | Acceptance criteria `AC-DASH-NN`       |
 | [messages.md](messages.md)     | Exact UI and error texts `MSG-DASH-NN` |
 
+## Design and API
+
+| Layer   | Docs                                                                                                                                                                                                                   |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Screens | [SCR-DASH-01 Project dashboard](../../design/basic/screens/SCR-DASH-01-project-dashboard.md) (served at `/` for the current project)                                                                                   |
+| API     | No endpoint of its own yet: [API-ME-01](../../api/me/get-current-project.md) for the project, then the project, members, releases, milestones and activity endpoints ([index](../../api/README.md#endpoint-index))     |
+| Data    | [releases](../../database/tables/releases.md), [milestones](../../database/tables/milestones.md), [project_members](../../database/tables/project_members.md), [activity_logs](../../database/tables/activity_logs.md) |
+
 ## Goal
 
 Give every project member one page that shows the project's state at a glance (active release, current sprint,
@@ -83,6 +91,7 @@ None. Q-ADMIN-04 (Overview becomes the dashboard) is decided; see
 
 ## Change log
 
-| Date       | Change                                                      | Why      |
-| ---------- | ----------------------------------------------------------- | -------- |
-| 2026-10-09 | First version, from the Phase 3C business requirements v1.3 | Phase 3C |
+| Date       | Change                                                                | Why              |
+| ---------- | --------------------------------------------------------------------- | ---------------- |
+| 2026-10-09 | First version, from the Phase 3C business requirements v1.3           | Phase 3C         |
+| 2026-10-09 | "Design and API" table: screens, API and data of the Phase 3C code PR | Phase 3C code PR |

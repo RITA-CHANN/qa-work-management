@@ -20,6 +20,9 @@ tags:
   - name: Milestones
   - name: Activity
   - name: Users
+  - name: Me
+  - name: Search
+  - name: Admin
 paths:
   /api/health:
     get:
@@ -89,6 +92,17 @@ paths:
                       code:
                         enum:
                           - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: ACCOUNT_DEACTIVATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - ACCOUNT_DEACTIVATED
         '415':
           description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
           content:
@@ -163,6 +177,64 @@ paths:
                       code:
                         enum:
                           - UNAUTHENTICATED
+  /api/auth/change-password:
+    post:
+      operationId: API-AUTH-04
+      summary: Replace a one-time password
+      description: 'Docs: docs/api/auth/post-change-password.md'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AuthUser'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
   /api/projects:
     get:
       operationId: API-PROJECT-01
@@ -1859,6 +1931,1159 @@ paths:
                       code:
                         enum:
                           - UNAUTHENTICATED
+  /api/me/current-project:
+    get:
+      operationId: API-ME-01
+      summary: The project the shell opens on
+      description: 'Docs: docs/api/me/get-current-project.md'
+      tags:
+        - Me
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CurrentProject'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+    put:
+      operationId: API-ME-02
+      summary: Remember the current project
+      description: 'Docs: docs/api/me/put-current-project.md'
+      tags:
+        - Me
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrentProjectUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CurrentProject'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+  /api/search:
+    get:
+      operationId: API-SEARCH-01
+      summary: Search projects, releases, milestones and (Admins) users
+      description: 'Docs: docs/api/search/get-search.md'
+      tags:
+        - Search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SearchResult'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+  /api/admin/overview:
+    get:
+      operationId: API-ADMIN-01
+      summary: All-projects dashboard KPIs
+      description: 'Docs: docs/api/admin/get-overview.md'
+      tags:
+        - Admin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AdminOverview'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+  /api/admin/projects:
+    get:
+      operationId: API-ADMIN-02
+      summary: Every project
+      description: 'Docs: docs/api/admin/get-projects.md'
+      tags:
+        - Admin
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+        - name: status
+          in: query
+          required: false
+          schema:
+            default: all
+            type: string
+            enum:
+              - active
+              - archived
+              - all
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminProject'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+  /api/admin/users:
+    get:
+      operationId: API-ADMIN-03
+      summary: Every user account
+      description: 'Docs: docs/api/admin/get-users.md'
+      tags:
+        - Admin
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ADMIN
+              - USER
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - DEACTIVATED
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminUser'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+    post:
+      operationId: API-ADMIN-04
+      summary: Create a user with a one-time password
+      description: 'Docs: docs/api/admin/post-user.md'
+      tags:
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OneTimePassword'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '409':
+          description: 'Conflict: EMAIL_TAKEN'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - EMAIL_TAKEN
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+  /api/admin/users/{id}:
+    get:
+      operationId: API-ADMIN-05
+      summary: One user with projects and sessions
+      description: 'Docs: docs/api/admin/get-user.md'
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AdminUserDetail'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+    patch:
+      operationId: API-ADMIN-06
+      summary: Change a user's global role
+      description: 'Docs: docs/api/admin/patch-user.md'
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AdminUser'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+        '422':
+          description: 'Unprocessable Content: OWN_ACCOUNT, LAST_ADMIN'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - OWN_ACCOUNT
+                          - LAST_ADMIN
+  /api/admin/users/{id}/deactivate:
+    post:
+      operationId: API-ADMIN-07
+      summary: Deactivate a user
+      description: 'Docs: docs/api/admin/post-user-deactivate.md'
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmptyBody'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AdminUser'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+        '422':
+          description: 'Unprocessable Content: OWN_ACCOUNT, LAST_ADMIN, LAST_PROJECT_ADMIN'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - OWN_ACCOUNT
+                          - LAST_ADMIN
+                          - LAST_PROJECT_ADMIN
+  /api/admin/users/{id}/reactivate:
+    post:
+      operationId: API-ADMIN-08
+      summary: Reactivate a user
+      description: 'Docs: docs/api/admin/post-user-reactivate.md'
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmptyBody'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AdminUser'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+        '422':
+          description: 'Unprocessable Content: OWN_ACCOUNT'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - OWN_ACCOUNT
+  /api/admin/users/{id}/reset-password:
+    post:
+      operationId: API-ADMIN-09
+      summary: Reset a password to a new one-time password
+      description: 'Docs: docs/api/admin/post-user-reset-password.md'
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmptyBody'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OneTimePassword'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+  /api/admin/users/{id}/sign-out:
+    post:
+      operationId: API-ADMIN-10
+      summary: Sign a user out everywhere
+      description: 'Docs: docs/api/admin/post-user-sign-out.md'
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmptyBody'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SignOutResult'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+        '415':
+          description: 'Unsupported Media Type: UNSUPPORTED_MEDIA_TYPE'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNSUPPORTED_MEDIA_TYPE
+  /api/admin/audit:
+    get:
+      operationId: API-ADMIN-11
+      summary: Audit log, newest first
+      description: 'Docs: docs/api/admin/get-audit.md'
+      tags:
+        - Admin
+      parameters:
+        - name: actorId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: action
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 60
+        - name: projectKey
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 10
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        - name: asAdmin
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            default: 50
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditEvent'
+                  meta:
+                    type: object
+                    required:
+                      - nextCursor
+                    properties:
+                      nextCursor:
+                        type:
+                          - string
+                          - 'null'
+        '400':
+          description: 'Bad Request: VALIDATION_ERROR'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '403':
+          description: 'Forbidden: PASSWORD_CHANGE_REQUIRED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - PASSWORD_CHANGE_REQUIRED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
 components:
   securitySchemes:
     session:
@@ -2390,6 +3615,470 @@ components:
         - name
         - email
       additionalProperties: false
+    CurrentProject:
+      type: object
+      properties:
+        key:
+          type:
+            - string
+            - 'null'
+      required:
+        - key
+      additionalProperties: false
+    SearchResult:
+      type: object
+      properties:
+        group:
+          type: string
+          enum:
+            - project
+            - release
+            - milestone
+            - user
+        id:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        href:
+          type: string
+      required:
+        - group
+        - id
+        - title
+        - subtitle
+        - href
+      additionalProperties: false
+    AdminOverview:
+      type: object
+      properties:
+        activeProjects:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        archivedProjects:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        activeUsers:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        totalUsers:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        admins:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        failedSignIns7d:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        adminActions7d:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        projects:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              name:
+                type: string
+              archived:
+                type: boolean
+              memberCount:
+                type: integer
+                minimum: -9007199254740991
+                maximum: 9007199254740991
+              projectAdmins:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                  required:
+                    - id
+                    - name
+                  additionalProperties: false
+              activeRelease:
+                anyOf:
+                  - type: object
+                    properties:
+                      name:
+                        type: string
+                      targetDate:
+                        type:
+                          - string
+                          - 'null'
+                    required:
+                      - name
+                      - targetDate
+                    additionalProperties: false
+                  - type: 'null'
+              activeMilestone:
+                anyOf:
+                  - type: object
+                    properties:
+                      name:
+                        type: string
+                      endDate:
+                        type: string
+                    required:
+                      - name
+                      - endDate
+                    additionalProperties: false
+                  - type: 'null'
+              lastActivityAt:
+                type:
+                  - string
+                  - 'null'
+              createdAt:
+                type: string
+            required:
+              - key
+              - name
+              - archived
+              - memberCount
+              - projectAdmins
+              - activeRelease
+              - activeMilestone
+              - lastActivityAt
+              - createdAt
+            additionalProperties: false
+      required:
+        - activeProjects
+        - archivedProjects
+        - activeUsers
+        - totalUsers
+        - admins
+        - failedSignIns7d
+        - adminActions7d
+        - projects
+      additionalProperties: false
+    AdminProject:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        archived:
+          type: boolean
+        memberCount:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        projectAdmins:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+            required:
+              - id
+              - name
+            additionalProperties: false
+        activeRelease:
+          anyOf:
+            - type: object
+              properties:
+                name:
+                  type: string
+                targetDate:
+                  type:
+                    - string
+                    - 'null'
+              required:
+                - name
+                - targetDate
+              additionalProperties: false
+            - type: 'null'
+        activeMilestone:
+          anyOf:
+            - type: object
+              properties:
+                name:
+                  type: string
+                endDate:
+                  type: string
+              required:
+                - name
+                - endDate
+              additionalProperties: false
+            - type: 'null'
+        lastActivityAt:
+          type:
+            - string
+            - 'null'
+        createdAt:
+          type: string
+      required:
+        - key
+        - name
+        - archived
+        - memberCount
+        - projectAdmins
+        - activeRelease
+        - activeMilestone
+        - lastActivityAt
+        - createdAt
+      additionalProperties: false
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+          pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+        globalRole:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - DEACTIVATED
+        mustChangePassword:
+          type: boolean
+        projectCount:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        lastSignInAt:
+          type:
+            - string
+            - 'null'
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - globalRole
+        - status
+        - mustChangePassword
+        - projectCount
+        - lastSignInAt
+        - createdAt
+      additionalProperties: false
+    AdminUserDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+          pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+        globalRole:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - DEACTIVATED
+        mustChangePassword:
+          type: boolean
+        projectCount:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        lastSignInAt:
+          type:
+            - string
+            - 'null'
+        createdAt:
+          type: string
+        projects:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              name:
+                type: string
+              role:
+                type: string
+              archived:
+                type: boolean
+            required:
+              - key
+              - name
+              - role
+              - archived
+            additionalProperties: false
+        activeSessions:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+      required:
+        - id
+        - name
+        - email
+        - globalRole
+        - status
+        - mustChangePassword
+        - projectCount
+        - lastSignInAt
+        - createdAt
+        - projects
+        - activeSessions
+      additionalProperties: false
+    OneTimePassword:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+              pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+            globalRole:
+              type: string
+              enum:
+                - ADMIN
+                - USER
+            status:
+              type: string
+              enum:
+                - ACTIVE
+                - DEACTIVATED
+            mustChangePassword:
+              type: boolean
+            projectCount:
+              type: integer
+              minimum: -9007199254740991
+              maximum: 9007199254740991
+            lastSignInAt:
+              type:
+                - string
+                - 'null'
+            createdAt:
+              type: string
+          required:
+            - id
+            - name
+            - email
+            - globalRole
+            - status
+            - mustChangePassword
+            - projectCount
+            - lastSignInAt
+            - createdAt
+          additionalProperties: false
+        oneTimePassword:
+          type: string
+      required:
+        - user
+        - oneTimePassword
+      additionalProperties: false
+    SignOutResult:
+      type: object
+      properties:
+        endedSessions:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+      required:
+        - endedSessions
+      additionalProperties: false
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+        actor:
+          anyOf:
+            - type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+              required:
+                - id
+                - name
+              additionalProperties: false
+            - type: 'null'
+        action:
+          type: string
+        actionLabel:
+          type: string
+        targetType:
+          type: string
+        targetName:
+          type: string
+        projectKey:
+          type:
+            - string
+            - 'null'
+        before:
+          anyOf:
+            - type: object
+              propertyNames:
+                type: string
+              additionalProperties: {}
+            - type: 'null'
+        after:
+          anyOf:
+            - type: object
+              propertyNames:
+                type: string
+              additionalProperties: {}
+            - type: 'null'
+        actedAs:
+          type:
+            - string
+            - 'null'
+        ip:
+          type:
+            - string
+            - 'null'
+      required:
+        - id
+        - at
+        - actor
+        - action
+        - actionLabel
+        - targetType
+        - targetName
+        - projectKey
+        - before
+        - after
+        - actedAs
+        - ip
+      additionalProperties: false
     LoginRequest:
       type: object
       properties:
@@ -2594,4 +4283,57 @@ components:
             - COMPLETED
       required:
         - version
+      additionalProperties: false
+    ChangePassword:
+      type: object
+      properties:
+        newPassword:
+          type: string
+          minLength: 8
+          maxLength: 200
+        confirmPassword:
+          type: string
+      required:
+        - newPassword
+        - confirmPassword
+      additionalProperties: false
+    CurrentProjectUpdate:
+      type: object
+      properties:
+        key:
+          type: string
+          minLength: 1
+      required:
+        - key
+      additionalProperties: false
+    AdminUserCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        email:
+          type: string
+          minLength: 1
+        globalRole:
+          default: USER
+          type: string
+          enum:
+            - ADMIN
+            - USER
+      required:
+        - name
+        - email
+      additionalProperties: false
+    AdminUserUpdate:
+      type: object
+      properties:
+        globalRole:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+      required:
+        - globalRole
       additionalProperties: false

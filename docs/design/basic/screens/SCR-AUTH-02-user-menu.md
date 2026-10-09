@@ -13,10 +13,14 @@ traces:
   acceptance: [AC-AUTH-18, AC-AUTH-19, AC-AUTH-27, AC-AUTH-28]
   api: [API-AUTH-02, API-AUTH-03]
   design: [FLW-AUTH-01, FLW-AUTH-02, DD-AUTH-03]
-updated: 2026-10-07
+updated: 2026-10-09
 ---
 
 # SCR-AUTH-02 Header user menu
+
+> **Phase 3C:** the header name and "Log out" button are replaced by the account menu of the app shell
+> ([SCR-SHELL-01](SCR-SHELL-01-app-shell.md)): open `getByRole('button', { name: 'Account: <name>' })`, then
+> `getByRole('menuitem', { name: 'Log out' })`. The behaviour of logging out below is unchanged.
 
 A part of the app header (`AppLayout`), shown on every page once logged in. API: [API-AUTH-03 GET /api/auth/me](../../../api/auth/get-me.md)
 for the name, [API-AUTH-02 POST /api/auth/logout](../../../api/auth/post-logout.md) for the button. What happens after
@@ -84,3 +88,4 @@ wrap; there is no criterion for small screens yet.
 | 2026-10-07 | First version                                                            | Phase 2                                     |
 | 2026-10-07 | Added API and flow links, failure behaviour of Log out                   | Full login feature design                   |
 | 2026-10-08 | Added Layout, Actions, States, Permissions, Accessibility and Responsive | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-09 | Note: replaced by the account menu of SCR-SHELL-01                       | Phase 3C                                    |

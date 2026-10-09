@@ -97,3 +97,39 @@ only Admin.
   format, `docs:check`, axe on every page (AC-SHELL-06).
 - By hand: `/admin` as Linh (404), create user → first sign-in, deactivate with two browsers, Guest Sam with default
   switches, ⌘K as Linh never shows SECRET.
+
+## 8. Changed locators for existing tests
+
+The Phase 3C code PR moves every page into the new app shell ([SCR-SHELL-01](../design/basic/screens/SCR-SHELL-01-app-shell.md)).
+Accessible names that Linh's Playwright tests use and that changed (BR-SHELL-08, AC-SHELL-08):
+
+| Where                   | Before (Phase 2 / 3A)                                     | Now (Phase 3C)                                                                                                                                                                                                                                                            |
+| ----------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Log out                 | `getByRole('button', { name: 'Log out' })` in the header  | The account menu replaces the header name and the "Log out" button: click `getByRole('button', { name: 'Account: Linh QA' })`, then `getByRole('menuitem', { name: 'Log out' })`                                                                                          |
+| Signed-in user's name   | `getByText('Linh QA')`                                    | No longer unique: the dashboard's recent activity shows names too. Use `getByRole('button', { name: 'Account: Linh QA' })`                                                                                                                                                |
+| `/`                     | Placeholder dashboard ("Nothing to show yet")             | The current project's dashboard ([SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)). `<h1>` still "Dashboard", page title still "Dashboard · QA Work Management". After a fresh seed Linh's current project is MOBI (first of her projects by name) |
+| Side nav                | `navigation` "Main" with links "Dashboard" and "Projects" | Still `navigation` "Main" with "Dashboard" and "Projects", plus "Project overview", "Releases & sprints", "Members" and "Activity" when a project is current                                                                                                              |
+| Project page tab links  | `page.getByRole('link', { name: 'Members' })` was unique  | "Members" and "Activity" now also exist in the side nav, and "Overview" matches "Project overview" as a substring: scope to `getByRole('navigation', { name: 'Project sections' })`                                                                                       |
+| Admin console           | (none)                                                    | Account menu item "Admin console" for Ada only; `/admin` for anyone else shows "Page not found"                                                                                                                                                                           |
+| One-time password users | (none)                                                    | Every page redirects to `/change-password` ([SCR-AUTH-03](../design/basic/screens/SCR-AUTH-03-set-new-password.md)) until the password is changed                                                                                                                         |
+
+API tests: the login and `GET /api/auth/me` bodies gain `mustChangePassword` (false for every seed user). A test that
+compares the whole body with `toEqual` needs the new field.
+
+## 9. Not done yet in the Phase 3C code PR
+
+These wait for the role model change in PR #13 (role model v2: Project admin / Member, job titles), or follow in
+a second 3C PR:
+
+| Not built yet                                                                                                                               | Requirements                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| Guest access level and the per-project Guest visibility settings                                                                            | [guest](../requirements/guest/README.md) |
+| Project settings page; moving project details from Overview to Settings, dashboard on `/projects/:key`                                      | Q-ADMIN-04, BR-DASH-01, AC-DASH-04       |
+| Project creation by System admins only, with a first Project admin ("New project" in Admin › Projects; `POST /api/projects` 403 for others) | BR-ADMIN-18, AC-ADMIN-12, AC-ADMIN-13    |
+| "Change project admin"                                                                                                                      | BR-ADMIN-04, AC-ADMIN-09                 |
+| "You are viewing this project as Admin" banner                                                                                              | BR-ADMIN-05, AC-ADMIN-03                 |
+| Admin console › Settings and audit retention clean-up (365 days)                                                                            | BR-ADMIN-17, AC-ADMIN-19                 |
+| `GET /api/projects/:key/dashboard` (the dashboard reads the existing endpoints instead)                                                     | Section 3 step 4                         |
+
+Until role model v2 lands, "Project admin" in the Admin console (Project admins column, BR-ADMIN-11 check) means a
+member with role `OWNER` (`apps/api/src/modules/admin/project-admins.ts`).
