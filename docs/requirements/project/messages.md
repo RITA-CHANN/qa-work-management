@@ -50,6 +50,8 @@ below and the code differ. Tests should assert these exact texts. Shared texts (
 | MSG-PROJECT-31 | Delete non-planned milestone (422)                           | error   | alert    | Only a planned milestone can be deleted                                            |
 | MSG-PROJECT-32 | Milestone in a released release (422)                        | error   | alert    | Release {name} is already released. Add milestones to a planned or active release. |
 | MSG-PROJECT-33 | New project: first project admin missing or not a user (400) | error   | field    | Choose an existing user as the first project admin                                 |
+| MSG-PROJECT-34 | Activity filter: To is before From                           | error   | field    | The end date can't be before the start date                                        |
+| MSG-PROJECT-35 | Activity: no entry matches the filters                       | info    | status   | No activity matches these filters                                                  |
 
 `Kind` and `Shown as` are explained in the [template](../../_templates/feature/messages.md). API errors carry the
 same text in the problem body's `detail` and the ID in `messageId`
@@ -59,8 +61,9 @@ states use `role="status"`.
 
 ## Change log
 
-| Date       | Change                                                                                                                                          | Why                        |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| 2026-10-08 | First version, from the Phase 3 business requirements v2 (with Linh's answers to Q-PROJECT-01 to Q-PROJECT-05)                                  | Phase 3A                   |
-| 2026-10-09 | Added MSG-PROJECT-32: a milestone can't be added to a released release (found while building the API)                                           | Phase 3A code              |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects (MSG-PROJECT-12, 21, 22 reworded, MSG-PROJECT-33 added) | Linh's decision 2026-10-09 |
+| Date       | Change                                                                                                                                          | Why                          |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| 2026-10-08 | First version, from the Phase 3 business requirements v2 (with Linh's answers to Q-PROJECT-01 to Q-PROJECT-05)                                  | Phase 3A                     |
+| 2026-10-09 | Added MSG-PROJECT-32: a milestone can't be added to a released release (found while building the API)                                           | Phase 3A code                |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects (MSG-PROJECT-12, 21, 22 reworded, MSG-PROJECT-33 added) | Linh's decision 2026-10-09   |
+| 2026-10-09 | Added MSG-PROJECT-34 (activity date filter) and MSG-PROJECT-35 (activity filters match nothing)                                                 | Screen review SCR-PROJECT-05 |

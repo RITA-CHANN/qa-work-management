@@ -1116,6 +1116,37 @@ paths:
           schema:
             type: string
             minLength: 1
+        - name: entityType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - project
+              - member
+              - release
+              - milestone
+        - name: actorId
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 40
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
       responses:
         '200':
           description: OK
@@ -1151,6 +1182,56 @@ paths:
                       code:
                         enum:
                           - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+  /api/projects/{key}/activity/actors:
+    get:
+      operationId: API-PROJECT-14
+      summary: People with entries in the activity log
+      description: 'Docs: docs/api/projects/get-project-activity-actors.md'
+      tags:
+        - Activity
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Project key, case-insensitive
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActivityActor'
         '401':
           description: 'Unauthorized: UNAUTHENTICATED'
           content:
@@ -3872,6 +3953,17 @@ components:
         - version
         - createdAt
         - updatedAt
+      additionalProperties: false
+    ActivityActor:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
       additionalProperties: false
     ActivityEntry:
       type: object
