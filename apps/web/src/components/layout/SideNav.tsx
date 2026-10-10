@@ -7,7 +7,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import { NavLink } from 'react-router';
+import { Link, NavLink, useLocation } from 'react-router';
 import type { GuestArea } from '@qawm/shared';
 import { useProjectAccess } from '@/features/projects/access';
 import { useProject } from '@/features/projects/api';
@@ -22,6 +22,8 @@ type NavItem = {
   area?: GuestArea;
   /** Only for those who manage the project. */
   adminOnly?: boolean;
+  /** Another path that shows the same page, where this item is current too. */
+  alsoAt?: string;
 };
 type NavGroup = { label: string; items: NavItem[] };
 
@@ -34,7 +36,17 @@ function groupsFor(projectKey: string | null): NavGroup[] {
   return [
     {
       label: 'Overview',
-      items: [{ to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true, area: 'dashboard' }],
+      // The project's own URL, so the item is current on /projects/:key; "/" shows the same dashboard.
+      items: [
+        {
+          to: project ?? '/',
+          label: 'Dashboard',
+          icon: LayoutDashboard,
+          end: true,
+          area: 'dashboard',
+          alsoAt: '/',
+        },
+      ],
     },
     ...(project
       ? [
@@ -68,6 +80,7 @@ function groupsFor(projectKey: string | null): NavGroup[] {
 }
 
 export function SideNav({ projectKey }: { projectKey: string | null }) {
+  const { pathname } = useLocation();
   // Same cache entry as the project page, so this costs no extra request there.
   const project = useProject(projectKey ?? '', !!projectKey);
   const access = useProjectAccess(project.data);
@@ -85,28 +98,33 @@ export function SideNav({ projectKey }: { projectKey: string | null }) {
             {group.label}
           </p>
           <ul className="flex flex-col gap-0.5">
-            {group.items.map(({ to, label, icon: Icon, end }) => (
+            {group.items.map(({ to, label, icon: Icon, end, alsoAt }) => (
               <li key={to}>
-                {/* NavLink sets aria-current="page" on the active link. */}
-                <NavLink
-                  to={to}
-                  end={end}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-muted',
-                      isActive &&
-                        'bg-primary-tint text-primary-tint-foreground hover:bg-primary-tint',
-                    )
-                  }
-                >
-                  <Icon aria-hidden="true" className="size-4" />
-                  {label}
-                </NavLink>
+                {alsoAt === pathname ? (
+                  // NavLink can't be made current on another path, so this case is a plain link.
+                  <Link to={to} aria-current="page" className={itemClass(true)}>
+                    <Icon aria-hidden="true" className="size-4" />
+                    {label}
+                  </Link>
+                ) : (
+                  // NavLink sets aria-current="page" on the active link.
+                  <NavLink to={to} end={end} className={({ isActive }) => itemClass(isActive)}>
+                    <Icon aria-hidden="true" className="size-4" />
+                    {label}
+                  </NavLink>
+                )}
               </li>
             ))}
           </ul>
         </div>
       ))}
     </nav>
+  );
+}
+
+function itemClass(current: boolean) {
+  return cn(
+    'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-muted',
+    current && 'bg-primary-tint text-primary-tint-foreground hover:bg-primary-tint',
   );
 }

@@ -66,6 +66,10 @@ export const MESSAGES = {
   'MSG-PROJECT-32':
     'Release {name} is already released. Add milestones to a planned or active release.',
   'MSG-PROJECT-33': 'Choose an existing user as the first project admin',
+  'MSG-PROJECT-50': 'Project archived',
+  'MSG-PROJECT-51': 'Project restored',
+  'MSG-PROJECT-52': 'Deleted project {key}',
+  'MSG-PROJECT-53': "This project doesn't exist or you don't have access to it.",
 
   // Admin console: docs/requirements/admin/messages.md
   'MSG-ADMIN-01': 'An account with this email already exists',

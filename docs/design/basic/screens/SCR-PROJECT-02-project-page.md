@@ -1,6 +1,6 @@
 ---
 id: SCR-PROJECT-02
-title: Project page (header, dashboard, settings, project dialogs)
+title: Project page frame (header, banners, project dialogs)
 type: screen
 feature: project
 status: review
@@ -8,7 +8,7 @@ phase: 3
 owner: Claude
 reviewers: [Linh]
 approved:
-route: /projects/:key
+route: /projects/:key/*
 traces:
   requirements:
     [
@@ -26,11 +26,8 @@ traces:
       BR-PROJECT-09,
       BR-PROJECT-34,
       BR-PROJECT-35,
-      US-DASH-01,
-      BR-DASH-01,
+      BR-PROJECT-50,
       BR-ADMIN-05,
-      US-GUEST-01,
-      BR-GUEST-02,
       BR-GUEST-03,
       BR-GUEST-06,
     ]
@@ -48,148 +45,154 @@ traces:
       AC-PROJECT-33,
       AC-PROJECT-35,
       AC-PROJECT-64,
-      AC-DASH-04,
+      AC-PROJECT-111,
+      AC-PROJECT-112,
+      AC-PROJECT-113,
+      AC-PROJECT-114,
+      AC-PROJECT-115,
       AC-ADMIN-03,
       AC-GUEST-01,
-      AC-GUEST-02,
-      AC-GUEST-05,
     ]
-  api:
-    [API-PROJECT-03, API-PROJECT-04, API-PROJECT-05, API-PROJECT-06, API-PROJECT-07, API-PROJECT-13]
-  design: [FLW-PROJECT-03, FLW-PROJECT-05, DD-PROJECT-01, DD-PROJECT-03, SCR-DASH-01]
-updated: 2026-10-09
+  api: [API-PROJECT-03, API-PROJECT-04, API-PROJECT-05, API-PROJECT-06, API-PROJECT-07]
+  design:
+    [
+      SCR-SHELL-01,
+      SCR-DASH-01,
+      SCR-PROJECT-03,
+      SCR-PROJECT-04,
+      SCR-PROJECT-05,
+      FLW-PROJECT-03,
+      FLW-PROJECT-05,
+      DD-PROJECT-01,
+      DD-PROJECT-03,
+    ]
+updated: 2026-10-10
 ---
 
-# SCR-PROJECT-02 Project page (header, dashboard, settings, project dialogs)
+# SCR-PROJECT-02 Project page frame (header, banners, project dialogs)
 
-The page of one project. The header and tabs are shared by every tab; this doc covers the header, the
-**Dashboard** tab (the project home, which embeds [SCR-DASH-01](SCR-DASH-01-project-dashboard.md) and replaces the
-3A Overview, BR-DASH-01), the **Settings** tab and the project-level dialogs (edit, archive, restore, delete). Other
-tabs: SCR-PROJECT-03 Members, SCR-PROJECT-04 Releases & sprints, SCR-PROJECT-05 Activity.
+The frame around every page of one project (`/projects/:key/*`): the header, the banners, the current milestone
+line and the project-level dialogs (edit, archive, restore, delete). Follows ISO 9241-110 and WCAG 2.2 AA.
+
+What goes inside the frame is another screen: Dashboard [SCR-DASH-01](SCR-DASH-01-project-dashboard.md) at
+`/projects/:key`, Releases & sprints SCR-PROJECT-04, Members SCR-PROJECT-03, Activity SCR-PROJECT-05, Project settings
+(screen in design, ID reserved in the screen inventory). There is **no tab bar**: the side nav of the app shell ([SCR-SHELL-01](SCR-SHELL-01-app-shell.md)) is
+the only way between these pages, and it marks the current one (BR-PROJECT-50). Each inner page starts with its own
+`<h2>`, so the frame needs no section title.
 
 ## Layout
 
 ```
-┌──────────┬────────────────────────────────────────────────────────────────────────────┐
-│ nav      │  ShopEase Web  SHOP  [Project admin]              [ Edit ] [ ⋯ More ▾ ]     │ <h1> name, key, my-access badge
-│          │  You are viewing this project as Admin                                     │ MSG-ADMIN-08, System admin not a member
-│          │  ⚠ This project is archived. Restore it to make changes. [Restore]         │ banner only when archived
-│          │  Current: Sprint 4 · release 2.4 · 3 days left                             │ or "Overdue by 2 days"
-│          │  [ Dashboard ] [ Releases & sprints ] [ Members ] [ Activity ] [ Settings ] │ tabs (links, URL per tab)
-│          │  ── Dashboard ─────────────────────────────────────────────────────────────  │
-│          │  KPI row and cards of SCR-DASH-01 (without its own header)                  │
-└──────────┴────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────┬──────────────────────────────────────────────────────────────────┐
+│ side nav (Main)  │  ShopEase Web  SHOP  [Project admin] [Archived]   [ Edit ] [More ▾] │ <h1> name, key, my-access badge
+│  Dashboard   ◀── │  You are viewing this project as Admin                             │ MSG-ADMIN-08, System admin not a member
+│  Releases &…     │  This project is archived. Restore it to make changes. [Restore]   │ only when archived, amber
+│  Members         │  Current: Sprint 4 · release 2.4 · 3 days left                     │ or "Overdue by 2 days"
+│  Activity        │  ── page of the current side nav item ───────────────────────────  │
+│  Project settings│  <h2> Members …                                                    │
+└──────────────────┴──────────────────────────────────────────────────────────────────┘
 More ▾ (Project admins and System admins): Archive / Restore, Delete (only when archived)
 Badge: "Project admin", "Member" or "Guest" (my access); "System admin" for a System admin who is not a member
-Tabs: a Guest sees only the tabs of areas switched on for Guests; Settings only for Project admins and System admins
-
-── Settings (/projects/:key/settings) ───────────────────────────────────────────────
-┌─ Project details ───────────── [Edit details] ┐┌─ Guests ────────────────────────────┐
-│ Key          SHOP                             ││ Project dashboard            (●   ) │ role="switch", one per area
-│ Name         ShopEase Web                     ││ Releases and sprints         (●   ) │ that exists so far
-│ Description  Customer web shop …              ││ Members list                 (   ○) │
-│ Created      Ada Admin, 2026-09-01            ││ Activity log                 (   ○) │
-└───────────────────────────────────────────────┘│                   [ Cancel ] [ Save ]│
-                                                 └──────────────────────────────────────┘
+Below 768 px: [ Actions ▾ ] replaces Edit and More, with the same items (Edit, Archive / Restore, Delete)
 
 Dialog "Edit project": Key (read-only text), Name, Description, [Cancel] [Save]
 Dialog "Archive project?": explains read-only effect, [Cancel] [Archive]
 Dialog "Delete project?": warning, "Type SHOP to confirm" [______], [Cancel] [Delete] (disabled until it matches)
 ```
 
-Routes: `/projects/:key` (Dashboard), `/projects/:key/releases`, `/projects/:key/members`,
-`/projects/:key/activity`, `/projects/:key/settings`. A tab a person may not see answers with the "Page not found"
-page (MSG-COMMON-13), the same as the API's 404 (BR-GUEST-03).
+The Danger zone of Project settings reuses the archive and delete dialogs of this screen.
 
 ## Fields
 
-| Field                       | Input type     | Required | Client validation               | Message        | Notes                                                                                    |
-| --------------------------- | -------------- | -------- | ------------------------------- | -------------- | ---------------------------------------------------------------------------------------- |
-| Key (edit dialog)           | read-only text | —        | —                               | —              | Not an input (BR-PROJECT-03)                                                             |
-| Name                        | `text`         | yes      | 3–100 characters after trimming | MSG-PROJECT-03 |                                                                                          |
-| Description                 | `textarea`     | no       | at most 2000 characters         | MSG-PROJECT-05 |                                                                                          |
-| Confirm key (delete dialog) | `text`         | yes      | equals the project key exactly  | MSG-PROJECT-10 | Delete button disabled until it matches                                                  |
-| Guest area switches         | switch × 4     | —        | —                               | —              | One per area of `GUEST_AREAS_AVAILABLE`, labelled with `GUEST_AREA_LABELS` (BR-GUEST-02) |
+| Field                       | Input type     | Required | Client validation               | Message        | Notes                                                       |
+| --------------------------- | -------------- | -------- | ------------------------------- | -------------- | ----------------------------------------------------------- |
+| Key (edit dialog)           | read-only text | —        | —                               | —              | Not an input (BR-PROJECT-03)                                |
+| Name                        | `text`         | yes      | 3–100 characters after trimming | MSG-PROJECT-03 |                                                             |
+| Description                 | `textarea`     | no       | at most 2000 characters         | MSG-PROJECT-05 | Counter "n / 2000" under the field                          |
+| Confirm key (delete dialog) | `text`         | yes      | equals the project key exactly  | MSG-PROJECT-10 | MSG-PROJECT-10 is the label; no error text while typing (1) |
+
+(1) The Delete button stays disabled until the key matches, which already shows the state. A red error before the
+user has finished typing would blame them for an unfinished input (ISO 9241-110, error tolerance).
 
 ## Actions
 
-| Action                                            | Result                                                                                                                                | Criteria      |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| Open `/projects/SHOP`                             | `GET /api/projects/SHOP`; header and the Dashboard tab                                                                                | AC-PROJECT-15 |
-| Open a key you can't see                          | "Project not found" page (MSG-PROJECT-06) with a link back to Projects                                                                | AC-PROJECT-16 |
-| Edit (header) or Settings › "Edit details" → Save | `PATCH` with `version`; dialog closes, toast MSG-PROJECT-19                                                                           | AC-PROJECT-19 |
-| Save, server 409                                  | Alert MSG-PROJECT-07 in the dialog, input kept, "Reload" button refetches                                                             | AC-PROJECT-21 |
-| More → Archive → confirm                          | `POST …/archive`; banner appears, all write buttons disappear                                                                         | AC-PROJECT-30 |
-| Restore (banner or More)                          | `POST …/restore`; banner goes, buttons return                                                                                         | AC-PROJECT-32 |
-| More → Delete (archived only) → type key → Delete | `DELETE`; go to `/projects`, toast                                                                                                    | AC-PROJECT-35 |
-| Delete with the wrong key typed                   | Delete stays disabled; MSG-PROJECT-10 under the field                                                                                 | AC-PROJECT-35 |
-| Settings › Guests: flip switches                  | Only the form changes; Save and Cancel are enabled once it differs from the saved list                                                |               |
-| Settings › Guests › Save                          | `PUT /api/projects/:key/guest-visibility` with the areas switched on; toast MSG-GUEST-02; Guests see the change on their next request | AC-GUEST-02   |
-| Settings › Guests › Cancel                        | Switches go back to the saved list                                                                                                    |               |
-| Save, server error                                | The error text in an alert in the Guests card; switches kept                                                                          |               |
+| Action                                                    | Result                                                                             | Criteria                      |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------- |
+| Open `/projects/SHOP`                                     | `GET /api/projects/SHOP`; header, then the dashboard; side nav "Dashboard" current | AC-PROJECT-15, AC-PROJECT-111 |
+| Click an item in the side nav                             | Its page opens inside the same frame; that item is current                         | AC-PROJECT-112                |
+| Open a key you can't see                                  | "Project not found" page with a link back to Projects                              | AC-PROJECT-16, AC-PROJECT-114 |
+| Edit → Save                                               | `PATCH` with `version`; dialog closes, toast MSG-PROJECT-19                        | AC-PROJECT-19                 |
+| Save, server 409                                          | Alert MSG-PROJECT-07 in the dialog, input kept, "Reload" button refetches          | AC-PROJECT-21                 |
+| More → Archive → confirm                                  | `POST …/archive`; toast MSG-PROJECT-50; banner appears, write buttons go           | AC-PROJECT-30, AC-PROJECT-113 |
+| Restore (banner or More)                                  | `POST …/restore`; toast MSG-PROJECT-51; banner goes, buttons return                | AC-PROJECT-32, AC-PROJECT-113 |
+| More → Delete (archived only) → type key → Delete         | `DELETE`; go to `/projects`, toast MSG-PROJECT-52                                  | AC-PROJECT-35, AC-PROJECT-113 |
+| Delete with a wrong or unfinished key typed               | Delete stays disabled; no error text                                               | AC-PROJECT-35                 |
+| Restore or archive fails                                  | Error text in an alert under the banners                                           |                               |
+| Below 768 px: Actions → Edit / Archive / Restore / Delete | Same as the matching Edit or More item                                             | AC-PROJECT-115                |
 
 ## States
 
-| State                         | What the user sees                                                                                                                                                                       | Criteria                     |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Loading                       | Header skeleton                                                                                                                                                                          |                              |
-| Not found / not a member      | MSG-PROJECT-06 page, same for both                                                                                                                                                       | AC-PROJECT-16                |
-| Error                         | MSG-COMMON-01 with "Try again"                                                                                                                                                           |                              |
-| System admin, not a member    | Banner MSG-ADMIN-08 under the header on every tab (`role="status"`)                                                                                                                      | AC-ADMIN-03                  |
-| Member (read only)            | No Edit, no More menu, no Settings tab                                                                                                                                                   | AC-PROJECT-17, AC-PROJECT-22 |
-| Guest                         | Badge "Guest"; only the tabs of areas switched on; no Edit, More or Settings; Dashboard shows only the cards of those areas                                                              | AC-GUEST-01                  |
-| Guest, dashboard switched off | The Dashboard tab is hidden and `/projects/:key` shows "Page not found"                                                                                                                  | AC-GUEST-01                  |
-| Archived                      | Banner MSG-PROJECT-08 style text with Restore (Project admins only); every write button hidden on all tabs; Settings shows the switches disabled, without Save, Cancel or "Edit details" | AC-PROJECT-30                |
-| Active milestone              | "Current: <milestone> · release <name> · N days left" or "Overdue by N days"                                                                                                             | AC-PROJECT-64                |
-| No active milestone           | Line hidden                                                                                                                                                                              |                              |
-| Success                       | Toast MSG-PROJECT-19 after a project save, MSG-GUEST-02 after a Guests save                                                                                                              | AC-PROJECT-19, AC-GUEST-02   |
+| State                      | What the user sees                                                                                                                              | Criteria                      |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Loading                    | Header skeleton (`aria-busy="true"`)                                                                                                            |                               |
+| Not found / not a member   | Heading MSG-PROJECT-06, line MSG-PROJECT-53, "Back to projects"; same for both                                                                  | AC-PROJECT-16, AC-PROJECT-114 |
+| Error                      | The error text (MSG-COMMON-01 when the server gives none) with "Try again"                                                                      |                               |
+| System admin, not a member | Badge "System admin"; banner MSG-ADMIN-08 under the header on every page (`role="status"`)                                                      | AC-ADMIN-03                   |
+| Member (read only)         | No Edit, More or Actions; no "Project settings" in the side nav                                                                                 | AC-PROJECT-17, AC-PROJECT-22  |
+| Guest                      | Badge "Guest"; no Edit, More or Actions; the side nav lists only the areas switched on for Guests                                               | AC-GUEST-01                   |
+| Guest, area switched off   | That page (dashboard included) answers "Page not found" (MSG-COMMON-13), like the API's 404                                                     | AC-GUEST-01                   |
+| Archived                   | Badge "Archived"; amber banner MSG-PROJECT-08 with Restore (Project admins and System admins); no Edit; every write button hidden on every page | AC-PROJECT-30                 |
+| Active milestone           | "Current: <milestone> · release <name> · N days left" or "Overdue by N days"                                                                    | AC-PROJECT-64                 |
+| No active milestone        | Line hidden                                                                                                                                     |                               |
+| Success                    | Toast MSG-PROJECT-19 (save), MSG-PROJECT-50 (archive), MSG-PROJECT-51 (restore), MSG-PROJECT-52 (delete)                                        | AC-PROJECT-19, AC-PROJECT-113 |
 
 ## Permissions
 
-| Access level                | Can see                                                | Can do                                                 |
-| --------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
-| Project admin, System admin | Every tab, Settings included                           | Edit, archive, restore, delete; change what Guests see |
-| Member (any job title)      | Every tab except Settings                              | Nothing on these tabs                                  |
-| Guest                       | The tabs of areas switched on for Guests (BR-GUEST-03) | Nothing (BR-GUEST-04)                                  |
-| Not a member                | "Project not found"                                    | —                                                      |
+| Access level                | Can see                                                   | Can do                         |
+| --------------------------- | --------------------------------------------------------- | ------------------------------ |
+| Project admin, System admin | The frame on every page                                   | Edit, archive, restore, delete |
+| Member (any job title)      | The frame on every page except Project settings           | Nothing in the frame           |
+| Guest                       | The frame on the pages of areas switched on (BR-GUEST-03) | Nothing (BR-GUEST-04)          |
+| Not a member                | "Project not found"                                       | —                              |
+
+The API checks every action again (DD-PROJECT-01); hiding a button is not the security.
 
 ## Accessibility
 
-- Page title "<Name> · Projects · QA Work Management"; `<h1>` is the project name; the key and access badge are text.
-- Tabs are links in a `nav` labelled "Project sections" with `aria-current="page"` on the active one (they change
-  the URL, so they are links, not an ARIA tab widget).
-- The archived banner and the "viewing as Admin" banner are `role="status"`.
-- Dialogs: `role="dialog"` / `role="alertdialog"` (archive, delete), focus trapped and returned to the button that
-  opened them. The delete field's requirement is in its label: "Type SHOP to confirm".
-- The More menu is a button with `aria-haspopup="menu"`; items reachable with arrow keys; Esc closes.
-- Settings: each card is a `<section>` labelled by its `<h2>`. Each Guest switch is a `button` with `role="switch"`,
-  `aria-checked` and a `<label>` with the area name; the switches are in a `role="group"` named "Areas Guests can
-  see". Disabled switches use the `disabled` attribute.
+- Page title "<Name> · Projects · QA Work Management" (inner pages may add their name in front); "Project not
+  found · QA Work Management" on the not-found page. `<h1>` is the project name; key and badges are text.
+- Landmarks come from the app shell: side nav `nav` "Main" (current item has `aria-current="page"`), `main` holds
+  the frame and the page.
+- The archived banner and the "viewing as Admin" banner are `role="status"`. Archived is said in words ("Archived"
+  badge, banner text), not only by colour.
+- Dialogs: `role="dialog"` (edit) / `role="alertdialog"` (archive, delete), focus trapped and returned to the
+  button that opened them. The delete field's requirement is its label: "Type SHOP to confirm".
+- More and Actions are buttons with `aria-haspopup="menu"`; items reachable with arrow keys; Esc closes and returns
+  focus to the button.
 - "3 days left" is text; overdue is shown with the word "Overdue", not only red.
+- Contrast: banner text on the amber tint and the admin banner both at least 4.5:1.
 
 ## Responsive
 
-Below 768 px the header wraps (name on one line, badges below); Edit and More become one "Actions" menu; tabs
-scroll horizontally. The Settings cards are side by side from 1024 px and stacked below.
+Below 768 px the header wraps (name on one line, badges below) and Edit and More become one "Actions" menu. The side
+nav's own behaviour on narrow screens belongs to SCR-SHELL-01.
 
 ## Locators for tests
 
-`getByRole('heading', { level: 1 })`, in `getByRole('navigation', { name: 'Project sections' })`:
-`getByRole('link', { name: 'Dashboard' })`, `getByRole('link', { name: 'Releases & sprints' })`,
-`getByRole('link', { name: 'Members' })`, `getByRole('link', { name: 'Activity' })`,
-`getByRole('link', { name: 'Settings' })`; `getByRole('button', { name: 'Edit' })`,
-`getByRole('button', { name: 'More' })`, `getByRole('menuitem', { name: 'Archive' })`,
-`getByRole('dialog', { name: 'Edit project' })`, `getByRole('alertdialog', { name: 'Delete project?' })`,
-`getByLabel('Type SHOP to confirm')`, `getByText('This project is archived', { exact: false })`,
-`getByText(msg('MSG-ADMIN-08'))`. Settings: `getByRole('button', { name: 'Edit details' })`,
-`getByRole('group', { name: 'Areas Guests can see' })`, `getByRole('switch', { name: 'Activity log' })` (also
-"Project dashboard", "Releases and sprints", "Members list"), `getByRole('button', { name: 'Save' })`,
-`getByRole('button', { name: 'Cancel' })`.
+`getByRole('heading', { level: 1 })`; side nav: `getByRole('navigation', { name: 'Main' })` then
+`getByRole('link', { name: 'Dashboard' })` (also "Releases & sprints", "Members", "Activity", "Project settings"),
+current one `toHaveAttribute('aria-current', 'page')`; `getByRole('button', { name: 'Edit' })`,
+`getByRole('button', { name: 'More' })`, `getByRole('button', { name: 'Actions' })` (narrow screen),
+`getByRole('menuitem', { name: 'Archive' })`, `getByRole('dialog', { name: 'Edit project' })`,
+`getByRole('alertdialog', { name: 'Archive project?' })`, `getByRole('alertdialog', { name: 'Delete project?' })`,
+`getByLabel('Type SHOP to confirm')`, `getByText(msg('MSG-PROJECT-08'))`, `getByText(msg('MSG-ADMIN-08'))`, toasts
+`getByText(msg('MSG-PROJECT-50'))` etc.
 
 ## Change log
 
-| Date       | Change                                                                                                                                                 | Why                                                          |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| 2026-10-08 | First version                                                                                                                                          | Phase 3A                                                     |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects                                                                | Linh's decision 2026-10-09                                   |
-| 2026-10-09 | Dashboard tab replaces Overview; tab "Releases & sprints"; Settings tab (Project details, Guests); tabs hidden for Guests by area; banner MSG-ADMIN-08 | Phase 3C (BR-DASH-01, BR-GUEST-02, BR-GUEST-03, BR-ADMIN-05) |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                               | Why                                                                         |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 2026-10-08 | First version                                                                                                                                                                                                                                                                                                                                                                                                        | Phase 3A                                                                    |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects                                                                                                                                                                                                                                                                                                                              | Linh's decision 2026-10-09                                                  |
+| 2026-10-09 | Dashboard tab replaces Overview; tab "Releases & sprints"; Settings tab (Project details, Guests); tabs hidden for Guests by area; banner MSG-ADMIN-08                                                                                                                                                                                                                                                               | Phase 3C (BR-DASH-01, BR-GUEST-02, BR-GUEST-03, BR-ADMIN-05)                |
+| 2026-10-10 | Frame only: Dashboard content is SCR-DASH-01, Settings content moves to the Project settings screen. Tab bar removed, side nav is the only section nav (BR-PROJECT-50, AC-PROJECT-111/112). Toasts MSG-PROJECT-50/51/52 for archive, restore, delete; not-found page title and line MSG-PROJECT-53; no error while typing the delete key; amber archived banner; "Actions" menu below 768 px (AC-PROJECT-113 to 115) | Screen review REV-SCR-PROJECT-02 (F-01 to F-08), Linh's decision 2026-10-10 |
