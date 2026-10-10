@@ -28,7 +28,7 @@ Technical plan: [phase-3c-plan.md](../../phases/phase-3c-plan.md). The folder is
 | Layer   | Docs                                                                                                                                                                                                                   |
 | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Screens | [SCR-DASH-01 Project dashboard](../../design/basic/screens/SCR-DASH-01-project-dashboard.md) (served at `/` for the current project)                                                                                   |
-| API     | No endpoint of its own yet: [API-ME-01](../../api/me/get-current-project.md) for the project, then the project, members, releases, milestones and activity endpoints ([index](../../api/README.md#endpoint-index))     |
+| API     | [API-DASH-01](../../api/projects/get-project-dashboard.md) `GET /api/projects/:key/dashboard`, after [API-ME-01](../../api/me/get-current-project.md) at `/`                                                           |
 | Data    | [releases](../../database/tables/releases.md), [milestones](../../database/tables/milestones.md), [project_members](../../database/tables/project_members.md), [activity_logs](../../database/tables/activity_logs.md) |
 
 ## Goal
@@ -91,7 +91,8 @@ None. Q-ADMIN-04 (Overview becomes the dashboard) is decided; see
 
 ## Change log
 
-| Date       | Change                                                                | Why              |
-| ---------- | --------------------------------------------------------------------- | ---------------- |
-| 2026-10-09 | First version, from the Phase 3C business requirements v1.3           | Phase 3C         |
-| 2026-10-09 | "Design and API" table: screens, API and data of the Phase 3C code PR | Phase 3C code PR |
+| Date       | Change                                                                | Why                |
+| ---------- | --------------------------------------------------------------------- | ------------------ |
+| 2026-10-09 | First version, from the Phase 3C business requirements v1.3           | Phase 3C           |
+| 2026-10-09 | "Design and API" table: screens, API and data of the Phase 3C code PR | Phase 3C code PR   |
+| 2026-10-09 | API row: the dashboard endpoint API-DASH-01                           | SCR-DASH-01 review |

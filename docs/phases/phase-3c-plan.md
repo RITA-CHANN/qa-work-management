@@ -127,8 +127,5 @@ compares the whole body with `toEqual` needs the new field. Project bodies (API-
 Built since the first 3C code PR: the Guest access level and Guest visibility (API-PROJECT-13), the project Settings
 tab and the Dashboard tab on `/projects/:key`, project creation in Admin console › Projects only, "Change project
 admin" (API-ADMIN-12), the "viewing this project as Admin" banner, Admin console › Settings (API-ADMIN-13,
-API-ADMIN-14) and the daily audit retention clean-up. Still open:
-
-| Not built yet                                                                           | Requirements     |
-| --------------------------------------------------------------------------------------- | ---------------- |
-| `GET /api/projects/:key/dashboard` (the dashboard reads the existing endpoints instead) | Section 3 step 4 |
+API-ADMIN-14) and the daily audit retention clean-up. The last open item, `GET /api/projects/:key/dashboard`
+(API-DASH-01), is built in the SCR-DASH-01 screen thread. Nothing of Phase 3C is open.

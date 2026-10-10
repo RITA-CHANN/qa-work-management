@@ -16,7 +16,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 | ---------------------------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- | --- |
 | [Authentication](auth.md)    | 2     | 32       | 12        | 28                | 15                 | 13              | 4                      | 5   |
 | [Admin console](admin.md)    | 3     | 22       | 10        | 21                | 0                  | 21              | 1                      | 0   |
-| [Project dashboard](dash.md) | 3     | 7        | 1         | 7                 | 0                  | 7               | 0                      | 0   |
+| [Project dashboard](dash.md) | 3     | 9        | 2         | 9                 | 0                  | 9               | 0                      | 0   |
 | [Guest access](guest.md)     | 3     | 6        | 2         | 6                 | 0                  | 6               | 0                      | 0   |
 | [Projects](project.md)       | 3     | 87       | 25        | 87                | 0                  | 87              | 0                      | 8   |
 | [App shell](shell.md)        | 3     | 8        | 1         | 7                 | 0                  | 7               | 1                      | 0   |
@@ -37,6 +37,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 - [AC-ADMIN-16](../requirements/admin/acceptance.md): A new one-time password is shown once; the user's session ends; their next sign-in asks for a new password (MSG-ADMIN-07)
 - [AC-ADMIN-18](../requirements/admin/acceptance.md): No entry was added for it, and the user or project is unchanged
 - [AC-DASH-03](../requirements/dash/acceptance.md): There is no create, edit or delete control, every card links to its page, and no cost, budget or rate data is shown
+- [AC-DASH-09](../requirements/dash/acceptance.md): 200 with `release`, `sprint` and `deadlines`, and no `team` or `activity` field; with `dashboard` off as well, 404
 - [AC-GUEST-01](../requirements/guest/acceptance.md): Sam sees the dashboard and Releases only; Members and Activity are in neither the nav, search nor dashboard; both APIs return 404
 - [AC-GUEST-03](../requirements/guest/acceptance.md): Every call returns 403 (MSG-COMMON-06) and nothing changes
 - [AC-PROJECT-01](../requirements/project/acceptance.md): I land on the new project's page; Oanh Owner is listed as Project admin, I am not listed as a member, and the badge shows "System admin"
