@@ -189,7 +189,7 @@ function DashboardBody({ project, data }: { project: Project; data: Dashboard })
   const activityCard = sees('activity') && (
     <Card title="Recent activity" actions={<CardLink to={`${base}/activity`}>Full log</CardLink>}>
       {activity.length ? (
-        <ActivityList compact entries={activity} label="Recent activity" />
+        <ActivityList entries={activity} label="Recent activity" />
       ) : (
         <Empty>No activity yet</Empty>
       )}

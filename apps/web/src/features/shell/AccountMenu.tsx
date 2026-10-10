@@ -2,14 +2,7 @@ import { useNavigate } from 'react-router';
 import { Menu, type MenuItem } from '@/components/ui/menu';
 import { useLogout } from '@/features/auth/use-logout';
 import { useMe } from '@/features/auth/use-me';
-
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]!.toUpperCase())
-    .join('');
+import { initials } from '@/lib/utils';
 
 /**
  * Avatar menu in the top bar (SCR-AUTH-02, BR-SHELL-02). "Admin console" is the only way into the
