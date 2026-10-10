@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { msg } from './messages';
 
 /** Activity log of a project (BR-PROJECT-19..22, DD-PROJECT-02). Entries are never edited or deleted. */
 
@@ -35,11 +36,27 @@ export type ActivityChanges = z.infer<typeof activityChangesSchema>;
 
 export const ACTIVITY_PAGE_SIZE = 20;
 
-/** Query of GET /api/projects/:key/activity (API-PROJECT-12). NFR-PROJECT-05: at most 100 per page. */
-export const activityQuerySchema = z.strictObject({
-  limit: z.coerce.number().int().min(1).max(100).default(ACTIVITY_PAGE_SIZE),
-  cursor: z.string().min(1).optional(),
-});
+/**
+ * Query of GET /api/projects/:key/activity (API-PROJECT-12). NFR-PROJECT-05: at most 100 per page.
+ * Filters (BR-PROJECT-38) combine with AND; `from` is inclusive, `to` exclusive, both instants with an offset.
+ */
+export const activityQuerySchema = z
+  .strictObject({
+    limit: z.coerce.number().int().min(1).max(100).default(ACTIVITY_PAGE_SIZE),
+    cursor: z.string().min(1).optional(),
+    entityType: z.enum(ACTIVITY_ENTITY_TYPES).optional(),
+    actorId: z.string().min(1).max(40).optional(),
+    from: z.iso.datetime({ offset: true }).optional(),
+    to: z.iso.datetime({ offset: true }).optional(),
+  })
+  .refine((query) => !query.from || !query.to || new Date(query.to) > new Date(query.from), {
+    message: msg('MSG-PROJECT-34'),
+    path: ['to'],
+  });
+
+/** One person in the Person filter (API-PROJECT-14): everyone with an entry in the project's log. */
+export const activityActorSchema = z.object({ id: z.string(), name: z.string() });
+export type ActivityActor = z.infer<typeof activityActorSchema>;
 
 export const activityEntrySchema = z.object({
   id: z.string(),

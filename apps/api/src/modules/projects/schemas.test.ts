@@ -1,4 +1,5 @@
 import {
+  activityQuerySchema,
   makeMilestoneCreateSchema,
   memberUpdateSchema,
   projectCreateSchema,
@@ -112,5 +113,32 @@ describe('milestone setting (BR-PROJECT-28)', () => {
       endDate: '2026-11-15',
     });
     expect(messages(result)).toEqual(['A sprint needs a start and end date, 1–14 days long']);
+  });
+});
+
+describe('activity filters (BR-PROJECT-38)', () => {
+  it('accepts type, person and an instant range', () => {
+    const result = activityQuerySchema.safeParse({
+      entityType: 'member',
+      actorId: 'u1',
+      from: '2026-10-08T00:00:00+07:00',
+      to: '2026-10-09T00:00:00+07:00',
+    });
+    expect(result.success).toBe(true);
+    expect(result.data?.limit).toBe(20);
+  });
+
+  it('refuses an unknown type and a bare date', () => {
+    expect(activityQuerySchema.safeParse({ entityType: 'user' }).success).toBe(false);
+    expect(activityQuerySchema.safeParse({ from: '2026-10-08' }).success).toBe(false);
+  });
+
+  it('refuses `to` not after `from` with MSG-PROJECT-34 on /to', () => {
+    const result = activityQuerySchema.safeParse({
+      from: '2026-10-09T00:00:00Z',
+      to: '2026-10-09T00:00:00Z',
+    });
+    expect(messages(result)).toEqual(["The end date can't be before the start date"]);
+    expect(result.error?.issues[0]?.path).toEqual(['to']);
   });
 });
