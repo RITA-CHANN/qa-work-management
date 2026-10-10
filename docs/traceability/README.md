@@ -15,7 +15,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 | Feature                      | Phase | Criteria | High risk | Planned automated | With a tagged test | Automation gaps | Manual, unit or review | NFR |
 | ---------------------------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- | --- |
 | [Authentication](auth.md)    | 2     | 32       | 12        | 28                | 15                 | 13              | 4                      | 5   |
-| [Admin console](admin.md)    | 3     | 22       | 10        | 21                | 0                  | 21              | 1                      | 0   |
+| [Admin console](admin.md)    | 3     | 27       | 11        | 25                | 0                  | 25              | 2                      | 0   |
 | [Project dashboard](dash.md) | 3     | 9        | 2         | 9                 | 0                  | 9               | 0                      | 0   |
 | [Guest access](guest.md)     | 3     | 6        | 2         | 6                 | 0                  | 6               | 0                      | 0   |
 | [Projects](project.md)       | 3     | 95       | 26        | 94                | 0                  | 94              | 1                      | 8   |
@@ -36,6 +36,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 - [AC-ADMIN-13](../requirements/admin/acceptance.md): There is no button; the API returns 403 with MSG-ADMIN-09
 - [AC-ADMIN-16](../requirements/admin/acceptance.md): A new one-time password is shown once; the user's session ends; their next sign-in asks for a new password (MSG-ADMIN-07)
 - [AC-ADMIN-18](../requirements/admin/acceptance.md): No entry was added for it, and the user or project is unchanged
+- [AC-ADMIN-24](../requirements/admin/acceptance.md): The dialog "Delete project?" shows MSG-PROJECT-09; "Delete" stays disabled until the key is typed; the project leaves the list and I stay on Admin console › Projects
 - [AC-DASH-03](../requirements/dash/acceptance.md): There is no create, edit or delete control, every card links to its page, and no cost, budget or rate data is shown
 - [AC-DASH-09](../requirements/dash/acceptance.md): 200 with `release`, `sprint` and `deadlines`, and no `team` or `activity` field; with `dashboard` off as well, 404
 - [AC-GUEST-01](../requirements/guest/acceptance.md): Sam sees the dashboard and Releases only; Members and Activity are in neither the nav, search nor dashboard; both APIs return 404

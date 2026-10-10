@@ -95,6 +95,8 @@ export const MESSAGES = {
   'MSG-ADMIN-17': 'Choose an active user as project admin',
   'MSG-ADMIN-18': 'Enter a number of days from 30 to 3650',
   'MSG-ADMIN-19': 'Settings saved',
+  'MSG-ADMIN-20': 'No projects in this workspace yet',
+  'MSG-ADMIN-21': '{name} is already a project admin. Tick the box to make the others members.',
   'MSG-GUEST-01': 'The project admins have not shared the dashboard with Guests.',
   'MSG-GUEST-02': 'Guest access saved',
 
