@@ -18,7 +18,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 | [Admin console](admin.md)    | 3     | 22       | 10        | 21                | 0                  | 21              | 1                      | 0   |
 | [Project dashboard](dash.md) | 3     | 9        | 2         | 9                 | 0                  | 9               | 0                      | 0   |
 | [Guest access](guest.md)     | 3     | 6        | 2         | 6                 | 0                  | 6               | 0                      | 0   |
-| [Projects](project.md)       | 3     | 90       | 27        | 89                | 0                  | 89              | 1                      | 8   |
+| [Projects](project.md)       | 3     | 94       | 27        | 93                | 0                  | 93              | 1                      | 8   |
 | [App shell](shell.md)        | 3     | 8        | 1         | 7                 | 0                  | 7               | 1                      | 0   |
 
 ## Gaps to review
