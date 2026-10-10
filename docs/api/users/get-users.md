@@ -9,15 +9,24 @@ owner: Claude
 reviewers: [Linh]
 approved:
 traces:
-  requirements: [BR-PROJECT-11, BR-PROJECT-01, BR-ADMIN-04, BR-ADMIN-10, BR-ADMIN-18]
-  acceptance: [AC-PROJECT-23, AC-PROJECT-24, AC-PROJECT-01, AC-ADMIN-09, AC-ADMIN-12]
+  requirements: [BR-PROJECT-11, BR-PROJECT-41, BR-PROJECT-01, BR-ADMIN-04, BR-ADMIN-10, BR-ADMIN-18]
+  acceptance:
+    [
+      AC-PROJECT-23,
+      AC-PROJECT-24,
+      AC-PROJECT-91,
+      AC-PROJECT-92,
+      AC-PROJECT-01,
+      AC-ADMIN-09,
+      AC-ADMIN-12,
+    ]
   design: [SCR-PROJECT-03, SCR-PROJECT-01]
-updated: 2026-10-09
+updated: 2026-10-10
 ---
 
 # GET /api/users
 
-Lists active users for the "Add member" picker (SCR-PROJECT-03), and the "First project admin" picker of "New project"
+Lists active users for the "Add member" picker (SCR-PROJECT-03, which sends what the user types as `search` with `limit=20`, BR-PROJECT-41), and the "First project admin" picker of "New project"
 and the "New project admin" picker of "Change project admin" in Admin console › Projects (SCR-ADMIN-02). Status codes follow RFC 9110; errors are RFC 9457 problem details
 ([README.md](../README.md#error-format), [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 

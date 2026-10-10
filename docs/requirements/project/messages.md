@@ -52,6 +52,11 @@ below and the code differ. Tests should assert these exact texts. Shared texts (
 | MSG-PROJECT-33 | New project: first project admin missing or not a user (400)  | error   | field    | Choose an existing user as the first project admin                                 |
 | MSG-PROJECT-34 | Activity filter: To is before From                            | error   | field    | The end date can't be before the start date                                        |
 | MSG-PROJECT-35 | Activity: no entry matches the filters                        | info    | status   | No activity matches these filters                                                  |
+| MSG-PROJECT-40 | Add member: no user chosen                                    | error   | field    | Choose a user to add                                                               |
+| MSG-PROJECT-41 | Remove or Leave confirmation (`{name}` is "You" when leaving) | warning | status   | {name} will no longer see this project                                             |
+| MSG-PROJECT-42 | Step down to Member confirmation                              | warning | status   | You will lose admin rights in this project                                         |
+| MSG-PROJECT-43 | Members: no member matches the filters                        | info    | status   | No members match these filters                                                     |
+| MSG-PROJECT-44 | Add member: no user matches the search                        | info    | status   | No users match "{query}"                                                           |
 | MSG-PROJECT-50 | Toast after archive                                           | success | toast    | Project archived                                                                   |
 | MSG-PROJECT-51 | Toast after restore                                           | success | toast    | Project restored                                                                   |
 | MSG-PROJECT-52 | Toast after delete, on the project list                       | success | toast    | Deleted project {key}                                                              |
@@ -71,4 +76,5 @@ states use `role="status"`.
 | 2026-10-09 | Added MSG-PROJECT-32: a milestone can't be added to a released release (found while building the API)                                           | Phase 3A code                      |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects (MSG-PROJECT-12, 21, 22 reworded, MSG-PROJECT-33 added) | Linh's decision 2026-10-09         |
 | 2026-10-09 | Added MSG-PROJECT-34 (activity date filter) and MSG-PROJECT-35 (activity filters match nothing)                                                 | Screen review SCR-PROJECT-05       |
+| 2026-10-10 | Added MSG-PROJECT-40 to MSG-PROJECT-44 (members screen texts that were in the code, step down, filters, user search)                            | Screen review SCR-PROJECT-03       |
 | 2026-10-10 | Added MSG-PROJECT-50 to 53: archive, restore and delete toasts say what happened; "Project not found" says why                                  | SCR-PROJECT-02 review (F-03, F-07) |

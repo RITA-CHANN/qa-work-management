@@ -145,6 +145,19 @@ export function useUsers(enabled: boolean) {
   });
 }
 
+/** API-USER-01 with a search: up to 20 active users whose name or email contains `search` (all users when empty). */
+export function useUserSearch(search: string, enabled: boolean) {
+  const term = search.trim().slice(0, 100);
+  const params = new URLSearchParams({ limit: '20' });
+  if (term) params.set('search', term);
+  return useQuery({
+    queryKey: ['users', 'search', term],
+    queryFn: () => apiFetch<ApiSuccess<UserOption[]>>(`/users?${params}`).then(data),
+    enabled,
+    placeholderData: (previous) => previous,
+  });
+}
+
 /** A mutation that refreshes the given queries when it succeeds. */
 function useWrite<Input, Output>(write: (input: Input) => Promise<Output>, refresh: QueryKey[]) {
   const queryClient = useQueryClient();

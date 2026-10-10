@@ -19,6 +19,17 @@ import { errorText, isConflict } from './server-error';
 type DialogProps = { project: Project; open: boolean; onClose: () => void };
 
 /**
+ * Archive and Delete are also opened from Admin console › Projects (SCR-ADMIN-02), with the row's key and name.
+ * `onDone` runs after a success; for Delete it replaces the default, which goes to the project list.
+ */
+type ProjectActionDialogProps = {
+  project: Pick<Project, 'key' | 'name'>;
+  open: boolean;
+  onClose: () => void;
+  onDone?: () => void;
+};
+
+/**
  * "Edit project" (SCR-PROJECT-02). Sends the version it was opened with; if someone saved in between,
  * the server answers 409 and the dialog keeps the input and offers "Reload" (BR-PROJECT-07, AC-PROJECT-21).
  */
@@ -122,7 +133,7 @@ function EditProjectForm({ project, onClose }: { project: Project; onClose: () =
 }
 
 /** "Archive project?" (FLW-PROJECT-03): read-only for everyone until restored. */
-export function ArchiveProjectDialog({ project, open, onClose }: DialogProps) {
+export function ArchiveProjectDialog({ project, open, onClose, onDone }: ProjectActionDialogProps) {
   const archive = useProjectAction(project.key, 'archive');
   const toast = useToast();
   const [alert, setAlert] = useState<string | null>(null);
@@ -133,6 +144,7 @@ export function ArchiveProjectDialog({ project, open, onClose }: DialogProps) {
       await archive.mutateAsync();
       onClose();
       toast(msg('MSG-PROJECT-50'));
+      onDone?.();
     } catch (error) {
       setAlert(errorText(error));
     }
@@ -163,7 +175,13 @@ export function ArchiveProjectDialog({ project, open, onClose }: DialogProps) {
  * "Delete project?" (FLW-PROJECT-03): a project admin must type the key (MSG-PROJECT-10) (BR-PROJECT-09).
  * No error while typing; Delete stays disabled until the key matches (SCR-PROJECT-02).
  */
-export function DeleteProjectDialog({ project, open, onClose }: DialogProps) {
+export function DeleteProjectDialog({
+  project,
+  open,
+  onClose,
+  onDone,
+  note,
+}: ProjectActionDialogProps & { note?: string }) {
   const remove = useDeleteProject(project.key);
   const navigate = useNavigate();
   const toast = useToast();
@@ -183,7 +201,8 @@ export function DeleteProjectDialog({ project, open, onClose }: DialogProps) {
       await remove.mutateAsync();
       close();
       toast(msg('MSG-PROJECT-52', { key: project.key }));
-      void navigate('/projects');
+      if (onDone) onDone();
+      else void navigate('/projects');
     } catch (error) {
       setAlert(errorText(error));
     }
@@ -198,6 +217,7 @@ export function DeleteProjectDialog({ project, open, onClose }: DialogProps) {
       description={`${project.name} and its members and activity are deleted for good. This can't be undone.`}
     >
       {alert && <Alert>{alert}</Alert>}
+      {note && <p className="text-sm text-muted-foreground">{note}</p>}
       <TextField
         label={msg('MSG-PROJECT-10', { key: project.key })}
         value={typed}

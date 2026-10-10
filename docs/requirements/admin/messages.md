@@ -6,7 +6,7 @@ status: review
 owner: Claude
 reviewers: [Linh]
 phase: 3
-updated: 2026-10-09
+updated: 2026-10-10
 ---
 
 # Admin console messages
@@ -36,6 +36,8 @@ validation): [../common/messages.md](../common/messages.md). `{name}` and simila
 | MSG-ADMIN-17 | Change project admin: user unknown or deactivated    | error   | field    | Choose an active user as project admin                                           |
 | MSG-ADMIN-18 | Settings: audit retention out of range               | error   | field    | Enter a number of days from 30 to 3650                                           |
 | MSG-ADMIN-19 | Toast after the workspace settings are saved         | success | toast    | Settings saved                                                                   |
+| MSG-ADMIN-20 | Admin projects: the workspace has no project         | info    | status   | No projects in this workspace yet                                                |
+| MSG-ADMIN-21 | Change project admin: the chosen user already is one | info    | field    | {name} is already a project admin. Tick the box to make the others members.      |
 
 `Kind`: error, warning, info, success. `Shown as`: field, alert, status, toast, page, api (API response only).
 
@@ -44,8 +46,9 @@ MSG-ADMIN-10 replaces MSG-PROJECT-21 on the projects list, because users can no 
 
 ## Change log
 
-| Date       | Change                                                                               | Why                     |
-| ---------- | ------------------------------------------------------------------------------------ | ----------------------- |
-| 2026-10-09 | First version, from the Phase 3C business requirements v1.3                          | Phase 3C                |
-| 2026-10-09 | Added MSG-ADMIN-11 to MSG-ADMIN-16 (field validation, password change, unknown user) | Texts the 3C code needs |
-| 2026-10-09 | Added MSG-ADMIN-17 to MSG-ADMIN-19 (change project admin, workspace settings)        | Texts the 3C code needs |
+| Date       | Change                                                                                    | Why                        |
+| ---------- | ----------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-10-09 | First version, from the Phase 3C business requirements v1.3                               | Phase 3C                   |
+| 2026-10-09 | Added MSG-ADMIN-11 to MSG-ADMIN-16 (field validation, password change, unknown user)      | Texts the 3C code needs    |
+| 2026-10-09 | Added MSG-ADMIN-17 to MSG-ADMIN-19 (change project admin, workspace settings)             | Texts the 3C code needs    |
+| 2026-10-10 | Added MSG-ADMIN-20 (empty workspace) and MSG-ADMIN-21 (chosen user already Project admin) | SCR-ADMIN-02 review C4, C6 |

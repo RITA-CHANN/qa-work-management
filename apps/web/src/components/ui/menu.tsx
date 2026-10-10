@@ -6,7 +6,7 @@ export type MenuItem = { label: string; onSelect: () => void; destructive?: bool
 
 /**
  * A button that opens a list of actions (ARIA menu button pattern): arrow keys move between items,
- * Esc closes and returns focus to the button.
+ * Esc or choosing an item closes it and returns focus to the button.
  */
 export function Menu({
   label,
@@ -92,6 +92,8 @@ export function Menu({
               role="menuitem"
               tabIndex={-1}
               onClick={() => {
+                // Back on the button first, so a dialog the item opens returns focus there (WCAG 2.4.3).
+                buttonRef.current?.focus();
                 setOpen(false);
                 item.onSelect();
               }}

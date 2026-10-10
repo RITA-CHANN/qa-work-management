@@ -15,7 +15,7 @@ type FieldProps = {
  * A labelled form field. The error is linked with aria-describedby and marks the input aria-invalid,
  * so a test can use getByLabel('Name') and a screen reader reads the message.
  */
-function FieldShell({
+export function FieldShell({
   label,
   error,
   hint,
