@@ -6,7 +6,7 @@ status: review
 owner: Claude
 reviewers: [Linh]
 phase: 3
-updated: 2026-10-09
+updated: 2026-10-10
 ---
 
 # Projects acceptance criteria
@@ -128,6 +128,21 @@ that checks a criterion with its ID, for example `{ tag: '@AC-PROJECT-05' }`. Se
 | AC-PROJECT-65 | A milestone is Active or Completed                                             | I look for Delete                                                                       | It is not offered; the API returns 422 with MSG-PROJECT-31                                                           | BR-PROJECT-33                | Should   | Medium | Auto-API          |
 | AC-PROJECT-66 | I am a Member, with job title Team lead, Developer or Stakeholder              | I open milestones                                                                       | I can see them but there is no New / Edit / Delete; the API returns 403                                              | BR-PROJECT-35                | Must     | High   | Auto-UI, Auto-API |
 
+## Releases & sprints screen (US-PROJECT-08, US-PROJECT-11, US-PROJECT-12)
+
+From Linh's review of SCR-PROJECT-04 on 2026-10-10.
+
+| ID             | Given                                                                                           | When                                                                       | Then                                                                                                                                                            | Covers                                      | Priority | Risk   | Verify            |
+| -------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------- | ------ | ----------------- |
+| AC-PROJECT-101 | I am a Project admin and release 2.5 is Planned                                                 | I click "Activate 2.5"                                                     | A dialog "Activate release 2.5?" says it can't be undone. Cancel changes nothing; "Activate" makes 2.5 Active. The same happens for Release, Start and Complete | BR-PROJECT-46, BR-PROJECT-16, BR-PROJECT-31 | Must     | Medium | Auto-UI           |
+| AC-PROJECT-102 | Release 2.3 is Released                                                                         | I look for its Edit action, or send `PATCH` with a new name or dates       | There is no Edit action; the API answers 422 `RELEASE_CLOSED` with MSG-PROJECT-45 and nothing changes                                                           | BR-PROJECT-45                               | Must     | High   | Auto-UI, Auto-API |
+| AC-PROJECT-103 | "Sprint 3" is Completed                                                                         | I look for its Edit action, or send `PATCH` with a new name, goal or dates | There is no Edit action; the API answers 422 `MILESTONE_CLOSED` with MSG-PROJECT-46 and nothing changes                                                         | BR-PROJECT-45                               | Must     | High   | Auto-UI, Auto-API |
+| AC-PROJECT-104 | Release 2.4 is Active and "Sprint 4" is not Completed                                           | I look at "Release 2.4"                                                    | The button is disabled and the release row says "1 sprint not completed"                                                                                        | BR-PROJECT-25                               | Should   | Low    | Auto-UI           |
+| AC-PROJECT-105 | Release 2.4 is Active, has 2 sprints of which 1 is Completed, and its target date is in 20 days | I open the tab                                                             | The release row shows "1 / 2 sprints completed" and "20 days to target" ("Overdue by N days" after the target date; no countdown on a Released release)         | US-PROJECT-12, BR-PROJECT-34                | Should   | Low    | Auto-UI           |
+| AC-PROJECT-106 | I am a Project admin and release 2.5 is Planned                                                 | I click "New sprint in 2.5"                                                | The "New sprint" dialog opens with release 2.5 chosen and a hint with the release's dates and the longest sprint length                                         | BR-PROJECT-26, BR-PROJECT-28, BR-PROJECT-29 | Should   | Low    | Auto-UI           |
+| AC-PROJECT-107 | The window is 390 px wide                                                                       | I open the tab                                                             | Each sprint is a card, nothing scrolls sideways, and a release's actions are in a menu "Actions for 2.4"                                                        | US-PROJECT-12                               | Should   | Low    | Auto-UI           |
+| AC-PROJECT-108 | I am on the Releases & sprints tab                                                              | I read buttons, headings, dialogs and messages                             | They say "sprint", never "milestone"                                                                                                                            | BR-PROJECT-47                               | Could    | Low    | Manual            |
+
 ## Activity log (US-PROJECT-09)
 
 | ID            | Given                                          | When                                                       | Then                                                      | Covers                                      | Priority | Risk   | Verify           |
@@ -144,3 +159,4 @@ that checks a criterion with its ID, for example `{ tag: '@AC-PROJECT-05' }`. Se
 | 2026-10-08 | First version, from the Phase 3 business requirements v2 (with Linh's answers to Q-PROJECT-01 to Q-PROJECT-05)                                                                                  | Phase 3A                             |
 | 2026-10-08 | Added AC-PROJECT-67 to AC-PROJECT-70                                                                                                                                                            | Every story and rule has a criterion |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects. Reworded the criteria that named roles, added AC-PROJECT-71 to AC-PROJECT-76, deprecated AC-PROJECT-49 | Linh's decision 2026-10-09           |
+| 2026-10-10 | Added AC-PROJECT-101 to AC-PROJECT-108 (Releases & sprints screen review)                                                                                                                       | Linh's decision 2026-10-10           |

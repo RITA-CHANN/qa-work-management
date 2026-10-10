@@ -1537,7 +1537,7 @@ paths:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
         '422':
-          description: 'Unprocessable Content: PROJECT_ARCHIVED, ACTIVE_RELEASE_EXISTS, OPEN_MILESTONES, MILESTONE_OUTSIDE_RELEASE'
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, RELEASE_CLOSED, ACTIVE_RELEASE_EXISTS, OPEN_MILESTONES, MILESTONE_OUTSIDE_RELEASE'
           content:
             application/problem+json:
               schema:
@@ -1547,6 +1547,7 @@ paths:
                       code:
                         enum:
                           - PROJECT_ARCHIVED
+                          - RELEASE_CLOSED
                           - ACTIVE_RELEASE_EXISTS
                           - OPEN_MILESTONES
                           - MILESTONE_OUTSIDE_RELEASE
@@ -1902,7 +1903,7 @@ paths:
                         enum:
                           - UNSUPPORTED_MEDIA_TYPE
         '422':
-          description: 'Unprocessable Content: PROJECT_ARCHIVED, CANNOT_ACTIVATE_MILESTONE, MILESTONE_OUTSIDE_RELEASE, MILESTONE_OVERLAP'
+          description: 'Unprocessable Content: PROJECT_ARCHIVED, MILESTONE_CLOSED, CANNOT_ACTIVATE_MILESTONE, MILESTONE_OUTSIDE_RELEASE, MILESTONE_OVERLAP'
           content:
             application/problem+json:
               schema:
@@ -1912,6 +1913,7 @@ paths:
                       code:
                         enum:
                           - PROJECT_ARCHIVED
+                          - MILESTONE_CLOSED
                           - CANNOT_ACTIVATE_MILESTONE
                           - MILESTONE_OUTSIDE_RELEASE
                           - MILESTONE_OVERLAP
@@ -3477,6 +3479,7 @@ components:
             - MILESTONE_OUTSIDE_RELEASE
             - MILESTONE_OVERLAP
             - RELEASE_CLOSED
+            - MILESTONE_CLOSED
             - EMAIL_TAKEN
             - LAST_ADMIN
             - OWN_ACCOUNT
