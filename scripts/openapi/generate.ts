@@ -10,6 +10,7 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  activityActorSchema,
   activityEntrySchema,
   activityQuerySchema,
   adminOverviewSchema,
@@ -39,6 +40,7 @@ import {
   oneTimePasswordSchema,
   problemSchema,
   projectCreateSchema,
+  projectDashboardSchema,
   projectKeySchema,
   projectListQuerySchema,
   projectSchema,
@@ -89,7 +91,9 @@ const responseSchemas = {
   Member: memberSchema,
   Release: releaseSchema,
   Milestone: milestoneSchema,
+  ActivityActor: activityActorSchema,
   ActivityEntry: activityEntrySchema,
+  ProjectDashboard: projectDashboardSchema,
   UserOption: userOptionSchema,
   CurrentProject: currentProjectSchema,
   SearchResult: searchResultSchema,
@@ -174,7 +178,9 @@ const OPERATIONS: Operation[] = [
   { id: 'API-PROJECT-10', method: 'patch', path: '/api/projects/{key}/members/{userId}', summary: "Change a member's access level or job title", tag: 'Members', body: 'MemberUpdate', ok: { status: 200, schema: 'Member', shape: 'item' } },
   { id: 'API-PROJECT-11', method: 'delete', path: '/api/projects/{key}/members/{userId}', summary: 'Remove a member, or leave', tag: 'Members', ok: { status: 204 } },
   { id: 'API-PROJECT-12', method: 'get', path: '/api/projects/{key}/activity', summary: 'Activity log, newest first', tag: 'Activity', query: activityQuerySchema, ok: { status: 200, schema: 'ActivityEntry', shape: 'page' } },
+  { id: 'API-PROJECT-14', method: 'get', path: '/api/projects/{key}/activity/actors', summary: 'People with entries in the activity log', tag: 'Activity', ok: { status: 200, schema: 'ActivityActor', shape: 'list' } },
   { id: 'API-PROJECT-13', method: 'put', path: '/api/projects/{key}/guest-visibility', summary: 'Set which areas Guests see', tag: 'Projects', body: 'GuestVisibility', ok: { status: 200, schema: 'Project', shape: 'item' } },
+  { id: 'API-DASH-01', method: 'get', path: '/api/projects/{key}/dashboard', summary: 'Project dashboard data', tag: 'Projects', ok: { status: 200, schema: 'ProjectDashboard', shape: 'item' } },
   { id: 'API-RELEASE-01', method: 'get', path: '/api/projects/{key}/releases', summary: 'Releases of a project', tag: 'Releases', ok: { status: 200, schema: 'Release', shape: 'list' } },
   { id: 'API-RELEASE-02', method: 'post', path: '/api/projects/{key}/releases', summary: 'Create a release', tag: 'Releases', body: 'ReleaseCreate', ok: { status: 201, schema: 'Release', shape: 'item' } },
   { id: 'API-RELEASE-03', method: 'patch', path: '/api/projects/{key}/releases/{id}', summary: 'Edit a release or move its status', tag: 'Releases', body: 'ReleaseUpdate', ok: { status: 200, schema: 'Release', shape: 'item' } },

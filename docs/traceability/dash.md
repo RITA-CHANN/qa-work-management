@@ -4,36 +4,40 @@
 
 Back to the [overview](README.md). Requirements: [../requirements/dash/](../requirements/dash/README.md).
 
-7 acceptance criteria, 0 with a tagged test, 7 planned for automation without a test yet.
+9 acceptance criteria, 0 with a tagged test, 9 planned for automation without a test yet.
 
 ## Matrix
 
 Requirement → design → API → test. **Tests** lists where a test is tagged with the criterion; ⚠ means the
 criterion should be automated (Verify) but no test is tagged yet.
 
-| AC                                               | Priority | Risk   | Verify  | Covers                             | Screens and flows                                                        | Detail design | API | Tests  |
-| ------------------------------------------------ | -------- | ------ | ------- | ---------------------------------- | ------------------------------------------------------------------------ | ------------- | --- | ------ |
-| [AC-DASH-01](../requirements/dash/acceptance.md) | Must     | Medium | Auto-UI | US-DASH-01, BR-DASH-03, BR-DASH-04 | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
-| [AC-DASH-02](../requirements/dash/acceptance.md) | Must     | Low    | Auto-UI | BR-DASH-03, BR-DASH-04             | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
-| [AC-DASH-03](../requirements/dash/acceptance.md) | Must     | High   | Auto-UI | US-DASH-02, BR-DASH-02, BR-DASH-08 | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
-| [AC-DASH-04](../requirements/dash/acceptance.md) | Must     | Medium | Auto-UI | BR-DASH-01                         | [SCR-PROJECT-02](../design/basic/screens/SCR-PROJECT-02-project-page.md) | —             | —   | ⚠ none |
-| [AC-DASH-05](../requirements/dash/acceptance.md) | Should   | Medium | Auto-UI | BR-DASH-05                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
-| [AC-DASH-06](../requirements/dash/acceptance.md) | Should   | Low    | Auto-UI | BR-DASH-06                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
-| [AC-DASH-07](../requirements/dash/acceptance.md) | Should   | Low    | Auto-UI | US-DASH-01, BR-DASH-07             | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —   | ⚠ none |
+| AC                                               | Priority | Risk   | Verify   | Covers                             | Screens and flows                                                        | Detail design | API                                                     | Tests  |
+| ------------------------------------------------ | -------- | ------ | -------- | ---------------------------------- | ------------------------------------------------------------------------ | ------------- | ------------------------------------------------------- | ------ |
+| [AC-DASH-01](../requirements/dash/acceptance.md) | Must     | Medium | Auto-UI  | US-DASH-01, BR-DASH-03, BR-DASH-04 | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | [API-DASH-01](../api/projects/get-project-dashboard.md) | ⚠ none |
+| [AC-DASH-02](../requirements/dash/acceptance.md) | Must     | Low    | Auto-UI  | BR-DASH-03, BR-DASH-04             | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | [API-DASH-01](../api/projects/get-project-dashboard.md) | ⚠ none |
+| [AC-DASH-03](../requirements/dash/acceptance.md) | Must     | High   | Auto-UI  | US-DASH-02, BR-DASH-02, BR-DASH-08 | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | —                                                       | ⚠ none |
+| [AC-DASH-04](../requirements/dash/acceptance.md) | Must     | Medium | Auto-UI  | BR-DASH-01                         | [SCR-PROJECT-02](../design/basic/screens/SCR-PROJECT-02-project-page.md) | —             | —                                                       | ⚠ none |
+| [AC-DASH-05](../requirements/dash/acceptance.md) | Should   | Medium | Auto-UI  | BR-DASH-05                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | [API-DASH-01](../api/projects/get-project-dashboard.md) | ⚠ none |
+| [AC-DASH-06](../requirements/dash/acceptance.md) | Should   | Low    | Auto-UI  | BR-DASH-06                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | [API-DASH-01](../api/projects/get-project-dashboard.md) | ⚠ none |
+| [AC-DASH-07](../requirements/dash/acceptance.md) | Should   | Low    | Auto-UI  | US-DASH-01, BR-DASH-07             | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | [API-DASH-01](../api/projects/get-project-dashboard.md) | ⚠ none |
+| [AC-DASH-08](../requirements/dash/acceptance.md) | Should   | Medium | Auto-UI  | BR-DASH-05                         | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | [API-DASH-01](../api/projects/get-project-dashboard.md) | ⚠ none |
+| [AC-DASH-09](../requirements/dash/acceptance.md) | Must     | High   | Auto-API | BR-GUEST-03, BR-GUEST-05           | [SCR-DASH-01](../design/basic/screens/SCR-DASH-01-project-dashboard.md)  | —             | [API-DASH-01](../api/projects/get-project-dashboard.md) | ⚠ none |
 
 ## Automation gaps, highest risk first
 
 Criteria whose Verify says Auto-UI or Auto-API but no test is tagged with them yet. Start at the top.
 
-| AC                                               | Risk   | Priority | Verify  | Then                                                                                                                      |
-| ------------------------------------------------ | ------ | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------- |
-| [AC-DASH-03](../requirements/dash/acceptance.md) | High   | Must     | Auto-UI | There is no create, edit or delete control, every card links to its page, and no cost, budget or rate data is shown       |
-| [AC-DASH-01](../requirements/dash/acceptance.md) | Medium | Must     | Auto-UI | The release card shows 2.4 with days to target and sprints 1 / 2 completed; the sprint card shows Sprint 4 with days left |
-| [AC-DASH-04](../requirements/dash/acceptance.md) | Medium | Must     | Auto-UI | The dashboard opens as the project's home; there is no Overview tab, and the project details are under "Settings"         |
-| [AC-DASH-05](../requirements/dash/acceptance.md) | Medium | Should   | Auto-UI | Deadlines lists the two dates within 14 days, the 3-day one first, and not the 20-day one                                 |
-| [AC-DASH-02](../requirements/dash/acceptance.md) | Low    | Must     | Auto-UI | The release card shows 1.0 (Planned); the sprint card shows MSG-DASH-02                                                   |
-| [AC-DASH-06](../requirements/dash/acceptance.md) | Low    | Should   | Auto-UI | The team card shows 2 Project admins, the number of Members, the count per job title and a link to Members                |
-| [AC-DASH-07](../requirements/dash/acceptance.md) | Low    | Should   | Auto-UI | Recent activity shows the 10 newest, newest first, and a link that opens the full activity log                            |
+| AC                                               | Risk   | Priority | Verify   | Then                                                                                                                                           |
+| ------------------------------------------------ | ------ | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [AC-DASH-03](../requirements/dash/acceptance.md) | High   | Must     | Auto-UI  | There is no create, edit or delete control, every card links to its page, and no cost, budget or rate data is shown                            |
+| [AC-DASH-09](../requirements/dash/acceptance.md) | High   | Must     | Auto-API | 200 with `release`, `sprint` and `deadlines`, and no `team` or `activity` field; with `dashboard` off as well, 404                             |
+| [AC-DASH-01](../requirements/dash/acceptance.md) | Medium | Must     | Auto-UI  | The release card shows 2.4 with days to target and sprints 1 / 2 completed; the sprint card shows Sprint 4 with days left                      |
+| [AC-DASH-04](../requirements/dash/acceptance.md) | Medium | Must     | Auto-UI  | The dashboard opens as the project's home; there is no Overview tab, and the project details are under "Settings"                              |
+| [AC-DASH-05](../requirements/dash/acceptance.md) | Medium | Should   | Auto-UI  | Deadlines lists the two dates within 14 days, the 3-day one first, and not the 20-day one                                                      |
+| [AC-DASH-08](../requirements/dash/acceptance.md) | Medium | Should   | Auto-UI  | Deadlines lists the sprint first with "Overdue by 2 days", then the release target with "In 5 days"; the Deadlines KPI shows 2 and "1 overdue" |
+| [AC-DASH-02](../requirements/dash/acceptance.md) | Low    | Must     | Auto-UI  | The release card shows 1.0 (Planned); the sprint card shows MSG-DASH-02                                                                        |
+| [AC-DASH-06](../requirements/dash/acceptance.md) | Low    | Should   | Auto-UI  | The team card shows 2 Project admins, the number of Members, the count per job title and a link to Members                                     |
+| [AC-DASH-07](../requirements/dash/acceptance.md) | Low    | Should   | Auto-UI  | Recent activity shows the 10 newest, newest first, and a link that opens the full activity log                                                 |
 
 ## Non-functional requirements
 
