@@ -15,45 +15,50 @@ Code: `packages/shared/src/messages.ts`, used as `msg('MSG-PROJECT-07')`. `npm r
 below and the code differ. Tests should assert these exact texts. Shared texts (403, 404, validation):
 [../common/messages.md](../common/messages.md). `{name}` and similar are filled in at run time.
 
-| ID             | Where                                                        | Kind    | Shown as | Message                                                                         |
-| -------------- | ------------------------------------------------------------ | ------- | -------- | ------------------------------------------------------------------------------- |
-| MSG-PROJECT-01 | Key empty                                                    | error   | field    | Key is required                                                                 |
-| MSG-PROJECT-02 | Key wrong format                                             | error   | field    | Key must be 2–10 letters or digits and start with a letter                      |
-| MSG-PROJECT-03 | Name empty or wrong length                                   | error   | field    | Name must be 3–100 characters                                                   |
-| MSG-PROJECT-04 | Key already used                                             | error   | field    | This key is already in use                                                      |
-| MSG-PROJECT-05 | Description too long                                         | error   | field    | Description must be at most 2000 characters                                     |
-| MSG-PROJECT-06 | Project not found (page and API 404)                         | error   | page     | Project not found                                                               |
-| MSG-PROJECT-07 | Edit conflict (409)                                          | error   | alert    | Someone else changed this project. Reload to see their changes.                 |
-| MSG-PROJECT-08 | Change on an archived project (422)                          | error   | alert    | This project is archived. Restore it to make changes.                           |
-| MSG-PROJECT-09 | Delete not allowed (422)                                     | error   | alert    | Only an archived project with no releases can be deleted.                       |
-| MSG-PROJECT-10 | Delete confirm field, wrong key                              | error   | field    | Type {key} to confirm                                                           |
-| MSG-PROJECT-11 | Member already exists (409)                                  | error   | alert    | {name} is already a member of this project                                      |
-| MSG-PROJECT-12 | Last project admin (422)                                     | error   | alert    | A project must have at least one project admin                                  |
-| MSG-PROJECT-13 | Release name empty or too long                               | error   | field    | Release name must be 1–50 characters                                            |
-| MSG-PROJECT-14 | Release name taken                                           | error   | field    | A release with this name already exists in this project                         |
-| MSG-PROJECT-15 | Target before start                                          | error   | field    | Target date must be on or after the start date                                  |
-| MSG-PROJECT-16 | Status backwards (409)                                       | error   | alert    | Release status can only move forward                                            |
-| MSG-PROJECT-17 | Second active release (422)                                  | error   | alert    | Release {name} is already active. Release it first.                             |
-| MSG-PROJECT-18 | Delete release not allowed (422)                             | error   | alert    | Only a planned release with no sprints can be deleted                           |
-| MSG-PROJECT-19 | Toast after save                                             | success | toast    | Changes saved                                                                   |
-| MSG-PROJECT-20 | Search: no match                                             | info    | status   | No projects match your search                                                   |
-| MSG-PROJECT-21 | List: no projects at all                                     | info    | status   | You are not a member of any project yet. Ask an administrator to add you.       |
-| MSG-PROJECT-22 | Change own access level (422)                                | error   | alert    | You cannot change your own access level                                         |
-| MSG-PROJECT-23 | Milestone name empty or too long                             | error   | field    | Sprint name must be 1–50 characters                                             |
-| MSG-PROJECT-24 | Milestone dates missing or wrong length                      | error   | field    | A sprint needs a start and end date, 1–{maxDays} days long                      |
-| MSG-PROJECT-25 | Milestone outside its release                                | error   | field    | Sprint dates must be within release {name} ({start} – {end})                    |
-| MSG-PROJECT-26 | Milestones overlap (422)                                     | error   | alert    | Overlaps {name} ({start} – {end})                                               |
-| MSG-PROJECT-27 | Release with open milestones (422)                           | error   | alert    | Complete all sprints of this release first                                      |
-| MSG-PROJECT-28 | Milestone status backwards (409)                             | error   | alert    | Sprint status can only move forward                                             |
-| MSG-PROJECT-29 | Cannot activate milestone (422)                              | error   | alert    | Only one sprint can be active, and its release must be active                   |
-| MSG-PROJECT-30 | Milestone name taken                                         | error   | field    | A sprint with this name already exists in this project                          |
-| MSG-PROJECT-31 | Delete non-planned milestone (422)                           | error   | alert    | Only a planned sprint can be deleted                                            |
-| MSG-PROJECT-32 | Milestone in a released release (422)                        | error   | alert    | Release {name} is already released. Add sprints to a planned or active release. |
-| MSG-PROJECT-33 | New project: first project admin missing or not a user (400) | error   | field    | Choose an existing user as the first project admin                              |
-| MSG-PROJECT-34 | Activity filter: To is before From                           | error   | field    | The end date can't be before the start date                                     |
-| MSG-PROJECT-35 | Activity: no entry matches the filters                       | info    | status   | No activity matches these filters                                               |
-| MSG-PROJECT-45 | Edit a released release (422)                                | error   | alert    | Release {name} is released and can no longer be changed                         |
-| MSG-PROJECT-46 | Edit a completed sprint (422)                                | error   | alert    | {name} is completed and can no longer be changed                                |
+| ID             | Where                                                         | Kind    | Shown as | Message                                                                         |
+| -------------- | ------------------------------------------------------------- | ------- | -------- | ------------------------------------------------------------------------------- |
+| MSG-PROJECT-01 | Key empty                                                     | error   | field    | Key is required                                                                 |
+| MSG-PROJECT-02 | Key wrong format                                              | error   | field    | Key must be 2–10 letters or digits and start with a letter                      |
+| MSG-PROJECT-03 | Name empty or wrong length                                    | error   | field    | Name must be 3–100 characters                                                   |
+| MSG-PROJECT-04 | Key already used                                              | error   | field    | This key is already in use                                                      |
+| MSG-PROJECT-05 | Description too long                                          | error   | field    | Description must be at most 2000 characters                                     |
+| MSG-PROJECT-06 | Project not found (page and API 404)                          | error   | page     | Project not found                                                               |
+| MSG-PROJECT-07 | Edit conflict (409)                                           | error   | alert    | Someone else changed this project. Reload to see their changes.                 |
+| MSG-PROJECT-08 | Change on an archived project (422)                           | error   | alert    | This project is archived. Restore it to make changes.                           |
+| MSG-PROJECT-09 | Delete not allowed (422)                                      | error   | alert    | Only an archived project with no releases can be deleted.                       |
+| MSG-PROJECT-10 | Delete confirm field, wrong key                               | error   | field    | Type {key} to confirm                                                           |
+| MSG-PROJECT-11 | Member already exists (409)                                   | error   | alert    | {name} is already a member of this project                                      |
+| MSG-PROJECT-12 | Last project admin (422)                                      | error   | alert    | A project must have at least one project admin                                  |
+| MSG-PROJECT-13 | Release name empty or too long                                | error   | field    | Release name must be 1–50 characters                                            |
+| MSG-PROJECT-14 | Release name taken                                            | error   | field    | A release with this name already exists in this project                         |
+| MSG-PROJECT-15 | Target before start                                           | error   | field    | Target date must be on or after the start date                                  |
+| MSG-PROJECT-16 | Status backwards (409)                                        | error   | alert    | Release status can only move forward                                            |
+| MSG-PROJECT-17 | Second active release (422)                                   | error   | alert    | Release {name} is already active. Release it first.                             |
+| MSG-PROJECT-18 | Delete release not allowed (422)                              | error   | alert    | Only a planned release with no sprints can be deleted                           |
+| MSG-PROJECT-19 | Toast after save                                              | success | toast    | Changes saved                                                                   |
+| MSG-PROJECT-20 | Search: no match                                              | info    | status   | No projects match your search                                                   |
+| MSG-PROJECT-21 | List: no projects at all                                      | info    | status   | You are not a member of any project yet. Ask an administrator to add you.       |
+| MSG-PROJECT-22 | Change own access level (422)                                 | error   | alert    | You cannot change your own access level                                         |
+| MSG-PROJECT-23 | Milestone name empty or too long                              | error   | field    | Sprint name must be 1–50 characters                                             |
+| MSG-PROJECT-24 | Milestone dates missing or wrong length                       | error   | field    | A sprint needs a start and end date, 1–{maxDays} days long                      |
+| MSG-PROJECT-25 | Milestone outside its release                                 | error   | field    | Sprint dates must be within release {name} ({start} – {end})                    |
+| MSG-PROJECT-26 | Milestones overlap (422)                                      | error   | alert    | Overlaps {name} ({start} – {end})                                               |
+| MSG-PROJECT-27 | Release with open milestones (422)                            | error   | alert    | Complete all sprints of this release first                                      |
+| MSG-PROJECT-28 | Milestone status backwards (409)                              | error   | alert    | Sprint status can only move forward                                             |
+| MSG-PROJECT-29 | Cannot activate milestone (422)                               | error   | alert    | Only one sprint can be active, and its release must be active                   |
+| MSG-PROJECT-30 | Milestone name taken                                          | error   | field    | A sprint with this name already exists in this project                          |
+| MSG-PROJECT-31 | Delete non-planned milestone (422)                            | error   | alert    | Only a planned sprint can be deleted                                            |
+| MSG-PROJECT-32 | Milestone in a released release (422)                         | error   | alert    | Release {name} is already released. Add sprints to a planned or active release. |
+| MSG-PROJECT-33 | New project: first project admin missing or not a user (400)  | error   | field    | Choose an existing user as the first project admin                              |
+| MSG-PROJECT-34 | Activity filter: To is before From                            | error   | field    | The end date can't be before the start date                                     |
+| MSG-PROJECT-35 | Activity: no entry matches the filters                        | info    | status   | No activity matches these filters                                               |
+| MSG-PROJECT-40 | Add member: no user chosen                                    | error   | field    | Choose a user to add                                                            |
+| MSG-PROJECT-41 | Remove or Leave confirmation (`{name}` is "You" when leaving) | warning | status   | {name} will no longer see this project                                          |
+| MSG-PROJECT-42 | Step down to Member confirmation                              | warning | status   | You will lose admin rights in this project                                      |
+| MSG-PROJECT-43 | Members: no member matches the filters                        | info    | status   | No members match these filters                                                  |
+| MSG-PROJECT-44 | Add member: no user matches the search                        | info    | status   | No users match "{query}"                                                        |
+| MSG-PROJECT-45 | Edit a released release (422)                                 | error   | alert    | Release {name} is released and can no longer be changed                         |
+| MSG-PROJECT-46 | Edit a completed sprint (422)                                 | error   | alert    | {name} is completed and can no longer be changed                                |
 
 `Kind` and `Shown as` are explained in the [template](../../_templates/feature/messages.md). API errors carry the
 same text in the problem body's `detail` and the ID in `messageId`
@@ -69,4 +74,5 @@ states use `role="status"`.
 | 2026-10-09 | Added MSG-PROJECT-32: a milestone can't be added to a released release (found while building the API)                                                                                                      | Phase 3A code                                             |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects (MSG-PROJECT-12, 21, 22 reworded, MSG-PROJECT-33 added)                                                            | Linh's decision 2026-10-09                                |
 | 2026-10-09 | Added MSG-PROJECT-34 (activity date filter) and MSG-PROJECT-35 (activity filters match nothing)                                                                                                            | Screen review SCR-PROJECT-05                              |
+| 2026-10-10 | Added MSG-PROJECT-40 to MSG-PROJECT-44 (members screen texts that were in the code, step down, filters, user search)                                                                                       | Screen review SCR-PROJECT-03                              |
 | 2026-10-10 | The UI says "sprint" for a milestone: MSG-PROJECT-18, 23–32 reworded (MSG-PROJECT-26 names the sprint only). Added MSG-PROJECT-45, 46 (released release and completed sprint are read-only, BR-PROJECT-45) | Linh's decision 2026-10-10 (SCR-PROJECT-04 review C5, C7) |

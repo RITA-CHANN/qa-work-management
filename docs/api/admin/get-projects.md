@@ -12,14 +12,14 @@ traces:
   requirements: [US-ADMIN-03, BR-ADMIN-01, BR-ADMIN-02, BR-ADMIN-03]
   acceptance: [AC-ADMIN-01, AC-ADMIN-02]
   design: [SCR-ADMIN-02]
-updated: 2026-10-09
+updated: 2026-10-10
 ---
 
 # GET /api/admin/projects
 
 Every project in the workspace, archived included, for Admin console › Projects (SCR-ADMIN-02, BR-ADMIN-03). The
-row actions (archive, restore, delete) use the normal project endpoints, where an Admin acts as Owner
-(BR-PROJECT-36). Status codes follow RFC 9110; errors are RFC 9457 problem details
+row actions (archive, restore, delete) use the normal project endpoints, where a System admin acts as
+Project admin (BR-PROJECT-36). Status codes follow RFC 9110; errors are RFC 9457 problem details
 ([README.md](../README.md#error-format), [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 
 |                 |                                                                                      |
@@ -63,17 +63,17 @@ Active projects first, then archived; by name inside each.
 }
 ```
 
-| Field             | Type                                 | Description                                                                                  |
-| ----------------- | ------------------------------------ | -------------------------------------------------------------------------------------------- |
-| `key`             | string                               | Project key                                                                                  |
-| `name`            | string                               | Project name                                                                                 |
-| `archived`        | boolean                              | `true` when archived                                                                         |
-| `memberCount`     | integer                              | Number of members                                                                            |
-| `projectAdmins`   | { id, name }[]                       | Members who count as Project admin. Until role model v2 (PR #13) lands, that is role `OWNER` |
-| `activeRelease`   | { name, targetDate \| null } \| null | The `ACTIVE` release; `targetDate` is a calendar date `YYYY-MM-DD`                           |
-| `activeMilestone` | { name, endDate } \| null            | The `ACTIVE` milestone                                                                       |
-| `lastActivityAt`  | string (ISO 8601) \| null            | Newest activity log entry of the project                                                     |
-| `createdAt`       | string (ISO 8601)                    | When the project was created                                                                 |
+| Field             | Type                                 | Description                                                        |
+| ----------------- | ------------------------------------ | ------------------------------------------------------------------ |
+| `key`             | string                               | Project key                                                        |
+| `name`            | string                               | Project name                                                       |
+| `archived`        | boolean                              | `true` when archived                                               |
+| `memberCount`     | integer                              | Number of members                                                  |
+| `projectAdmins`   | { id, name }[]                       | Members with access `PROJECT_ADMIN`                                |
+| `activeRelease`   | { name, targetDate \| null } \| null | The `ACTIVE` release; `targetDate` is a calendar date `YYYY-MM-DD` |
+| `activeMilestone` | { name, endDate } \| null            | The `ACTIVE` milestone                                             |
+| `lastActivityAt`  | string (ISO 8601) \| null            | Newest activity log entry of the project                           |
+| `createdAt`       | string (ISO 8601)                    | When the project was created                                       |
 
 Not paginated: the list holds every matching project.
 
@@ -122,6 +122,7 @@ curl -b admin-cookies.txt 'http://localhost:3000/api/admin/projects?status=archi
 
 ## Change log
 
-| Date       | Change        | Why      |
-| ---------- | ------------- | -------- |
-| 2026-10-09 | First version | Phase 3C |
+| Date       | Change                                                                                                   | Why                 |
+| ---------- | -------------------------------------------------------------------------------------------------------- | ------------------- |
+| 2026-10-09 | First version                                                                                            | Phase 3C            |
+| 2026-10-10 | `projectAdmins` described with role model v2; the screen now shows `activeRelease` and `activeMilestone` | SCR-ADMIN-02 review |

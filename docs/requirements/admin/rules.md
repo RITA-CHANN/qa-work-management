@@ -6,7 +6,7 @@ status: review
 owner: Claude
 reviewers: [Linh]
 phase: 3
-updated: 2026-10-09
+updated: 2026-10-10
 ---
 
 # Admin console business rules
@@ -16,14 +16,14 @@ One rule per row, and one testable statement per rule (ISO/IEC/IEEE 29148: singu
 
 ## Console and projects
 
-| ID          | Rule                                                                                                                                                                                                                                                                                                                                  | Source                                   | Status   |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | -------- |
-| BR-ADMIN-01 | The Admin console lives under `/admin` with its own top bar (deep indigo), side nav and a "Back to workspace" link. For a non-Admin every `/admin` page and `/api/admin/*` endpoint behaves as if it does not exist (404).                                                                                                            | Linh comment "UI rieng cho 2 role"       | proposed |
-| BR-ADMIN-02 | **All-projects dashboard** shows, per project: key, name, status, members, active release and its days to target, current sprint, last activity date. KPIs: active projects, archived projects, active users / total users, Admins, failed sign-ins in the last 7 days.                                                               | Linh comment (all projects = Admin only) | proposed |
-| BR-ADMIN-03 | **Projects** lists every project (archived included) with search and a status filter, and a "New project" button (BR-ADMIN-18). Actions per row: Open, Archive / Restore, Delete (archived only, BR-PROJECT-09 applies), Change project admin.                                                                                        | Linh request (1)                         | proposed |
-| BR-ADMIN-18 | Only a System admin can **create a project**, from Admin console › Projects › "New project": key, name, description and the first Project admin (an active user, required). The System admin is not added as a member. The User UI has no "New project" button and `POST /api/projects` returns 403 for everyone else (MSG-ADMIN-09). | Linh 2026-10-09 (role model v2)          | proposed |
-| BR-ADMIN-04 | **Change project admin** makes a chosen user Project admin (adding them as a member if needed) and, if chosen, turns the current Project admin(s) into Members, in one step. A project always keeps at least one Project admin.                                                                                                       | Linh request (1), role model v2          | proposed |
-| BR-ADMIN-05 | When an Admin opens a project they are **not a member of** (User UI), a banner "You are viewing this project as Admin" (MSG-ADMIN-08) stays visible on every page of that project.                                                                                                                                                    | Redesign proposal §8                     | proposed |
+| ID          | Rule                                                                                                                                                                                                                                                                                                                                                                | Source                                   | Status   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | -------- |
+| BR-ADMIN-01 | The Admin console lives under `/admin` with its own top bar (deep indigo), side nav and a "Back to workspace" link. For a non-Admin every `/admin` page and `/api/admin/*` endpoint behaves as if it does not exist (404).                                                                                                                                          | Linh comment "UI rieng cho 2 role"       | proposed |
+| BR-ADMIN-02 | **All-projects dashboard** shows, per project: key, name, status, members, active release and its days to target, current sprint, last activity date. KPIs: active projects, archived projects, active users / total users, Admins, failed sign-ins in the last 7 days.                                                                                             | Linh comment (all projects = Admin only) | proposed |
+| BR-ADMIN-03 | **Projects** lists every project (archived included) with search and a status filter, and a "New project" button (BR-ADMIN-18). Actions per row: Open, Archive / Restore, Delete (archived only, BR-PROJECT-09 applies), Change project admin. Archive and Delete ask for confirmation with the same dialogs as the User UI; search and status are kept in the URL. | Linh request (1)                         | proposed |
+| BR-ADMIN-18 | Only a System admin can **create a project**, from Admin console › Projects › "New project": key, name, description and the first Project admin (an active user, required). The System admin is not added as a member. The User UI has no "New project" button and `POST /api/projects` returns 403 for everyone else (MSG-ADMIN-09).                               | Linh 2026-10-09 (role model v2)          | proposed |
+| BR-ADMIN-04 | **Change project admin** makes a chosen user Project admin (adding them as a member if needed) and, if chosen, turns the current Project admin(s) into Members, in one step. A project always keeps at least one Project admin.                                                                                                                                     | Linh request (1), role model v2          | proposed |
+| BR-ADMIN-05 | When an Admin opens a project they are **not a member of** (User UI), a banner "You are viewing this project as Admin" (MSG-ADMIN-08) stays visible on every page of that project.                                                                                                                                                                                  | Redesign proposal §8                     | proposed |
 
 ## Users
 
@@ -49,6 +49,7 @@ One rule per row, and one testable statement per rule (ISO/IEC/IEEE 29148: singu
 
 ## Change log
 
-| Date       | Change                                                                                                                      | Why      |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------- | -------- |
-| 2026-10-09 | First version, from the Phase 3C business requirements v1.3 (BR-ADMIN-18 added in v1.2: only System admins create projects) | Phase 3C |
+| Date       | Change                                                                                                                      | Why                 |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| 2026-10-09 | First version, from the Phase 3C business requirements v1.3 (BR-ADMIN-18 added in v1.2: only System admins create projects) | Phase 3C            |
+| 2026-10-10 | BR-ADMIN-03: Archive and Delete confirm with the User UI dialogs; filters kept in the URL                                   | SCR-ADMIN-02 review |
