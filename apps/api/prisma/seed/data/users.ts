@@ -18,6 +18,8 @@ export const users: { email: string; name: string; globalRole: GlobalRole; statu
     { email: 'pm@qawm.test', name: 'Mai PM', globalRole: 'USER' },
     { email: 'teamlead@qawm.test', name: 'Tuan TeamLead', globalRole: 'USER' },
     { email: 'stakeholder@qawm.test', name: 'Sam Stakeholder', globalRole: 'USER' },
+    // A user in no project: the empty project list (AC-ADMIN-22).
+    { email: 'newbie@qawm.test', name: 'Nora Newbie', globalRole: 'USER' },
     // Phase 3C: a deactivated account (BR-ADMIN-10). Can't sign in.
     {
       email: 'inactive@qawm.test',

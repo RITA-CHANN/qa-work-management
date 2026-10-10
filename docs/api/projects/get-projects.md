@@ -9,9 +9,18 @@ owner: Claude
 reviewers: [Linh]
 approved:
 traces:
-  requirements: [US-PROJECT-02, US-PROJECT-10, BR-PROJECT-06, BR-PROJECT-08, BR-PROJECT-36]
+  requirements:
+    [US-PROJECT-02, US-PROJECT-10, BR-PROJECT-06, BR-PROJECT-08, BR-PROJECT-36, BR-GUEST-03]
   acceptance:
-    [AC-PROJECT-09, AC-PROJECT-10, AC-PROJECT-11, AC-PROJECT-12, AC-PROJECT-13, AC-PROJECT-14]
+    [
+      AC-PROJECT-09,
+      AC-PROJECT-10,
+      AC-PROJECT-11,
+      AC-PROJECT-12,
+      AC-PROJECT-13,
+      AC-PROJECT-77,
+      AC-PROJECT-79,
+    ]
   design: [SCR-PROJECT-01]
 updated: 2026-10-09
 ---
@@ -59,15 +68,15 @@ Lists the projects the caller is a member of (every project for a System admin),
 }
 ```
 
-| Field           | Type                      | Description                                                                                               |
-| --------------- | ------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `key`           | string                    | Project key, upper-case (BR-PROJECT-02)                                                                   |
-| `name`          | string                    | Display name                                                                                              |
-| `archivedAt`    | string (ISO 8601) \| null | When it was archived; `null` = active                                                                     |
-| `myAccess`      | ProjectAccess \| null     | Caller's access level (`PROJECT_ADMIN`, `MEMBER`, `GUEST`); `null` for a System admin who is not a member |
-| `memberCount`   | integer                   | Number of members                                                                                         |
-| `activeRelease` | { id, name } \| null      | The `ACTIVE` release                                                                                      |
-| `updatedAt`     | string (ISO 8601)         | Last change                                                                                               |
+| Field           | Type                      | Description                                                                                                      |
+| --------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `key`           | string                    | Project key, upper-case (BR-PROJECT-02)                                                                          |
+| `name`          | string                    | Display name                                                                                                     |
+| `archivedAt`    | string (ISO 8601) \| null | When it was archived; `null` = active                                                                            |
+| `myAccess`      | ProjectAccess \| null     | Caller's access level (`PROJECT_ADMIN`, `MEMBER`, `GUEST`); `null` for a System admin who is not a member        |
+| `memberCount`   | integer \| null           | Number of members; `null` for a Guest when the project's Guest switch "Members" is off (BR-GUEST-03)             |
+| `activeRelease` | { id, name } \| null      | The `ACTIVE` release; `null` when there is none, or for a Guest when "Releases and sprints" is off (BR-GUEST-03) |
+| `updatedAt`     | string (ISO 8601)         | Last change                                                                                                      |
 
 Sorted by name. No pagination in Phase 3: a user is in at most a few hundred projects (assumption in the requirements).
 
@@ -113,8 +122,9 @@ curl -b cookies.txt 'http://localhost:3000/api/projects?search=shop&archived=tru
 
 ## Change log
 
-| Date       | Change                                                                                  | Why                                     |
-| ---------- | --------------------------------------------------------------------------------------- | --------------------------------------- |
-| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                    | Phase 3A                                |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects | Linh's decision 2026-10-09              |
-| 2026-10-09 | `myAccess` can be `GUEST`                                                               | Guest access (BR-GUEST-01, BR-GUEST-02) |
+| Date       | Change                                                                                                                      | Why                                      |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| 2026-10-08 | First version (design; built in the Phase 3 code PR)                                                                        | Phase 3A                                 |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects                                     | Linh's decision 2026-10-09               |
+| 2026-10-09 | `myAccess` can be `GUEST`                                                                                                   | Guest access (BR-GUEST-01, BR-GUEST-02)  |
+| 2026-10-09 | `memberCount` and `activeRelease` are `null` for a Guest when that area is off; System admin rows keep their active release | Project list screen review (BR-GUEST-03) |

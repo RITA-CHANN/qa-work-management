@@ -50,18 +50,41 @@ export async function listProjects(
       releases: { where: { status: 'ACTIVE' }, select: { id: true, name: true } },
     },
   });
-  return rows.map((row) => ({
-    key: row.key,
-    name: row.name,
-    archivedAt: row.archivedAt?.toISOString() ?? null,
-    myAccess: row.members[0]?.access ?? null,
-    memberCount: row._count.members,
-    // BR-GUEST-03: a Guest without the releases area doesn't see the active release.
-    activeRelease: canSeeArea(row.members[0]?.access, row.guestAreas, 'releases')
-      ? (row.releases[0] ?? null)
-      : null,
-    updatedAt: row.updatedAt.toISOString(),
-  }));
+  // A Guest never counts other Guests (BR-GUEST-05), as in the project view.
+  const guestProjects = rows.filter((row) => row.members[0]?.access === 'GUEST');
+  const nonGuestCounts = new Map(
+    guestProjects.length
+      ? (
+          await prisma.projectMember.groupBy({
+            by: ['projectId'],
+            where: {
+              projectId: { in: guestProjects.map((row) => row.id) },
+              access: { not: 'GUEST' },
+            },
+            _count: { _all: true },
+          })
+        ).map((group) => [group.projectId, group._count._all])
+      : [],
+  );
+  return rows.map((row) => {
+    const myAccess = row.members[0]?.access ?? null;
+    // A System admin who is not a member sees everything (BR-PROJECT-36); BR-GUEST-03 hides areas from Guests.
+    const sees = (area: 'releases' | 'members') =>
+      canSeeArea(myAccess ?? 'PROJECT_ADMIN', row.guestAreas, area);
+    return {
+      key: row.key,
+      name: row.name,
+      archivedAt: row.archivedAt?.toISOString() ?? null,
+      myAccess,
+      memberCount: !sees('members')
+        ? null
+        : myAccess === 'GUEST'
+          ? (nonGuestCounts.get(row.id) ?? 0) + 1
+          : row._count.members,
+      activeRelease: sees('releases') ? (row.releases[0] ?? null) : null,
+      updatedAt: row.updatedAt.toISOString(),
+    };
+  });
 }
 
 /**
