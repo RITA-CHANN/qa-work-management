@@ -30,13 +30,15 @@ the code differ. `{name}` is filled in at run time.
 | MSG-COMMON-12 | Header API status: API down or not ok            | error   | status   | Offline                                                        |
 | MSG-COMMON-13 | Unknown page: heading                            | error   | page     | Page not found                                                 |
 | MSG-COMMON-14 | Unknown page: text under the heading             | error   | page     | The page you are looking for does not exist.                   |
+| MSG-COMMON-15 | Leaving a form with unsaved changes              | warning | alert    | You have unsaved changes. Leave this page and lose them?       |
 
 `Kind` and `Shown as` are explained in the [template](../../_templates/feature/messages.md); `api` means the text is
 only in API responses.
 
 ## Change log
 
-| Date       | Change                             | Why                                         |
-| ---------- | ---------------------------------- | ------------------------------------------- |
-| 2026-10-07 | First version                      | Phase 1                                     |
-| 2026-10-08 | Added Kind and Shown as (WCAG 2.2) | Documentation standards (docs/STANDARDS.md) |
+| Date       | Change                                | Why                                         |
+| ---------- | ------------------------------------- | ------------------------------------------- |
+| 2026-10-07 | First version                         | Phase 1                                     |
+| 2026-10-08 | Added Kind and Shown as (WCAG 2.2)    | Documentation standards (docs/STANDARDS.md) |
+| 2026-10-09 | Added MSG-COMMON-15 (unsaved changes) | SCR-PROJECT-06                              |

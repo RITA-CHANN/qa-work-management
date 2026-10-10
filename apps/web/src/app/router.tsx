@@ -16,7 +16,10 @@ import { DashboardTab } from '@/features/projects/DashboardTab';
 import { ProjectLayout } from '@/features/projects/ProjectLayout';
 import { ProjectListPage } from '@/features/projects/ProjectListPage';
 import { ReleasesTab } from '@/features/projects/ReleasesTab';
-import { SettingsRoute } from '@/features/projects/SettingsTab';
+import { DangerZoneSettings } from '@/features/projects/settings/DangerZoneSettings';
+import { GeneralSettings } from '@/features/projects/settings/GeneralSettings';
+import { GuestSettings } from '@/features/projects/settings/GuestSettings';
+import { SettingsRoute } from '@/features/projects/settings/SettingsLayout';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -81,7 +84,17 @@ export const router = createBrowserRouter([
                   </AreaRoute>
                 ),
               },
-              { path: 'settings', element: <SettingsRoute /> },
+              {
+                // SCR-PROJECT-06: one URL per section; an unknown section is "not found".
+                path: 'settings',
+                element: <SettingsRoute />,
+                children: [
+                  { index: true, element: <GeneralSettings /> },
+                  { path: 'guests', element: <GuestSettings /> },
+                  { path: 'danger-zone', element: <DangerZoneSettings /> },
+                  { path: '*', element: <NotFoundPage /> },
+                ],
+              },
             ],
           },
           { path: '*', element: <NotFoundPage /> },
