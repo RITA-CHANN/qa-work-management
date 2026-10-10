@@ -9,3 +9,10 @@ export function timeLeft(endDate: string, today: string = todayIso()): string {
   if (days < 0) return `Overdue by ${-days} ${-days === 1 ? 'day' : 'days'}`;
   return `${days} ${days === 1 ? 'day' : 'days'} left`;
 }
+
+/** AC-PROJECT-105: "20 days to target" until a release's target date, then "Overdue by N days". */
+export function toTarget(targetDate: string, today: string = todayIso()): string {
+  const days = daysBetween(today, targetDate);
+  if (days < 0) return `Overdue by ${-days} ${-days === 1 ? 'day' : 'days'}`;
+  return `${days} ${days === 1 ? 'day' : 'days'} to target`;
+}

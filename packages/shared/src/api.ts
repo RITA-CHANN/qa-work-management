@@ -43,6 +43,7 @@ export const ERROR_CODES = [
   'MILESTONE_OUTSIDE_RELEASE',
   'MILESTONE_OVERLAP',
   'RELEASE_CLOSED',
+  'MILESTONE_CLOSED',
   // Phase 3C (docs/api/README.md#phase-3c-codes)
   'EMAIL_TAKEN',
   'LAST_ADMIN',

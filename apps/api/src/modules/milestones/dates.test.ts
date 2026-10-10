@@ -29,7 +29,7 @@ describe('milestone length (BR-PROJECT-28)', () => {
     });
     expect(result.error?.issues[0]).toMatchObject({
       path: ['endDate'],
-      message: 'A milestone needs a start and end date, 1–28 days long',
+      message: 'A sprint needs a start and end date, 1–28 days long',
     });
   });
 });
@@ -61,7 +61,7 @@ describe('no overlap (BR-PROJECT-30)', () => {
     expect(() => assertNoOverlap(range('2026-11-14', '2026-11-27'), [sprint5])).toThrow(
       expect.objectContaining({
         code: 'MILESTONE_OVERLAP',
-        message: 'Overlaps milestone Sprint 5 (2026-11-01 – 2026-11-14)',
+        message: 'Overlaps Sprint 5 (2026-11-01 – 2026-11-14)',
       }),
     );
   });

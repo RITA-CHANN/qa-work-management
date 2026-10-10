@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from 'react';
 import {
   inclusiveDays,
   isoDateSchema,
+  MILESTONE_MAX_DAYS,
   milestoneCreateSchema,
   milestoneUpdateSchema,
   msg,
@@ -140,25 +141,31 @@ function ReleaseForm({
   );
 }
 
-/** "New milestone" / "Edit milestone" (SCR-PROJECT-04): release, name, goal, dates with a live length. */
+/**
+ * "New sprint" / "Edit sprint" (SCR-PROJECT-04; the UI says sprint for a milestone, BR-PROJECT-47):
+ * release, name, goal, dates with a live length. `releaseId` pre-selects the release (AC-PROJECT-106).
+ */
 export function MilestoneDialog({
   projectKey,
   open,
   milestone,
+  releaseId,
   releases,
   onClose,
 }: {
   projectKey: string;
   open: boolean;
   milestone?: Milestone;
+  releaseId?: string;
   releases: Release[];
   onClose: () => void;
 }) {
   return (
-    <Dialog open={open} onClose={onClose} title={milestone ? 'Edit milestone' : 'New milestone'}>
+    <Dialog open={open} onClose={onClose} title={milestone ? 'Edit sprint' : 'New sprint'}>
       <MilestoneForm
         projectKey={projectKey}
         milestone={milestone}
+        releaseId={releaseId}
         releases={releases}
         onClose={onClose}
       />
@@ -169,11 +176,13 @@ export function MilestoneDialog({
 function MilestoneForm({
   projectKey,
   milestone,
+  releaseId,
   releases,
   onClose,
 }: {
   projectKey: string;
   milestone?: Milestone;
+  releaseId?: string;
   releases: Release[];
   onClose: () => void;
 }) {
@@ -186,6 +195,10 @@ function MilestoneForm({
   // Milestones go into a Planned or Active release (BR-PROJECT-26); the active one is the default.
   const choices = releases.filter((release) => release.status !== 'RELEASED');
   const defaultRelease = choices.find((release) => release.status === 'ACTIVE') ?? choices[0];
+  const [chosenId, setChosenId] = useState(
+    milestone?.releaseId ?? releaseId ?? defaultRelease?.id ?? '',
+  );
+  const chosen = releases.find((release) => release.id === chosenId);
 
   const validDates = isoDateSchema.safeParse(start).success && isoDateSchema.safeParse(end).success;
   const days = validDates ? inclusiveDays(start, end) : null;
@@ -229,9 +242,10 @@ function MilestoneForm({
       <SelectField
         label="Release"
         name="releaseId"
-        defaultValue={milestone?.releaseId ?? defaultRelease?.id}
+        value={chosenId}
+        onChange={(event) => setChosenId(event.target.value)}
         disabled={!!milestone}
-        hint={milestone ? "A milestone can't move to another release." : undefined}
+        hint={releaseHint(chosen, !!milestone)}
         error={errors.releaseId}
       >
         {(milestone ? releases : choices).map((release) => (
@@ -276,4 +290,16 @@ function MilestoneForm({
       </DialogActions>
     </form>
   );
+}
+
+/** AC-PROJECT-106: the release's dates and the longest sprint, so date errors are avoided before Save. */
+function releaseHint(release: Release | undefined, editing: boolean): string {
+  const parts = [editing ? "A sprint can't move to another release." : ''];
+  if (release && (release.startDate || release.targetDate)) {
+    parts.push(
+      `Release ${release.name} runs ${release.startDate ?? '…'} → ${release.targetDate ?? '…'}.`,
+    );
+  }
+  parts.push(`A sprint is 1–${MILESTONE_MAX_DAYS} days.`);
+  return parts.filter(Boolean).join(' ');
 }
