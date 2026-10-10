@@ -8,6 +8,7 @@ import {
   projectCreateSchema,
   projectListQuerySchema,
   projectUpdateSchema,
+  type ActivityActor,
   type ActivityEntry,
   type ApiCursorPage,
   type ApiSuccess,
@@ -18,7 +19,7 @@ import {
 import { parseOrThrow } from '../../lib/errors';
 import { prisma } from '../../lib/prisma';
 import { requireAuth } from '../../middleware/require-auth';
-import { listActivity } from '../activity/activity.service';
+import { listActivity, listActivityActors } from '../activity/activity.service';
 import { milestonesRouter } from '../milestones/milestones.routes';
 import { releasesRouter } from '../releases/releases.routes';
 import { assertArea, keyOf, loadProject, readProjectView } from './loader';
@@ -139,6 +140,13 @@ projectsRouter.get('/:key/activity', async (req, res) => {
     data: page.data,
     meta: { nextCursor: page.nextCursor },
   } satisfies ApiCursorPage<ActivityEntry>);
+});
+
+/** GET /api/projects/:key/activity/actors (API-PROJECT-14): the Person filter of SCR-PROJECT-05. */
+projectsRouter.get('/:key/activity/actors', async (req, res) => {
+  const ctx = await loadProject(keyOf(req), req.user!);
+  assertArea(ctx, 'activity');
+  res.json({ data: await listActivityActors(ctx) } satisfies ApiSuccess<ActivityActor[]>);
 });
 
 projectsRouter.use('/:key/releases', releasesRouter);

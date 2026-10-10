@@ -17,12 +17,24 @@ traces:
       BR-PROJECT-20,
       BR-PROJECT-21,
       BR-PROJECT-22,
+      BR-PROJECT-38,
       BR-GUEST-06,
       BR-ADMIN-04,
     ]
   acceptance:
-    [AC-PROJECT-08, AC-PROJECT-44, AC-PROJECT-45, AC-PROJECT-46, AC-PROJECT-47, AC-GUEST-02]
-  api: [API-PROJECT-12, API-PROJECT-13, API-ADMIN-12]
+    [
+      AC-PROJECT-08,
+      AC-PROJECT-44,
+      AC-PROJECT-45,
+      AC-PROJECT-46,
+      AC-PROJECT-47,
+      AC-PROJECT-81,
+      AC-PROJECT-82,
+      AC-PROJECT-83,
+      AC-PROJECT-85,
+      AC-GUEST-02,
+    ]
+  api: [API-PROJECT-12, API-PROJECT-13, API-PROJECT-14, API-ADMIN-12]
   design: [SCR-PROJECT-05]
 updated: 2026-10-09
 ---
@@ -62,28 +74,33 @@ sequenceDiagram
 | `milestone.created` / `milestone.updated` / `milestone.deleted` | {actor} created / edited / deleted milestone {name}                                                                                                     | edited fields                            |
 | `milestone.status_changed`                                      | {actor} moved milestone {name} from {old} to {new}                                                                                                      | `status`                                 |
 
-Access levels, job titles and statuses in summaries are the display names ("Project admin", "QA engineer", "Active"). Project deletion writes no
+Access levels, job titles and statuses in summaries are the display names ("Project admin", "QA engineer", "Active").
+`changes` keep the stored values (`MEMBER`, `QAE`, `ACTIVE`, area keys); the web app turns them into display names
+when it shows them (SCR-PROJECT-05, BR-PROJECT-20), so the API stays stable and old entries need no migration. Project deletion writes no
 entry: the log is deleted with the project.
 
 ## Rules in code
 
-| Topic          | Behaviour                                                                                                                                                                                                                                                  | Rule                                  |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| One helper     | Services call `recordActivity(tx, input)` with the transaction client; it has no way to run outside a transaction                                                                                                                                          | BR-PROJECT-22                         |
-| Summary frozen | The sentence is built at write time, so renaming a user later does not change old entries                                                                                                                                                                  | BR-PROJECT-20                         |
-| Diff           | `diff(before, after)` keeps only fields whose value changed; an edit that changes nothing writes no entry and does not bump `version`                                                                                                                      | BR-PROJECT-20                         |
-| Audit too      | `recordActivity` with `audit: true` also writes an audit event in the same transaction, whoever acts (`actedAs` is `ADMIN` only for a System admin who is not a member). Used by Guest visibility (API-PROJECT-13) and Change project admin (API-ADMIN-12) | BR-GUEST-06, BR-ADMIN-04, BR-ADMIN-16 |
-| Append-only    | No update or delete code path; the API has only `GET` for activity                                                                                                                                                                                         | BR-PROJECT-21                         |
-| Page           | `GET …/activity?limit=20&cursor=<id>`: `ORDER BY created_at DESC, id DESC`, rows after the cursor row; `limit` 1–100                                                                                                                                       | BR-PROJECT-21, NFR-PROJECT-05         |
-| Next cursor    | `meta.nextCursor` is the last row's id, or `null` when there are no more                                                                                                                                                                                   | BR-PROJECT-21                         |
+| Topic          | Behaviour                                                                                                                                                                                                                                                             | Rule                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| One helper     | Services call `recordActivity(tx, input)` with the transaction client; it has no way to run outside a transaction                                                                                                                                                     | BR-PROJECT-22                         |
+| Summary frozen | The sentence is built at write time, so renaming a user later does not change old entries                                                                                                                                                                             | BR-PROJECT-20                         |
+| Diff           | `diff(before, after)` keeps only fields whose value changed; an edit that changes nothing writes no entry and does not bump `version`                                                                                                                                 | BR-PROJECT-20                         |
+| Audit too      | `recordActivity` with `audit: true` also writes an audit event in the same transaction, whoever acts (`actedAs` is `ADMIN` only for a System admin who is not a member). Used by Guest visibility (API-PROJECT-13) and Change project admin (API-ADMIN-12)            | BR-GUEST-06, BR-ADMIN-04, BR-ADMIN-16 |
+| Append-only    | No update or delete code path; the API has only `GET` for activity                                                                                                                                                                                                    | BR-PROJECT-21                         |
+| Page           | `GET …/activity?limit=20&cursor=<id>`: `ORDER BY created_at DESC, id DESC`, rows after the cursor row; `limit` 1–100                                                                                                                                                  | BR-PROJECT-21, NFR-PROJECT-05         |
+| Next cursor    | `meta.nextCursor` is the last row's id, or `null` when there are no more                                                                                                                                                                                              | BR-PROJECT-21                         |
+| Filters        | `entityType`, `actorId`, `from` (inclusive) and `to` (exclusive) are added to the same `WHERE` with AND; order and cursor rules do not change. The existing index (`project_id`, `created_at` desc, `id` desc) serves them: NFR-PROJECT-06 is 10 000 rows per project | BR-PROJECT-38                         |
+| People filter  | API-PROJECT-14: `DISTINCT actor_id` of the project's entries, joined to users, sorted by name                                                                                                                                                                         | BR-PROJECT-38                         |
 
 ## Errors
 
-| Situation                     | What the code does                                    | Status / message                    |
-| ----------------------------- | ----------------------------------------------------- | ----------------------------------- |
-| Insert of the entry fails     | Whole transaction rolls back; the change is not saved | 500 `INTERNAL_ERROR`, MSG-COMMON-02 |
-| Cursor id not in this project | Treated as invalid                                    | 400 `VALIDATION_ERROR`              |
-| `limit` outside 1–100         | Schema rejects it                                     | 400 `VALIDATION_ERROR`              |
+| Situation                                   | What the code does                                    | Status / message                             |
+| ------------------------------------------- | ----------------------------------------------------- | -------------------------------------------- |
+| Insert of the entry fails                   | Whole transaction rolls back; the change is not saved | 500 `INTERNAL_ERROR`, MSG-COMMON-02          |
+| Cursor id not in this project               | Treated as invalid                                    | 400 `VALIDATION_ERROR`                       |
+| `limit` outside 1–100                       | Schema rejects it                                     | 400 `VALIDATION_ERROR`                       |
+| `to` not after `from`; unknown `entityType` | Schema rejects it                                     | 400 `VALIDATION_ERROR`, `/to` MSG-PROJECT-34 |
 
 ## Security
 
@@ -105,3 +122,4 @@ or ids of other projects. No endpoint can change or delete an entry (AC-PROJECT-
 | 2026-10-08 | First version                                                                                    | Phase 3A                           |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects          | Linh's decision 2026-10-09         |
 | 2026-10-09 | Added `project.guest_visibility_changed`, the `audit: true` option and the Guest `activity` area | Guest access, change project admin |
+| 2026-10-09 | Filters and the people list (API-PROJECT-14); `changes` shown with display names by the web app  | BR-PROJECT-38, BR-PROJECT-20       |

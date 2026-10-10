@@ -66,6 +66,8 @@ export const MESSAGES = {
   'MSG-PROJECT-32':
     'Release {name} is already released. Add milestones to a planned or active release.',
   'MSG-PROJECT-33': 'Choose an existing user as the first project admin',
+  'MSG-PROJECT-34': "The end date can't be before the start date",
+  'MSG-PROJECT-35': 'No activity matches these filters',
   'MSG-PROJECT-50': 'Project archived',
   'MSG-PROJECT-51': 'Project restored',
   'MSG-PROJECT-52': 'Deleted project {key}',

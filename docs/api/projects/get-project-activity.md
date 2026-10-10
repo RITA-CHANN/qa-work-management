@@ -10,7 +10,15 @@ reviewers: [Linh]
 approved:
 traces:
   requirements:
-    [US-PROJECT-09, BR-PROJECT-19, BR-PROJECT-20, BR-PROJECT-21, BR-PROJECT-22, BR-GUEST-03]
+    [
+      US-PROJECT-09,
+      BR-PROJECT-19,
+      BR-PROJECT-20,
+      BR-PROJECT-21,
+      BR-PROJECT-22,
+      BR-PROJECT-38,
+      BR-GUEST-03,
+    ]
   acceptance:
     [
       AC-PROJECT-08,
@@ -18,6 +26,10 @@ traces:
       AC-PROJECT-45,
       AC-PROJECT-46,
       AC-PROJECT-47,
+      AC-PROJECT-81,
+      AC-PROJECT-82,
+      AC-PROJECT-83,
+      AC-PROJECT-86,
       AC-GUEST-01,
       AC-GUEST-02,
     ]
@@ -27,7 +39,7 @@ updated: 2026-10-09
 
 # GET /api/projects/:key/activity
 
-Pages through the project's activity log, newest first (SCR-PROJECT-05). Status codes follow RFC 9110; errors are RFC 9457 problem details
+Pages through the project's activity log, newest first, optionally filtered (SCR-PROJECT-05, BR-PROJECT-38). Status codes follow RFC 9110; errors are RFC 9457 problem details
 ([README.md](../README.md#error-format), [ADR-0010](../../decisions/ADR-0010-problem-details-errors.md)).
 
 |                 |                                                                                  |
@@ -46,10 +58,17 @@ Pages through the project's activity log, newest first (SCR-PROJECT-05). Status 
 
 ### Query parameters
 
-| Name     | Type    | Required | Default | Description                            |
-| -------- | ------- | -------- | ------- | -------------------------------------- |
-| `limit`  | integer | no       | 20      | 1–100 entries per page                 |
-| `cursor` | string  | no       | —       | `meta.nextCursor` of the previous page |
+| Name         | Type                                    | Required | Default | Description                                                                            |
+| ------------ | --------------------------------------- | -------- | ------- | -------------------------------------------------------------------------------------- |
+| `limit`      | integer                                 | no       | 20      | 1–100 entries per page                                                                 |
+| `cursor`     | string                                  | no       | —       | `meta.nextCursor` of the previous page                                                 |
+| `entityType` | string                                  | no       | —       | `project`, `member`, `release` or `milestone`                                          |
+| `actorId`    | string                                  | no       | —       | Only entries by this user (ids from API-PROJECT-14); an unknown id gives an empty page |
+| `from`       | string (ISO 8601 date-time with offset) | no       | —       | Entries at or after this instant                                                       |
+| `to`         | string (ISO 8601 date-time with offset) | no       | —       | Entries **before** this instant (exclusive); must be after `from`                      |
+
+Filters combine with AND. Keep the same filters on every page: a cursor is only checked to belong to this project, so
+changing filters mid-way gives a page that starts after that entry within the new filter.
 
 ## Responses
 
@@ -103,12 +122,12 @@ There is no POST, PATCH or DELETE for activity (BR-PROJECT-21).
 
 Body: `application/problem+json`. Checked in the order of the table (DD-PROJECT-01).
 
-| Status | `code`             | `messageId`    | When                                                                                             |
-| ------ | ------------------ | -------------- | ------------------------------------------------------------------------------------------------ |
-| 400    | `VALIDATION_ERROR` | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`               |
-| 401    | `UNAUTHENTICATED`  | MSG-COMMON-05  | Not logged in                                                                                    |
-| 404    | `NOT_FOUND`        | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008) |
-| 404    | `NOT_FOUND`        | MSG-COMMON-07  | The caller is a Guest and the `activity` area is off for Guests (BR-GUEST-03)                    |
+| Status | `code`             | `messageId`    | When                                                                                                                                   |
+| ------ | ------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 400    | `VALIDATION_ERROR` | MSG-COMMON-04  | Body or query fails the schema; `errors` lists each field with its own `messageId`; `to` not after `from` is `/to` with MSG-PROJECT-34 |
+| 401    | `UNAUTHENTICATED`  | MSG-COMMON-05  | Not logged in                                                                                                                          |
+| 404    | `NOT_FOUND`        | MSG-PROJECT-06 | Unknown key, or the caller is not a member and not a System admin (same body for both, ADR-0008)                                       |
+| 404    | `NOT_FOUND`        | MSG-COMMON-07  | The caller is a Guest and the `activity` area is off for Guests (BR-GUEST-03)                                                          |
 
 ## Security
 
@@ -130,6 +149,7 @@ Read-only, safe and idempotent.
 
 ```bash
 curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/activity?limit=20'
+curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/activity?entityType=member&from=2026-10-01T00:00:00%2B07:00&to=2026-10-10T00:00:00%2B07:00'
 ```
 
 ## Test ideas
@@ -139,6 +159,8 @@ curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/activity?limit=20'
 | Happy path | After an edit, `limit=1`                                          | The edit's entry first       |
 | Boundary   | 25 entries: page 1 then page 2                                    | 20 then 5, `nextCursor` null |
 | Negative   | `limit=101`; cursor from another project                          | 400; 400                     |
+| Filter     | `entityType=member`; `actorId=<Oanh>`; `from`/`to` around one day | Only matching entries        |
+| Negative   | `entityType=user`; `from=2026-10-09`; `to` before `from`          | 400 each                     |
 | Security   | PATCH or DELETE on the path                                       | 404 route not found          |
 | Permission | Sam Stakeholder (Guest of SHOP), `activity` off, then switched on | 404 MSG-COMMON-07, then 200  |
 
@@ -149,3 +171,4 @@ curl -b cookies.txt 'http://localhost:3000/api/projects/SHOP/activity?limit=20'
 | 2026-10-08 | First version (design; built in the Phase 3 code PR)                                       | Phase 3A                   |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects    | Linh's decision 2026-10-09 |
 | 2026-10-09 | Guest: 404 while the `activity` area is off; new action `project.guest_visibility_changed` | BR-GUEST-03, BR-GUEST-06   |
+| 2026-10-09 | Filters `entityType`, `actorId`, `from`, `to`                                              | BR-PROJECT-38              |

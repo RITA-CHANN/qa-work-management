@@ -6,6 +6,8 @@ import {
   type QueryKey,
 } from '@tanstack/react-query';
 import type {
+  ActivityActor,
+  ActivityEntityType,
   ActivityEntry,
   ApiCursorPage,
   ApiSuccess,
@@ -35,8 +37,9 @@ export const projectKeys = {
   members: (key: string) => ['project', key.toUpperCase(), 'members'] as const,
   releases: (key: string) => ['project', key.toUpperCase(), 'releases'] as const,
   milestones: (key: string) => ['project', key.toUpperCase(), 'milestones'] as const,
-  activity: (key: string, limit: number) =>
-    ['project', key.toUpperCase(), 'activity', limit] as const,
+  activity: (key: string, limit: number, filters: ActivityFilters = {}) =>
+    ['project', key.toUpperCase(), 'activity', limit, filters] as const,
+  activityActors: (key: string) => ['project', key.toUpperCase(), 'activity', 'actors'] as const,
 };
 
 const base = (key: string) => `/projects/${encodeURIComponent(key)}`;
@@ -87,16 +90,39 @@ export function useMilestones(key: string, enabled = true) {
 }
 
 /** Activity pages: "Load more" fetches the page after the last entry (cursor). */
-export function useActivity(key: string, limit = 20, enabled = true) {
+/** API filters of the activity log (BR-PROJECT-38): `from` inclusive, `to` exclusive, ISO date-times. */
+export type ActivityFilters = {
+  entityType?: ActivityEntityType;
+  actorId?: string;
+  from?: string;
+  to?: string;
+};
+
+export function useActivity(
+  key: string,
+  limit = 20,
+  enabled = true,
+  filters: ActivityFilters = {},
+) {
   return useInfiniteQuery({
-    queryKey: projectKeys.activity(key, limit),
+    queryKey: projectKeys.activity(key, limit, filters),
     enabled,
     initialPageParam: null as string | null,
-    queryFn: ({ pageParam }) =>
-      apiFetch<ApiCursorPage<ActivityEntry>>(
-        `${base(key)}/activity?limit=${limit}${pageParam ? `&cursor=${pageParam}` : ''}`,
-      ),
+    queryFn: ({ pageParam }) => {
+      const params = new URLSearchParams({ limit: String(limit) });
+      for (const [name, value] of Object.entries(filters)) if (value) params.set(name, value);
+      if (pageParam) params.set('cursor', pageParam);
+      return apiFetch<ApiCursorPage<ActivityEntry>>(`${base(key)}/activity?${params}`);
+    },
     getNextPageParam: (page) => page.meta.nextCursor,
+  });
+}
+
+/** API-PROJECT-14: the people of the Person filter. */
+export function useActivityActors(key: string) {
+  return useQuery({
+    queryKey: projectKeys.activityActors(key),
+    queryFn: () => apiFetch<ApiSuccess<ActivityActor[]>>(`${base(key)}/activity/actors`).then(data),
   });
 }
 
