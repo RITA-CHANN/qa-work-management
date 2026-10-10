@@ -92,6 +92,7 @@ Every seed user gets the password `Password123!` from Phase 2 (dev and test only
 | pm@qawm.test          | Mai PM          | USER        | Project admin and project manager (Phase 3)              |
 | teamlead@qawm.test    | Tuan TeamLead   | USER        | Leader of another team (Phase 3)                         |
 | stakeholder@qawm.test | Sam Stakeholder | USER        | Business stakeholder (Phase 3)                           |
+| newbie@qawm.test      | Nora Newbie     | USER        | Member of no project: empty project list (AC-ADMIN-22)   |
 | inactive@qawm.test    | Hoa Inactive    | USER        | DEACTIVATED                                              | Deactivated account, can't sign in (Phase 3C, BR-ADMIN-10) |
 
 ## Used by
@@ -111,3 +112,4 @@ Every seed user gets the password `Password123!` from Phase 2 (dev and test only
 | 2026-10-08 | Four seed users for Phase 3 project roles                                                                   | —                                        | Phase 3A                                    |
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects                     | —                                        | Linh's decision 2026-10-09                  |
 | 2026-10-09 | `status`, `must_change_password`, `last_sign_in_at`, `last_project_id`; seed user `inactive@` (Deactivated) | `20261009081118_admin_console_and_audit` | Phase 3C                                    |
+| 2026-10-10 | Seed user `newbie@` in no project (empty project list, AC-ADMIN-22)                                         | —                                        | Project list screen review                  |

@@ -12,3 +12,4 @@ export * from './users';
 export * from './admin';
 export * from './search';
 export * from './guest';
+export * from './dashboard';
