@@ -172,6 +172,10 @@ export async function updateMilestone(
         startDate: body.startDate ?? before.startDate,
         endDate: body.endDate ?? before.endDate,
       };
+      // BR-PROJECT-45: a completed sprint keeps its name, goal and dates.
+      if (changes && row.status === 'COMPLETED') {
+        throw new UnprocessableError('MILESTONE_CLOSED', 'MSG-PROJECT-46', { name: row.name });
+      }
 
       if (changes?.startDate || changes?.endDate) {
         // BR-PROJECT-28 against the stored date the body didn't send.

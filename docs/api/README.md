@@ -114,24 +114,25 @@ docs by `npm run docs:build`; `npm run docs:check` fails when it is out of date.
 
 ### Phase 3 codes
 
-| HTTP | `code`                      | When                                                             |
-| ---- | --------------------------- | ---------------------------------------------------------------- |
-| 409  | `KEY_TAKEN`                 | Project key already used (BR-PROJECT-03)                         |
-| 409  | `ALREADY_MEMBER`            | The user is already a member (BR-PROJECT-10)                     |
-| 409  | `VERSION_CONFLICT`          | Stale `version` on a `PATCH` (BR-PROJECT-07)                     |
-| 409  | `INVALID_TRANSITION`        | Status moved backwards or skipped (BR-PROJECT-16, BR-PROJECT-31) |
-| 409  | `RELEASE_NAME_TAKEN`        | Release name used in the project (BR-PROJECT-14)                 |
-| 409  | `MILESTONE_NAME_TAKEN`      | Milestone name used in the project (BR-PROJECT-27)               |
-| 422  | `PROJECT_ARCHIVED`          | Change to an archived project (BR-PROJECT-08)                    |
-| 422  | `DELETE_NOT_ALLOWED`        | Project, release or milestone can't be deleted in its state      |
-| 422  | `LAST_PROJECT_ADMIN`        | Change would leave no Project admin (BR-PROJECT-12)              |
-| 422  | `OWN_ACCESS`                | Caller changes their own access level (BR-PROJECT-24)            |
-| 422  | `ACTIVE_RELEASE_EXISTS`     | Another release is active (BR-PROJECT-17)                        |
-| 422  | `OPEN_MILESTONES`           | Release has milestones not completed (BR-PROJECT-25)             |
-| 422  | `CANNOT_ACTIVATE_MILESTONE` | Release not active or another milestone active (BR-PROJECT-32)   |
-| 422  | `MILESTONE_OUTSIDE_RELEASE` | Milestone dates outside the release (BR-PROJECT-29)              |
-| 422  | `MILESTONE_OVERLAP`         | Milestones of one release overlap (BR-PROJECT-30)                |
-| 422  | `RELEASE_CLOSED`            | Milestone added to a released release (MSG-PROJECT-32)           |
+| HTTP | `code`                      | When                                                                                                                 |
+| ---- | --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 409  | `KEY_TAKEN`                 | Project key already used (BR-PROJECT-03)                                                                             |
+| 409  | `ALREADY_MEMBER`            | The user is already a member (BR-PROJECT-10)                                                                         |
+| 409  | `VERSION_CONFLICT`          | Stale `version` on a `PATCH` (BR-PROJECT-07)                                                                         |
+| 409  | `INVALID_TRANSITION`        | Status moved backwards or skipped (BR-PROJECT-16, BR-PROJECT-31)                                                     |
+| 409  | `RELEASE_NAME_TAKEN`        | Release name used in the project (BR-PROJECT-14)                                                                     |
+| 409  | `MILESTONE_NAME_TAKEN`      | Milestone name used in the project (BR-PROJECT-27)                                                                   |
+| 422  | `PROJECT_ARCHIVED`          | Change to an archived project (BR-PROJECT-08)                                                                        |
+| 422  | `DELETE_NOT_ALLOWED`        | Project, release or milestone can't be deleted in its state                                                          |
+| 422  | `LAST_PROJECT_ADMIN`        | Change would leave no Project admin (BR-PROJECT-12)                                                                  |
+| 422  | `OWN_ACCESS`                | Caller changes their own access level (BR-PROJECT-24)                                                                |
+| 422  | `ACTIVE_RELEASE_EXISTS`     | Another release is active (BR-PROJECT-17)                                                                            |
+| 422  | `OPEN_MILESTONES`           | Release has milestones not completed (BR-PROJECT-25)                                                                 |
+| 422  | `CANNOT_ACTIVATE_MILESTONE` | Release not active or another milestone active (BR-PROJECT-32)                                                       |
+| 422  | `MILESTONE_OUTSIDE_RELEASE` | Milestone dates outside the release (BR-PROJECT-29)                                                                  |
+| 422  | `MILESTONE_OVERLAP`         | Milestones of one release overlap (BR-PROJECT-30)                                                                    |
+| 422  | `RELEASE_CLOSED`            | Milestone added to a released release (MSG-PROJECT-32), or a released release edited (MSG-PROJECT-45, BR-PROJECT-45) |
+| 422  | `MILESTONE_CLOSED`          | Completed milestone edited (MSG-PROJECT-46, BR-PROJECT-45)                                                           |
 
 ### Phase 3C codes
 

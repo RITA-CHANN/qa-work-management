@@ -27,6 +27,7 @@ traces:
       BR-PROJECT-32,
       BR-PROJECT-33,
       BR-PROJECT-34,
+      BR-PROJECT-45,
     ]
   acceptance:
     [
@@ -44,6 +45,8 @@ traces:
       AC-PROJECT-63,
       AC-PROJECT-64,
       AC-PROJECT-65,
+      AC-PROJECT-102,
+      AC-PROJECT-103,
     ]
   api:
     [
@@ -55,7 +58,7 @@ traces:
       API-MILESTONE-04,
     ]
   design: [FLW-PROJECT-04, SCR-PROJECT-04]
-updated: 2026-10-09
+updated: 2026-10-10
 ---
 
 # DD-PROJECT-04 Release and milestone lifecycle
@@ -101,18 +104,19 @@ Skipping a state (`PLANNED → RELEASED`) is not allowed either: each move is on
 
 ## Rules in code
 
-| Topic                 | Behaviour                                                                                                                                                              | Rule                         |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Transition table      | `RELEASE_NEXT = { PLANNED: 'ACTIVE', ACTIVE: 'RELEASED' }`, `MILESTONE_NEXT = { PLANNED: 'ACTIVE', ACTIVE: 'COMPLETED' }`; any other target → 409 `INVALID_TRANSITION` | BR-PROJECT-16, BR-PROJECT-31 |
-| One active            | Checked in the service, and a partial unique index catches a race                                                                                                      | BR-PROJECT-17, BR-PROJECT-32 |
-| Release → RELEASED    | Refused while any milestone of the release is not `COMPLETED`                                                                                                          | BR-PROJECT-25                |
-| New milestone         | Refused with 422 `RELEASE_CLOSED` (MSG-PROJECT-32) when the release is `RELEASED`                                                                                      | BR-PROJECT-25                |
-| Milestone length      | `days = end − start + 1`; must be 1 to `MILESTONE_MAX_DAYS` (default 28)                                                                                               | BR-PROJECT-28                |
-| Inside release        | If the release has `start_date`, milestone `start ≥ release.start`; if it has `target_date`, milestone `end ≤ release.target`                                          | BR-PROJECT-29                |
-| No overlap            | Two milestones of one release overlap when `a.start ≤ b.end AND b.start ≤ a.end` (inclusive days, so sharing one day overlaps)                                         | BR-PROJECT-30                |
-| Editing release dates | Refused with 422 `MILESTONE_OUTSIDE_RELEASE` if an existing milestone would fall outside the new dates                                                                 | BR-PROJECT-29                |
-| Days left             | Web computes from today (UTC date): `end − today` for Active; negative → "Overdue by N days"; never changes status                                                     | BR-PROJECT-34                |
-| Names                 | Trimmed; `name_normalized = lower(name)`; unique per project                                                                                                           | BR-PROJECT-14, BR-PROJECT-27 |
+| Topic                 | Behaviour                                                                                                                                                                                                                                                                 | Rule                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| Transition table      | `RELEASE_NEXT = { PLANNED: 'ACTIVE', ACTIVE: 'RELEASED' }`, `MILESTONE_NEXT = { PLANNED: 'ACTIVE', ACTIVE: 'COMPLETED' }`; any other target → 409 `INVALID_TRANSITION`                                                                                                    | BR-PROJECT-16, BR-PROJECT-31 |
+| One active            | Checked in the service, and a partial unique index catches a race                                                                                                                                                                                                         | BR-PROJECT-17, BR-PROJECT-32 |
+| Release → RELEASED    | Refused while any milestone of the release is not `COMPLETED`                                                                                                                                                                                                             | BR-PROJECT-25                |
+| New milestone         | Refused with 422 `RELEASE_CLOSED` (MSG-PROJECT-32) when the release is `RELEASED`                                                                                                                                                                                         | BR-PROJECT-25                |
+| Milestone length      | `days = end − start + 1`; must be 1 to `MILESTONE_MAX_DAYS` (default 28)                                                                                                                                                                                                  | BR-PROJECT-28                |
+| Inside release        | If the release has `start_date`, milestone `start ≥ release.start`; if it has `target_date`, milestone `end ≤ release.target`                                                                                                                                             | BR-PROJECT-29                |
+| No overlap            | Two milestones of one release overlap when `a.start ≤ b.end AND b.start ≤ a.end` (inclusive days, so sharing one day overlaps)                                                                                                                                            | BR-PROJECT-30                |
+| Editing release dates | Refused with 422 `MILESTONE_OUTSIDE_RELEASE` if an existing milestone would fall outside the new dates                                                                                                                                                                    | BR-PROJECT-29                |
+| Closed items          | A `RELEASED` release and a `COMPLETED` milestone refuse any change of name, goal or dates: 422 `RELEASE_CLOSED` (MSG-PROJECT-45) / `MILESTONE_CLOSED` (MSG-PROJECT-46), checked right after the version. A status-only body still goes through the transition table (409) | BR-PROJECT-45                |
+| Days left             | Web computes from today (UTC date): `end − today` for Active; negative → "Overdue by N days"; never changes status                                                                                                                                                        | BR-PROJECT-34                |
+| Names                 | Trimmed; `name_normalized = lower(name)`; unique per project                                                                                                                                                                                                              | BR-PROJECT-14, BR-PROJECT-27 |
 
 ## Errors
 
@@ -123,6 +127,7 @@ Skipping a state (`PLANNED → RELEASED`) is not allowed either: each move is on
 | Release with open milestones                    | Nothing saved      | 422 `OPEN_MILESTONES`, MSG-PROJECT-27                                               |
 | Milestone can't be activated                    | Nothing saved      | 422 `CANNOT_ACTIVATE_MILESTONE`, MSG-PROJECT-29                                     |
 | Milestone too long, too short, end before start | Schema rejects it  | 400 `VALIDATION_ERROR`, MSG-PROJECT-24                                              |
+| Edit a released release or completed milestone  | Nothing saved      | 422 `RELEASE_CLOSED`, MSG-PROJECT-45 / `MILESTONE_CLOSED`, MSG-PROJECT-46           |
 | Milestone outside its release                   | Nothing saved      | 422 `MILESTONE_OUTSIDE_RELEASE`, MSG-PROJECT-25                                     |
 | Overlap                                         | Nothing saved      | 422 `MILESTONE_OVERLAP`, MSG-PROJECT-26                                             |
 | Target before start (release)                   | Schema rejects it  | 400 `VALIDATION_ERROR`, MSG-PROJECT-15                                              |
@@ -146,7 +151,8 @@ a `releaseId` from another project gives 404.
 
 ## Change log
 
-| Date       | Change                                             | Why                              |
-| ---------- | -------------------------------------------------- | -------------------------------- |
-| 2026-10-08 | First version                                      | Phase 3A                         |
-| 2026-10-09 | Added the `RELEASE_CLOSED` rule for new milestones | Gap found while building the API |
+| Date       | Change                                                                 | Why                                                   |
+| ---------- | ---------------------------------------------------------------------- | ----------------------------------------------------- |
+| 2026-10-08 | First version                                                          | Phase 3A                                              |
+| 2026-10-09 | Added the `RELEASE_CLOSED` rule for new milestones                     | Gap found while building the API                      |
+| 2026-10-10 | Released release and completed milestone are read-only (BR-PROJECT-45) | Linh's decision 2026-10-10 (SCR-PROJECT-04 review C7) |

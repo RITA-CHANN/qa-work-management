@@ -18,7 +18,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 | [Admin console](admin.md)    | 3     | 27       | 11        | 25                | 0                  | 25              | 2                      | 0   |
 | [Project dashboard](dash.md) | 3     | 9        | 2         | 9                 | 0                  | 9               | 0                      | 0   |
 | [Guest access](guest.md)     | 3     | 6        | 2         | 6                 | 0                  | 6               | 0                      | 0   |
-| [Projects](project.md)       | 3     | 95       | 26        | 94                | 0                  | 94              | 1                      | 8   |
+| [Projects](project.md)       | 3     | 103      | 28        | 101               | 0                  | 101             | 2                      | 8   |
 | [App shell](shell.md)        | 3     | 8        | 1         | 7                 | 0                  | 7               | 1                      | 0   |
 
 ## Gaps to review
@@ -66,6 +66,8 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 - [AC-PROJECT-74](../requirements/project/acceptance.md): Each returns 403: a job title gives no rights
 - [AC-PROJECT-75](../requirements/project/acceptance.md): Each step works and writes an activity entry (any Project admin manages other Project admins)
 - [AC-PROJECT-94](../requirements/project/acceptance.md): The dialog shows MSG-PROJECT-12 and its button is disabled
+- [AC-PROJECT-102](../requirements/project/acceptance.md): There is no Edit action; the API answers 422 `RELEASE_CLOSED` with MSG-PROJECT-45 and nothing changes
+- [AC-PROJECT-103](../requirements/project/acceptance.md): There is no Edit action; the API answers 422 `MILESTONE_CLOSED` with MSG-PROJECT-46 and nothing changes
 - [AC-PROJECT-21](../requirements/project/acceptance.md): Tab 2 shows MSG-PROJECT-07, tab 1's values are kept, and tab 2 can reload to see them
 - [AC-SHELL-05](../requirements/shell/acceptance.md): SECRET is in neither the results nor the API response; with no match I see MSG-SHELL-01; Esc closes the search
 

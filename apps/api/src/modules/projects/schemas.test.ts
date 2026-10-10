@@ -112,7 +112,7 @@ describe('milestone setting (BR-PROJECT-28)', () => {
       startDate: '2026-11-01',
       endDate: '2026-11-15',
     });
-    expect(messages(result)).toEqual(['A milestone needs a start and end date, 1–14 days long']);
+    expect(messages(result)).toEqual(['A sprint needs a start and end date, 1–14 days long']);
   });
 });
 

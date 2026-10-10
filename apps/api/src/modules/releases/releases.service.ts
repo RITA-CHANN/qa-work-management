@@ -149,6 +149,10 @@ export async function updateRelease(
         targetDate: body.targetDate,
       });
       const after = { ...before, ...stripUndefined(body) };
+      // BR-PROJECT-45: a released release keeps its name and dates.
+      if (changes && row.status === 'RELEASED') {
+        throw new UnprocessableError('RELEASE_CLOSED', 'MSG-PROJECT-45', { name: row.name });
+      }
 
       if (changes && (changes.startDate || changes.targetDate)) {
         // BR-PROJECT-15 against the stored date the body didn't send.
