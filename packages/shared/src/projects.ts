@@ -125,7 +125,9 @@ export const projectSummarySchema = z.object({
   archivedAt: isoDateTime.nullable(),
   /** The caller's access; null for a System admin who is not a member (BR-PROJECT-36). */
   myAccess: projectAccessSchema.nullable(),
-  memberCount: z.number().int(),
+  /** Null for a Guest when the project's Guest switch "Members" is off (BR-GUEST-03). */
+  memberCount: z.number().int().nullable(),
+  /** Null when there is none, or for a Guest when "Releases and sprints" is off (BR-GUEST-03). */
   activeRelease: ref.nullable(),
   updatedAt: isoDateTime,
 });
