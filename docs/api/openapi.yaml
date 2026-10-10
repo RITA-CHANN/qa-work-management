@@ -1116,6 +1116,37 @@ paths:
           schema:
             type: string
             minLength: 1
+        - name: entityType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - project
+              - member
+              - release
+              - milestone
+        - name: actorId
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 40
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
       responses:
         '200':
           description: OK
@@ -1151,6 +1182,56 @@ paths:
                       code:
                         enum:
                           - VALIDATION_ERROR
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
+  /api/projects/{key}/activity/actors:
+    get:
+      operationId: API-PROJECT-14
+      summary: People with entries in the activity log
+      description: 'Docs: docs/api/projects/get-project-activity-actors.md'
+      tags:
+        - Activity
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Project key, case-insensitive
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActivityActor'
         '401':
           description: 'Unauthorized: UNAUTHENTICATED'
           content:
@@ -1272,6 +1353,54 @@ paths:
                       code:
                         enum:
                           - PROJECT_ARCHIVED
+  /api/projects/{key}/dashboard:
+    get:
+      operationId: API-DASH-01
+      summary: Project dashboard data
+      description: 'Docs: docs/api/projects/get-project-dashboard.md'
+      tags:
+        - Projects
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Project key, case-insensitive
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProjectDashboard'
+        '401':
+          description: 'Unauthorized: UNAUTHENTICATED'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - UNAUTHENTICATED
+        '404':
+          description: 'Not Found: NOT_FOUND'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - properties:
+                      code:
+                        enum:
+                          - NOT_FOUND
   /api/projects/{key}/releases:
     get:
       operationId: API-RELEASE-01
@@ -3877,6 +4006,17 @@ components:
         - createdAt
         - updatedAt
       additionalProperties: false
+    ActivityActor:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
+      additionalProperties: false
     ActivityEntry:
       type: object
       properties:
@@ -3952,6 +4092,284 @@ components:
         - changes
         - actor
         - createdAt
+      additionalProperties: false
+    ProjectDashboard:
+      type: object
+      properties:
+        asOf:
+          type: string
+          format: date
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        areas:
+          type: array
+          items:
+            type: string
+            enum:
+              - releases
+              - members
+              - activity
+        release:
+          anyOf:
+            - type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                status:
+                  type: string
+                  enum:
+                    - PLANNED
+                    - ACTIVE
+                    - RELEASED
+                startDate:
+                  anyOf:
+                    - type: string
+                      format: date
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                    - type: 'null'
+                targetDate:
+                  anyOf:
+                    - type: string
+                      format: date
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                    - type: 'null'
+                daysToTarget:
+                  anyOf:
+                    - type: integer
+                      minimum: -9007199254740991
+                      maximum: 9007199254740991
+                    - type: 'null'
+                sprints:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                          - PLANNED
+                          - ACTIVE
+                          - COMPLETED
+                    required:
+                      - id
+                      - name
+                      - status
+                    additionalProperties: false
+              required:
+                - id
+                - name
+                - status
+                - startDate
+                - targetDate
+                - daysToTarget
+                - sprints
+              additionalProperties: false
+            - type: 'null'
+        sprint:
+          anyOf:
+            - type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                goal:
+                  type:
+                    - string
+                    - 'null'
+                startDate:
+                  type: string
+                  format: date
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                endDate:
+                  type: string
+                  format: date
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                daysLeft:
+                  type: integer
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
+              required:
+                - id
+                - name
+                - goal
+                - startDate
+                - endDate
+                - daysLeft
+              additionalProperties: false
+            - type: 'null'
+        deadlines:
+          type: array
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                  - RELEASE_TARGET
+                  - SPRINT_END
+              id:
+                type: string
+              name:
+                type: string
+              date:
+                type: string
+                format: date
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+              days:
+                type: integer
+                minimum: -9007199254740991
+                maximum: 9007199254740991
+            required:
+              - kind
+              - id
+              - name
+              - date
+              - days
+            additionalProperties: false
+        team:
+          type: object
+          properties:
+            total:
+              type: integer
+              minimum: -9007199254740991
+              maximum: 9007199254740991
+            byAccess:
+              type: object
+              propertyNames:
+                type: string
+                enum:
+                  - PROJECT_ADMIN
+                  - MEMBER
+                  - GUEST
+              additionalProperties:
+                type: integer
+                minimum: -9007199254740991
+                maximum: 9007199254740991
+              required:
+                - PROJECT_ADMIN
+                - MEMBER
+                - GUEST
+            byJobTitle:
+              type: array
+              items:
+                type: object
+                properties:
+                  jobTitle:
+                    anyOf:
+                      - type: string
+                        enum:
+                          - QAE
+                          - QAL
+                          - QAA
+                          - PM
+                          - PO
+                          - BA
+                          - DEV
+                          - TL
+                          - DES
+                          - STK
+                          - OTH
+                      - type: 'null'
+                  count:
+                    type: integer
+                    minimum: -9007199254740991
+                    maximum: 9007199254740991
+                required:
+                  - jobTitle
+                  - count
+                additionalProperties: false
+          required:
+            - total
+            - byAccess
+            - byJobTitle
+          additionalProperties: false
+        activity:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              action:
+                type: string
+                enum:
+                  - project.created
+                  - project.updated
+                  - project.archived
+                  - project.restored
+                  - project.guest_visibility_changed
+                  - member.added
+                  - member.updated
+                  - member.removed
+                  - member.left
+                  - release.created
+                  - release.updated
+                  - release.status_changed
+                  - release.deleted
+                  - milestone.created
+                  - milestone.updated
+                  - milestone.status_changed
+                  - milestone.deleted
+              entityType:
+                type: string
+                enum:
+                  - project
+                  - member
+                  - release
+                  - milestone
+              entityId:
+                type: string
+              summary:
+                type: string
+              changes:
+                anyOf:
+                  - type: object
+                    propertyNames:
+                      type: string
+                    additionalProperties:
+                      type: object
+                      properties:
+                        from: {}
+                        to: {}
+                      required:
+                        - from
+                        - to
+                      additionalProperties: false
+                  - type: 'null'
+              actor:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                required:
+                  - id
+                  - name
+                additionalProperties: false
+              createdAt:
+                type: string
+                format: date-time
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+            required:
+              - id
+              - action
+              - entityType
+              - entityId
+              - summary
+              - changes
+              - actor
+              - createdAt
+            additionalProperties: false
+      required:
+        - asOf
+        - areas
       additionalProperties: false
     UserOption:
       type: object
