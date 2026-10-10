@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { msg, type SearchGroup, type SearchResult } from '@qawm/shared';
 import { Dialog } from '@/components/ui/dialog';
 import { inputClass } from '@/components/ui/field';
+import { useDebounced } from '@/lib/use-debounced';
 import { cn } from '@/lib/utils';
 import { useSearch } from './api';
 
@@ -13,15 +14,6 @@ const GROUP_LABELS: Record<SearchGroup, string> = {
   milestone: 'Sprints',
   user: 'Users',
 };
-
-function useDebounced(value: string, ms: number) {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), ms);
-    return () => clearTimeout(timer);
-  }, [value, ms]);
-  return debounced;
-}
 
 /**
  * ⌘K / Ctrl+K search (BR-SHELL-06): combobox + listbox pattern. Arrow keys move, Enter opens,

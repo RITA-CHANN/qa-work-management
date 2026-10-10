@@ -68,6 +68,11 @@ export const MESSAGES = {
   'MSG-PROJECT-33': 'Choose an existing user as the first project admin',
   'MSG-PROJECT-34': "The end date can't be before the start date",
   'MSG-PROJECT-35': 'No activity matches these filters',
+  'MSG-PROJECT-40': 'Choose a user to add',
+  'MSG-PROJECT-41': '{name} will no longer see this project',
+  'MSG-PROJECT-42': 'You will lose admin rights in this project',
+  'MSG-PROJECT-43': 'No members match these filters',
+  'MSG-PROJECT-44': 'No users match "{query}"',
 
   // Admin console: docs/requirements/admin/messages.md
   'MSG-ADMIN-01': 'An account with this email already exists',
