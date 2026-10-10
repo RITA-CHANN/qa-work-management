@@ -68,7 +68,7 @@ export function AdminProjectsPage() {
     setError(null);
     try {
       await action.mutateAsync({ key, action: 'restore' });
-      toast(msg('MSG-PROJECT-19'));
+      toast(msg('MSG-PROJECT-51'));
     } catch (e) {
       setError(errorText(e));
     }

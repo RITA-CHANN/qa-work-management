@@ -143,7 +143,7 @@ export function ArchiveProjectDialog({ project, open, onClose, onDone }: Project
     try {
       await archive.mutateAsync();
       onClose();
-      toast(msg('MSG-PROJECT-19'));
+      toast(msg('MSG-PROJECT-50'));
       onDone?.();
     } catch (error) {
       setAlert(errorText(error));
@@ -171,7 +171,10 @@ export function ArchiveProjectDialog({ project, open, onClose, onDone }: Project
   );
 }
 
-/** "Delete project?" (FLW-PROJECT-03): a project admin must type the key (MSG-PROJECT-10) (BR-PROJECT-09). */
+/**
+ * "Delete project?" (FLW-PROJECT-03): a project admin must type the key (MSG-PROJECT-10) (BR-PROJECT-09).
+ * No error while typing; Delete stays disabled until the key matches (SCR-PROJECT-02).
+ */
 export function DeleteProjectDialog({
   project,
   open,
@@ -197,7 +200,7 @@ export function DeleteProjectDialog({
     try {
       await remove.mutateAsync();
       close();
-      toast(`Project ${project.key} deleted`);
+      toast(msg('MSG-PROJECT-52', { key: project.key }));
       if (onDone) onDone();
       else void navigate('/projects');
     } catch (error) {
@@ -220,7 +223,6 @@ export function DeleteProjectDialog({
         value={typed}
         autoComplete="off"
         onChange={(event) => setTyped(event.target.value)}
-        error={typed && !matches ? msg('MSG-PROJECT-10', { key: project.key }) : undefined}
       />
       <DialogActions>
         <Button variant="outline" onClick={close}>

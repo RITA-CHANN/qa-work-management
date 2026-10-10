@@ -73,6 +73,10 @@ export const MESSAGES = {
   'MSG-PROJECT-42': 'You will lose admin rights in this project',
   'MSG-PROJECT-43': 'No members match these filters',
   'MSG-PROJECT-44': 'No users match "{query}"',
+  'MSG-PROJECT-50': 'Project archived',
+  'MSG-PROJECT-51': 'Project restored',
+  'MSG-PROJECT-52': 'Deleted project {key}',
+  'MSG-PROJECT-53': "This project doesn't exist or you don't have access to it.",
 
   // Admin console: docs/requirements/admin/messages.md
   'MSG-ADMIN-01': 'An account with this email already exists',

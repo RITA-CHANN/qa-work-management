@@ -26,7 +26,7 @@ below and the code differ. Tests should assert these exact texts. Shared texts (
 | MSG-PROJECT-07 | Edit conflict (409)                                           | error   | alert    | Someone else changed this project. Reload to see their changes.                    |
 | MSG-PROJECT-08 | Change on an archived project (422)                           | error   | alert    | This project is archived. Restore it to make changes.                              |
 | MSG-PROJECT-09 | Delete not allowed (422)                                      | error   | alert    | Only an archived project with no releases can be deleted.                          |
-| MSG-PROJECT-10 | Delete confirm field, wrong key                               | error   | field    | Type {key} to confirm                                                              |
+| MSG-PROJECT-10 | Delete confirm field label (Delete disabled until it matches) | info    | field    | Type {key} to confirm                                                              |
 | MSG-PROJECT-11 | Member already exists (409)                                   | error   | alert    | {name} is already a member of this project                                         |
 | MSG-PROJECT-12 | Last project admin (422)                                      | error   | alert    | A project must have at least one project admin                                     |
 | MSG-PROJECT-13 | Release name empty or too long                                | error   | field    | Release name must be 1–50 characters                                               |
@@ -57,6 +57,10 @@ below and the code differ. Tests should assert these exact texts. Shared texts (
 | MSG-PROJECT-42 | Step down to Member confirmation                              | warning | status   | You will lose admin rights in this project                                         |
 | MSG-PROJECT-43 | Members: no member matches the filters                        | info    | status   | No members match these filters                                                     |
 | MSG-PROJECT-44 | Add member: no user matches the search                        | info    | status   | No users match "{query}"                                                           |
+| MSG-PROJECT-50 | Toast after archive                                           | success | toast    | Project archived                                                                   |
+| MSG-PROJECT-51 | Toast after restore                                           | success | toast    | Project restored                                                                   |
+| MSG-PROJECT-52 | Toast after delete, on the project list                       | success | toast    | Deleted project {key}                                                              |
+| MSG-PROJECT-53 | "Project not found" page, under the heading                   | info    | page     | This project doesn't exist or you don't have access to it.                         |
 
 `Kind` and `Shown as` are explained in the [template](../../_templates/feature/messages.md). API errors carry the
 same text in the problem body's `detail` and the ID in `messageId`
@@ -66,10 +70,11 @@ states use `role="status"`.
 
 ## Change log
 
-| Date       | Change                                                                                                                                          | Why                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| 2026-10-08 | First version, from the Phase 3 business requirements v2 (with Linh's answers to Q-PROJECT-01 to Q-PROJECT-05)                                  | Phase 3A                     |
-| 2026-10-09 | Added MSG-PROJECT-32: a milestone can't be added to a released release (found while building the API)                                           | Phase 3A code                |
-| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects (MSG-PROJECT-12, 21, 22 reworded, MSG-PROJECT-33 added) | Linh's decision 2026-10-09   |
-| 2026-10-09 | Added MSG-PROJECT-34 (activity date filter) and MSG-PROJECT-35 (activity filters match nothing)                                                 | Screen review SCR-PROJECT-05 |
-| 2026-10-10 | Added MSG-PROJECT-40 to MSG-PROJECT-44 (members screen texts that were in the code, step down, filters, user search)                            | Screen review SCR-PROJECT-03 |
+| Date       | Change                                                                                                                                          | Why                                |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| 2026-10-08 | First version, from the Phase 3 business requirements v2 (with Linh's answers to Q-PROJECT-01 to Q-PROJECT-05)                                  | Phase 3A                           |
+| 2026-10-09 | Added MSG-PROJECT-32: a milestone can't be added to a released release (found while building the API)                                           | Phase 3A code                      |
+| 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects (MSG-PROJECT-12, 21, 22 reworded, MSG-PROJECT-33 added) | Linh's decision 2026-10-09         |
+| 2026-10-09 | Added MSG-PROJECT-34 (activity date filter) and MSG-PROJECT-35 (activity filters match nothing)                                                 | Screen review SCR-PROJECT-05       |
+| 2026-10-10 | Added MSG-PROJECT-40 to MSG-PROJECT-44 (members screen texts that were in the code, step down, filters, user search)                            | Screen review SCR-PROJECT-03       |
+| 2026-10-10 | Added MSG-PROJECT-50 to 53: archive, restore and delete toasts say what happened; "Project not found" says why                                  | SCR-PROJECT-02 review (F-03, F-07) |

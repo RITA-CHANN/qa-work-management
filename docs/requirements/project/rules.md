@@ -29,6 +29,7 @@ The permission matrix that BR-PROJECT-35 points to is in [README.md](README.md#p
 | BR-PROJECT-09 | **Delete** is permanent and only allowed for a project that is **archived first** and has **no releases**. Otherwise the user is told to archive it (MSG-PROJECT-09). The user must type the project key to confirm.                               | Linh's answer to Q-PROJECT-05                               | proposed |
 | BR-PROJECT-35 | Each **access level** (Project admin, Member) may do exactly the actions marked ✅ for it in the permission matrix ([README](README.md#permission-matrix)). Any other action by a member is refused with 403 (MSG-COMMON-06).                      | Permission matrix in README; Linh's decision 2026-10-09     | proposed |
 | BR-PROJECT-36 | A **System admin** (global role `ADMIN`) can do every action a Project admin can, on every project, without being a member.                                                                                                                        | Phase 0 architecture (global roles)                         | proposed |
+| BR-PROJECT-50 | A project's pages have **no tab bar**: the side nav is the only navigation between them, and the item of the page shown is marked current (Dashboard on `/projects/:key`, and on `/` for the current project).                                     | Linh's decision 2026-10-10 (SCR-PROJECT-02 review, F-01)    | proposed |
 
 ## Members
 
@@ -89,3 +90,4 @@ A **milestone** is a time-boxed iteration (a sprint) inside a release: release 2
 | 2026-10-09 | Role model v2: Project admin / Member + job title; only a System admin creates projects. Reworded BR-PROJECT-01, 06, 10, 12, 13, 23, 24, 35, 36; added BR-PROJECT-37 (job titles) | Linh's decision 2026-10-09   |
 | 2026-10-09 | Added BR-PROJECT-38 (activity filters); BR-PROJECT-20 says old and new values use display names                                                                                   | Screen review SCR-PROJECT-05 |
 | 2026-10-10 | Added BR-PROJECT-40 (members filters) and BR-PROJECT-41 (user picker searches every active user)                                                                                  | Screen review SCR-PROJECT-03 |
+| 2026-10-10 | Added BR-PROJECT-50: no tab bar on a project's pages, the side nav is the only section navigation                                                                                 | Linh's decision 2026-10-10   |

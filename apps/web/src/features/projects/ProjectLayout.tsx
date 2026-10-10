@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { Link, NavLink, Outlet, useParams } from 'react-router';
-import { msg, type GuestArea, type Project } from '@qawm/shared';
+import { Link, Outlet, useParams } from 'react-router';
+import { msg, type Project } from '@qawm/shared';
 import { PageHeader } from '@/components/PageHeader';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Menu, type MenuItem } from '@/components/ui/menu';
 import { useToast } from '@/components/ui/use-toast';
-import { cn } from '@/lib/utils';
 import { useProject, useProjectAction } from './api';
 import type { ProjectOutletContext } from './project-outlet';
 import { useProjectAccess } from './access';
@@ -16,18 +15,10 @@ import { timeLeft } from './milestone-time';
 import { ArchiveProjectDialog, DeleteProjectDialog, EditProjectDialog } from './ProjectDialogs';
 import { errorText, isNotFound } from './server-error';
 
-type Tab = { to: string; label: string; end?: boolean; area?: GuestArea; adminOnly?: boolean };
-
-/** Tabs of SCR-PROJECT-02. A Guest sees only areas switched on (BR-GUEST-03); Settings is for admins. */
-const TABS: Tab[] = [
-  { to: '', label: 'Dashboard', end: true, area: 'dashboard' },
-  { to: 'releases', label: 'Releases & sprints', area: 'releases' },
-  { to: 'members', label: 'Members', area: 'members' },
-  { to: 'activity', label: 'Activity', area: 'activity' },
-  { to: 'settings', label: 'Settings', adminOnly: true },
-];
-
-/** SCR-PROJECT-02: header, archived banner, current milestone and tabs, shared by every tab. */
+/**
+ * SCR-PROJECT-02: header, banners and current milestone, shared by every page of a project. The side nav
+ * (SCR-SHELL-01) is the only way between the project's pages; there is no tab bar (Linh, 2026-10-10).
+ */
 export function ProjectLayout() {
   const { key = '' } = useParams();
   const project = useProject(key);
@@ -58,7 +49,8 @@ export function ProjectLayout() {
 function ProjectNotFound() {
   return (
     <>
-      <PageHeader title={msg('MSG-PROJECT-06')} />
+      <title>{`${msg('MSG-PROJECT-06')} · QA Work Management`}</title>
+      <PageHeader title={msg('MSG-PROJECT-06')} description={msg('MSG-PROJECT-53')} />
       <Button asChild variant="outline">
         <Link to="/projects">Back to projects</Link>
       </Button>
@@ -78,7 +70,7 @@ function ProjectPage({ project }: { project: Project }) {
     setRestoreError(null);
     try {
       await restore.mutateAsync();
-      toast(msg('MSG-PROJECT-19'));
+      toast(msg('MSG-PROJECT-51'));
     } catch (error) {
       setRestoreError(errorText(error));
     }
@@ -95,6 +87,12 @@ function ProjectPage({ project }: { project: Project }) {
     moreItems.push({ label: 'Delete', onSelect: () => setDialog('delete'), destructive: true });
   }
 
+  const canEdit = access.can('project:edit');
+  const actionItems: MenuItem[] = [
+    ...(canEdit ? [{ label: 'Edit', onSelect: () => setDialog('edit') }] : []),
+    ...moreItems,
+  ];
+
   return (
     <>
       <title>{`${project.name} · Projects · QA Work Management`}</title>
@@ -105,14 +103,20 @@ function ProjectPage({ project }: { project: Project }) {
           <Badge>{project.myAccess ? accessLabel(project.myAccess) : 'System admin'}</Badge>
           {project.archivedAt && <Badge tone="warning">Archived</Badge>}
         </div>
-        <div className="flex items-center gap-2">
-          {access.can('project:edit') && (
+        <div className="hidden items-center gap-2 md:flex">
+          {canEdit && (
             <Button variant="outline" onClick={() => setDialog('edit')}>
               Edit
             </Button>
           )}
           {moreItems.length > 0 && <Menu label="More" items={moreItems} />}
         </div>
+        {/* Below 768 px Edit and More are one menu (SCR-PROJECT-02, Responsive). */}
+        {actionItems.length > 0 && (
+          <div className="md:hidden">
+            <Menu label="Actions" items={actionItems} />
+          </div>
+        )}
       </div>
 
       {access.viewingAsAdmin && (
@@ -127,7 +131,7 @@ function ProjectPage({ project }: { project: Project }) {
       {project.archivedAt && (
         <div
           role="status"
-          className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-destructive/40 bg-destructive/5 px-4 py-2 text-sm"
+          className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-warning/30 bg-warning-tint px-4 py-2 text-sm text-warning-foreground"
         >
           {msg('MSG-PROJECT-08')}
           {canArchive && (
@@ -151,31 +155,6 @@ function ProjectPage({ project }: { project: Project }) {
           {timeLeft(project.activeMilestone.endDate)}
         </p>
       )}
-
-      <nav aria-label="Project sections" className="mb-6 overflow-x-auto border-b">
-        <ul className="flex gap-1">
-          {TABS.filter(
-            (tab) =>
-              (!tab.area || access.sees(tab.area)) &&
-              (!tab.adminOnly || access.canEvenArchived('project:guests')),
-          ).map((tab) => (
-            <li key={tab.label}>
-              <NavLink
-                to={tab.to}
-                end={tab.end}
-                className={({ isActive }) =>
-                  cn(
-                    '-mb-px inline-block border-b-2 border-transparent px-3 py-2 text-sm whitespace-nowrap hover:text-foreground',
-                    isActive ? 'border-primary font-medium' : 'text-muted-foreground',
-                  )
-                }
-              >
-                {tab.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
 
       <Outlet context={{ project } satisfies ProjectOutletContext} />
 
