@@ -62,3 +62,9 @@ export function relativeDays(iso: string, now: Date = new Date()): string {
   if (days <= 0) return 'today';
   return days === 1 ? '1 day ago' : `${days} days ago`;
 }
+
+/** "9 Oct 2026": the local day of an instant, for date columns. */
+export function formatDate(iso: string): string {
+  const date = new Date(iso);
+  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+}
