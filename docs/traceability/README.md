@@ -16,9 +16,9 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 | ---------------------------- | ----- | -------- | --------- | ----------------- | ------------------ | --------------- | ---------------------- | --- |
 | [Authentication](auth.md)    | 2     | 32       | 12        | 28                | 15                 | 13              | 4                      | 5   |
 | [Admin console](admin.md)    | 3     | 27       | 11        | 25                | 0                  | 25              | 2                      | 0   |
-| [Project dashboard](dash.md) | 3     | 7        | 1         | 7                 | 0                  | 7               | 0                      | 0   |
+| [Project dashboard](dash.md) | 3     | 9        | 2         | 9                 | 0                  | 9               | 0                      | 0   |
 | [Guest access](guest.md)     | 3     | 6        | 2         | 6                 | 0                  | 6               | 0                      | 0   |
-| [Projects](project.md)       | 3     | 76       | 25        | 76                | 0                  | 76              | 0                      | 8   |
+| [Projects](project.md)       | 3     | 82       | 25        | 82                | 0                  | 82              | 0                      | 8   |
 | [App shell](shell.md)        | 3     | 8        | 1         | 7                 | 0                  | 7               | 1                      | 0   |
 
 ## Gaps to review
@@ -38,6 +38,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 - [AC-ADMIN-18](../requirements/admin/acceptance.md): No entry was added for it, and the user or project is unchanged
 - [AC-ADMIN-24](../requirements/admin/acceptance.md): The dialog "Delete project?" shows MSG-PROJECT-09; "Delete" stays disabled until the key is typed; the project leaves the list and I stay on Admin console › Projects
 - [AC-DASH-03](../requirements/dash/acceptance.md): There is no create, edit or delete control, every card links to its page, and no cost, budget or rate data is shown
+- [AC-DASH-09](../requirements/dash/acceptance.md): 200 with `release`, `sprint` and `deadlines`, and no `team` or `activity` field; with `dashboard` off as well, 404
 - [AC-GUEST-01](../requirements/guest/acceptance.md): Sam sees the dashboard and Releases only; Members and Activity are in neither the nav, search nor dashboard; both APIs return 404
 - [AC-GUEST-03](../requirements/guest/acceptance.md): Every call returns 403 (MSG-COMMON-06) and nothing changes
 - [AC-PROJECT-01](../requirements/project/acceptance.md): I land on the new project's page; Oanh Owner is listed as Project admin, I am not listed as a member, and the badge shows "System admin"
