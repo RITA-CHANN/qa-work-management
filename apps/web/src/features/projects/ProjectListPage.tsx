@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { msg } from '@qawm/shared';
+import { EmptyState } from '@/components/EmptyState';
 import { PageHeader } from '@/components/PageHeader';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { inputClass } from '@/components/ui/field';
+import { tableClass, tdClass, thClass } from '@/features/admin/format';
 import { useProjects } from './api';
-import { accessLabel, relativeDays } from './labels';
+import { accessLabel, formatDateTime, relativeDays } from './labels';
 
 /**
  * SCR-PROJECT-01: the projects I am in (all of them for a System admin), search, show archived.
@@ -56,98 +59,120 @@ export function ProjectListPage() {
   return (
     <>
       <PageHeader title="Projects" />
-      <div className="mb-4 flex flex-wrap items-center gap-6">
-        <label className="flex items-center gap-2 text-sm font-medium">
-          Search
-          <input
-            type="search"
-            value={search}
-            maxLength={100}
-            onChange={(event) => setSearch(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') applySearch(search);
-            }}
-            className={`${inputClass} w-64`}
-          />
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={archived}
-            onChange={(event) => toggleArchived(event.target.checked)}
-            className="size-4"
-          />
-          Show archived
-        </label>
-      </div>
+      <Card>
+        <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            Search
+            <input
+              type="search"
+              value={search}
+              maxLength={100}
+              placeholder="Key or name"
+              onChange={(event) => setSearch(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') applySearch(search);
+              }}
+              className={`${inputClass} w-64 max-w-full`}
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={archived}
+              onChange={(event) => toggleArchived(event.target.checked)}
+              className="size-4"
+            />
+            Show archived
+          </label>
+        </div>
 
-      {projects.isError ? (
-        <Alert>
-          {msg('MSG-COMMON-01')}
-          <Button size="sm" variant="outline" onClick={() => void projects.refetch()}>
-            Try again
-          </Button>
-        </Alert>
-      ) : (
-        <table className="w-full text-sm" aria-busy={projects.isPending}>
-          <caption className="sr-only">Your projects</caption>
-          <thead className="border-b text-left text-muted-foreground">
-            <tr>
-              <th scope="col" className="py-2 pr-4 font-medium">
-                Key
-              </th>
-              <th scope="col" className="py-2 pr-4 font-medium">
-                Name
-              </th>
-              <th scope="col" className="py-2 pr-4 font-medium">
-                My access
-              </th>
-              <th scope="col" className="hidden py-2 pr-4 font-medium md:table-cell">
-                Members
-              </th>
-              <th scope="col" className="py-2 pr-4 font-medium">
-                Active release
-              </th>
-              <th scope="col" className="hidden py-2 font-medium md:table-cell">
-                Updated
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.isPending &&
-              [0, 1, 2].map((i) => (
-                <tr key={i} aria-hidden="true">
-                  <td colSpan={6} className="py-3">
-                    <div className="h-4 animate-pulse rounded bg-muted" />
-                  </td>
+        {projects.isError && (
+          <Alert>
+            {msg('MSG-COMMON-01')}
+            <Button size="sm" variant="outline" onClick={() => void projects.refetch()}>
+              Try again
+            </Button>
+          </Alert>
+        )}
+        {empty &&
+          (q ? (
+            <EmptyState live title={msg('MSG-PROJECT-20')} />
+          ) : (
+            <EmptyState live title="No projects yet">
+              {msg('MSG-ADMIN-10')}
+            </EmptyState>
+          ))}
+        {(projects.isPending || rows.length > 0) && (
+          <div className="overflow-x-auto">
+            <table className={tableClass} aria-busy={projects.isPending}>
+              <caption className="sr-only">Your projects</caption>
+              <thead>
+                <tr>
+                  <th scope="col" className={thClass}>
+                    Key
+                  </th>
+                  <th scope="col" className={thClass}>
+                    Name
+                  </th>
+                  <th scope="col" className={thClass}>
+                    My access
+                  </th>
+                  <th scope="col" className={`${thClass} hidden md:table-cell`}>
+                    Members
+                  </th>
+                  <th scope="col" className={thClass}>
+                    Active release
+                  </th>
+                  <th scope="col" className={`${thClass} hidden md:table-cell`}>
+                    Updated
+                  </th>
                 </tr>
-              ))}
-            {rows.map((project) => (
-              <tr key={project.key} className="border-b last:border-0">
-                <td className="py-2 pr-4 font-mono">{project.key}</td>
-                <td className="py-2 pr-4">
-                  <Link
-                    to={`/projects/${project.key}`}
-                    className="font-medium underline-offset-4 hover:underline"
-                  >
-                    {project.name}
-                  </Link>
-                  {project.archivedAt && <Badge className="ml-2">Archived</Badge>}
-                </td>
-                <td className="py-2 pr-4">{accessLabel(project.myAccess)}</td>
-                <td className="hidden py-2 pr-4 md:table-cell">{project.memberCount}</td>
-                <td className="py-2 pr-4">{project.activeRelease?.name ?? '—'}</td>
-                <td className="hidden py-2 md:table-cell">{relativeDays(project.updatedAt)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-      {empty && (
-        <p role="status" className="mt-6 text-center text-muted-foreground">
-          {q ? msg('MSG-PROJECT-20') : msg('MSG-ADMIN-10')}
-        </p>
-      )}
+              </thead>
+              <tbody>
+                {projects.isPending &&
+                  [0, 1, 2].map((i) => (
+                    <tr key={i} aria-hidden="true">
+                      <td colSpan={6} className={tdClass}>
+                        <div className="h-4 animate-pulse rounded bg-muted" />
+                      </td>
+                    </tr>
+                  ))}
+                {rows.map((project) => (
+                  <tr key={project.key}>
+                    <td className={`${tdClass} font-mono text-xs text-muted-foreground`}>
+                      {project.key}
+                    </td>
+                    <td className={tdClass}>
+                      <Link
+                        to={`/projects/${project.key}`}
+                        className="font-semibold underline-offset-4 hover:underline"
+                      >
+                        {project.name}
+                      </Link>
+                      {project.archivedAt && (
+                        <Badge tone="warning" className="ml-2">
+                          Archived
+                        </Badge>
+                      )}
+                    </td>
+                    <td className={tdClass}>{accessLabel(project.myAccess)}</td>
+                    <td className={`${tdClass} hidden font-mono md:table-cell`}>
+                      {project.memberCount ?? '—'}
+                    </td>
+                    <td className={tdClass}>{project.activeRelease?.name ?? '—'}</td>
+                    <td
+                      className={`${tdClass} hidden text-muted-foreground md:table-cell`}
+                      title={formatDateTime(project.updatedAt)}
+                    >
+                      {relativeDays(project.updatedAt)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
     </>
   );
 }

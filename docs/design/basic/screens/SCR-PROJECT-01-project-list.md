@@ -127,7 +127,7 @@ sees every column, with "—" in My access.
 - Search has the visible label "Search" (role `searchbox`); "Show archived" is a labelled checkbox.
 - The table has a visually hidden `<caption>` "Your projects"; column headers are `<th scope="col">`.
 - Tab order: Search → Show archived → project links in row order.
-- The empty and no-match states are a `section` labelled by their `<h2>`, with the text in `role="status"`, so a
+- The empty and no-match states are a `section` with `role="status"`, labelled by their `<h2>`, so a
   screen reader announces them after a search; the error is `role="alert"`.
 - The "Archived" badge is text, not colour only. Text contrast at least 4.5:1.
 
