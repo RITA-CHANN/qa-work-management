@@ -2,13 +2,13 @@ import { useId, useState } from 'react';
 import type { ActivityEntry } from '@qawm/shared';
 import { initials } from '@/lib/utils';
 import { changeLines } from './activity-changes';
-import { dayKey, dayLabel, formatDateTime, formatTime } from './labels';
+import { dayKey, dayLabel, formatDateTime, formatTime, timeAgo } from './labels';
 
 /**
  * One entry: who did what and when, with the old → new values behind "Show changes" (BR-PROJECT-20).
- * `timeOnly` is for the day-grouped log, where the day is already in the group heading.
+ * `time`: "14:02" in the day-grouped log, where the day is already in the group heading; "2 h ago" on the dashboard.
  */
-function Entry({ entry, timeOnly }: { entry: ActivityEntry; timeOnly: boolean }) {
+function Entry({ entry, time }: { entry: ActivityEntry; time: 'clock' | 'ago' }) {
   const [open, setOpen] = useState(false);
   const changesId = useId();
   const changes = changeLines(entry);
@@ -23,8 +23,8 @@ function Entry({ entry, timeOnly }: { entry: ActivityEntry; timeOnly: boolean })
       <div className="flex min-w-0 flex-col gap-1">
         <span>{entry.summary}</span>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <time dateTime={entry.createdAt} title={new Date(entry.createdAt).toString()}>
-            {timeOnly ? formatTime(entry.createdAt) : formatDateTime(entry.createdAt)}
+          <time dateTime={entry.createdAt} title={formatDateTime(entry.createdAt)}>
+            {time === 'clock' ? formatTime(entry.createdAt) : timeAgo(entry.createdAt)}
           </time>
           {changes.length > 0 && (
             <>
@@ -55,12 +55,12 @@ function Entry({ entry, timeOnly }: { entry: ActivityEntry; timeOnly: boolean })
   );
 }
 
-/** A flat list with full dates, as on the Dashboard's "Recent activity" card (SCR-DASH-01). */
+/** A flat list with "2 h ago" times (full date and time on hover): the Dashboard's "Recent activity" card (SCR-DASH-01). */
 export function ActivityList({ entries, label }: { entries: ActivityEntry[]; label: string }) {
   return (
     <ol aria-label={label} className="flex flex-col divide-y">
       {entries.map((entry) => (
-        <Entry key={entry.id} entry={entry} timeOnly={false} />
+        <Entry key={entry.id} entry={entry} time="ago" />
       ))}
     </ol>
   );
@@ -84,7 +84,7 @@ export function ActivityByDay({ entries }: { entries: ActivityEntry[] }) {
           </h3>
           <ol aria-label={day.label} className="flex flex-col divide-y">
             {day.entries.map((entry) => (
-              <Entry key={entry.id} entry={entry} timeOnly />
+              <Entry key={entry.id} entry={entry} time="clock" />
             ))}
           </ol>
         </div>

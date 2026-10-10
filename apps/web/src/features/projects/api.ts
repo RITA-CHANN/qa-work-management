@@ -18,6 +18,7 @@ import type {
   MilestoneCreate,
   MilestoneUpdate,
   Project,
+  ProjectDashboard,
   ProjectCreate,
   MemberUpdate,
   ProjectSummary,
@@ -40,6 +41,7 @@ export const projectKeys = {
   activity: (key: string, limit: number, filters: ActivityFilters = {}) =>
     ['project', key.toUpperCase(), 'activity', limit, filters] as const,
   activityActors: (key: string) => ['project', key.toUpperCase(), 'activity', 'actors'] as const,
+  dashboard: (key: string) => ['project', key.toUpperCase(), 'dashboard'] as const,
 };
 
 const base = (key: string) => `/projects/${encodeURIComponent(key)}`;
@@ -62,6 +64,15 @@ export function useProject(key: string, enabled = true) {
     enabled,
     queryFn: () => apiFetch<ApiSuccess<Project>>(base(key)).then(data),
     retry: false,
+  });
+}
+
+/** API-DASH-01: everything the project dashboard shows (SCR-DASH-01). */
+export function useDashboard(key: string, enabled = true) {
+  return useQuery({
+    queryKey: projectKeys.dashboard(key),
+    enabled,
+    queryFn: () => apiFetch<ApiSuccess<ProjectDashboard>>(`${base(key)}/dashboard`).then(data),
   });
 }
 
