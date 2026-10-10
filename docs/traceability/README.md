@@ -63,7 +63,7 @@ trace in a doc's front matter (`traces:`) or a tag in a test (`{ tag: '@AC-AUTH-
 - [AC-PROJECT-71](../requirements/project/acceptance.md): There is no "New project" button; the API returns 403 and nothing is created
 - [AC-PROJECT-74](../requirements/project/acceptance.md): Each returns 403: a job title gives no rights
 - [AC-PROJECT-75](../requirements/project/acceptance.md): Each step works and writes an activity entry (any Project admin manages other Project admins)
-- [AC-PROJECT-125](../requirements/project/acceptance.md): There is no Settings tab, and every settings URL shows "Page not found"
+- [AC-PROJECT-125](../requirements/project/acceptance.md): There is no "Project settings" entry, and every settings URL shows "Page not found"
 - [AC-PROJECT-21](../requirements/project/acceptance.md): Tab 2 shows MSG-PROJECT-07, tab 1's values are kept, and tab 2 can reload to see them
 - [AC-SHELL-05](../requirements/shell/acceptance.md): SECRET is in neither the results nor the API response; with no match I see MSG-SHELL-01; Esc closes the search
 

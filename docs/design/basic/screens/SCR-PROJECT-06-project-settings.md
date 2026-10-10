@@ -3,11 +3,11 @@ id: SCR-PROJECT-06
 title: Project settings
 type: screen
 feature: project
-status: review
+status: approved
 phase: 3C
 owner: Claude
 reviewers: [Linh]
-approved:
+approved: 2026-10-10 (Linh)
 route: /projects/:key/settings
 traces:
   requirements:
@@ -77,7 +77,7 @@ once it is built"). The mockup "Project Settings" shows the full target.
 
 ```
 ┌──────────┬────────────────────────────────────────────────────────────────────────────┐
-│ nav      │  header and tabs of SCR-PROJECT-02, "Settings" tab current                  │
+│ nav      │  project header of SCR-PROJECT-02; side nav "Project settings" current     │
 │          │  ┌─ Settings ──────┐ ┌─ General ──────────────────────────────────────────┐ │
 │          │  │ General       ◀ │ │ <h2> General                                       │ │
 │          │  │ Guests          │ │ Key           SHOP            (read-only text)     │ │
@@ -133,7 +133,7 @@ Below 768 px the section nav becomes a row of links above the content (wraps, no
 
 | Action                                                    | Result                                                                                                                       | Criteria                      |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| Click "Settings" tab                                      | Opens `/projects/:key/settings` (General); "General" is the current section                                                  | AC-PROJECT-121                |
+| Open "Project settings" (side nav)                        | Opens `/projects/:key/settings` (General); "General" is the current section                                                  | AC-PROJECT-121                |
 | Click a section link, or open its URL directly            | That section shows; its link has `aria-current="page"`; browser back returns to the previous section                         | AC-PROJECT-121                |
 | Open an unknown section, e.g. `…/settings/xyz`            | "Page not found" (MSG-COMMON-13)                                                                                             | AC-PROJECT-121                |
 | General: change name or description                       | Save and Discard become enabled; nothing is sent yet                                                                         | AC-PROJECT-122                |
@@ -153,7 +153,7 @@ Below 768 px the section nav becomes a row of links above the content (wraps, no
 | State                             | What the user sees                                                                                                                                        | Criteria                    |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
 | Loading                           | Header skeleton of SCR-PROJECT-02; section nav shown, content skeleton                                                                                    |                             |
-| Member or Guest opens any section | "Page not found" (MSG-COMMON-13); the Settings tab is not shown to them                                                                                   | AC-GUEST-05, AC-PROJECT-125 |
+| Member or Guest opens any section | "Page not found" (MSG-COMMON-13); no "Project settings" entry is shown to them                                                                            | AC-GUEST-05, AC-PROJECT-125 |
 | System admin, not a member        | Banner MSG-ADMIN-08 (from SCR-PROJECT-02); everything editable                                                                                            |                             |
 | Archived                          | Banner from SCR-PROJECT-02; General fields read-only without Save/Discard; Guests switches disabled without buttons; Danger zone shows Restore and Delete | AC-PROJECT-124              |
 | Saving                            | Save button disabled and reads "Saving…"                                                                                                                  |                             |
@@ -175,10 +175,10 @@ The API already enforces every one of these (DD-PROJECT-01); the page only hides
 
 ## Accessibility
 
-- Page title "Settings · <Name> · QA Work Management"; `<h1>` stays the project name (SCR-PROJECT-02); each section
+- Page title as in SCR-PROJECT-02; `<h1>` stays the project name (SCR-PROJECT-02); each section
   has one `<h2>` ("General", "Guests", "Danger zone").
 - Section nav: `<nav aria-label="Settings sections">` with links; the current one has `aria-current="page"`.
-- Tab order: project tabs → section nav → section content → Save/Discard.
+- Tab order: side nav → project header → section nav → section content → Save/Discard.
 - Focus: after a section link, focus moves to the section `<h2>`; after a failed save, to the first invalid field;
   after a dialog closes, back to the button that opened it.
 - Errors are announced with `role="alert"`; toasts with `role="status"`.
@@ -206,6 +206,7 @@ No `data-testid` is needed.
 
 ## Change log
 
-| Date       | Change                                                                                    | Why                                        |
-| ---------- | ----------------------------------------------------------------------------------------- | ------------------------------------------ |
-| 2026-10-09 | First version: split out of SCR-PROJECT-02; section nav, inline General form, Danger zone | Screen inventory v1.2, per-screen workflow |
+| Date       | Change                                                                                                              | Why                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| 2026-10-09 | First version: split out of SCR-PROJECT-02; section nav, inline General form, Danger zone                           | Screen inventory v1.2, per-screen workflow             |
+| 2026-10-10 | Entry point is the side nav item "Project settings" (the project tab bar is being removed by SCR-PROJECT-02); built | Linh's choice in the page-frame thread; code in PR #17 |
